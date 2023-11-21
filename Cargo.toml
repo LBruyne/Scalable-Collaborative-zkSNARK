@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "secret-sharing",
+    "dist-sumcheck",
+    "mpc-net"
+]

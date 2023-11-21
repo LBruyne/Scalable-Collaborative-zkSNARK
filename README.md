@@ -1,2 +1,3 @@
-# rgkr
-Rust implementation of GKR interactive protocol
+# distributed-GKR
+
+Rust implementation of distributed GKR interactive protocol.
