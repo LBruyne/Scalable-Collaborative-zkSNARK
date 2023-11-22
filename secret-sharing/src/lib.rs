@@ -1,1 +1,2 @@
+#![feature(test)]
 mod pss;

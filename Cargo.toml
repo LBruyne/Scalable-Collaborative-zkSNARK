@@ -1,6 +1,10 @@
 [workspace]
+resolver = "2"
 members = [
     "secret-sharing",
     "dist-sumcheck",
     "mpc-net"
 ]
+
+[profile.bench]
+opt-level = 3
