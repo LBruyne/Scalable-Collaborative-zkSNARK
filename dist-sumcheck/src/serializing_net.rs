@@ -3,6 +3,7 @@ use async_trait::async_trait;
 
 use mpc_net::{MPCNet, MPCNetError, MultiplexedStreamID};
 
+/// The MPC net can serialize and deserialize elements. Should be useful for arkworks computation.
 #[async_trait]
 pub trait MPCSerializeNet: MPCNet {
     async fn worker_send_or_leader_receive_element<T: CanonicalDeserialize + CanonicalSerialize>(

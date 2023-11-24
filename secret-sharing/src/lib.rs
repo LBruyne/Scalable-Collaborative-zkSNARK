@@ -1,2 +1,2 @@
 #![feature(test)]
-mod pss;
+pub mod pss;
