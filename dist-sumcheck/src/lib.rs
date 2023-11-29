@@ -1,4 +1,5 @@
-pub mod serializing_net;
+#![feature(thread_id_value)]
 pub mod dmsm;
 pub mod degree_reduce;
-mod utils;
+pub mod dperm;
+pub mod utils;

@@ -357,6 +357,7 @@ dependencies = [
  "ark-serialize",
  "ark-std",
  "async-trait",
+ "colored",
  "digest",
  "env_logger",
  "log",
