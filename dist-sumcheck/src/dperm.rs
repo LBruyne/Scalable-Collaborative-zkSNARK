@@ -64,18 +64,18 @@ pub async fn d_perm_many<
 #[cfg(test)]
 mod tests {
     use ark_ec::bls12::Bls12Config;
-    use ark_ec::CurveGroup;
+    
     use ark_ec::Group;
-    use ark_ec::VariableBaseMSM;
+    
     use ark_std::UniformRand;
-    use ark_std::Zero;
+    
     use log::debug;
     use mpc_net::MultiplexedStreamID;
-    use mpc_net::multi::MULTIPLEXED_STREAMS;
+    
     use secret_sharing::pss::PackedSharingParams;
 
-    use ark_bls12_377::G1Affine;
-    use ark_bls12_377::G1Projective as G1P;
+    
+    
     use mpc_net::LocalTestNet;
 
     type F = <ark_ec::short_weierstrass::Projective<
@@ -87,8 +87,6 @@ mod tests {
 
     const L: usize = 4;
     const N: usize = L * 4;
-    // const T:usize = N/2 - L - 1;
-    const M: usize = 1 << 8;
 
     #[tokio::test]
     async fn perm_test() {

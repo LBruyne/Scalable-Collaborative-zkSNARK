@@ -28,8 +28,7 @@ macro_rules! start_timer {
     }};
     ($msg:expr, $silent:expr) => {{
         use $crate::utils::timer::{
-            compute_indent, AtomicUsize, Colorize, Instant, Ordering, ToString, NUM_INDENT,
-            PAD_CHAR, thread,
+            compute_indent, Colorize, Instant, Ordering, ToString, NUM_INDENT, thread,
         };
 
         let msg = $msg;
@@ -69,8 +68,7 @@ macro_rules! end_timer {
     }};
     ($time:expr, $msg:expr) => {{
         use $crate::utils::timer::{
-            compute_indent, format, AtomicUsize, Colorize, Instant, Ordering, ToString, NUM_INDENT,
-            PAD_CHAR, thread
+            compute_indent, format, Colorize, Ordering, NUM_INDENT
         };
 
 
