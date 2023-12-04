@@ -56,24 +56,18 @@ pub async fn d_msm_test<G: CurveGroup, Net: MPCNet>(
 async fn main() {
     env_logger::builder().init();
     
-    for i in 10..20 {
+    for i in 24..=24 {
         let dom = Radix2EvaluationDomain::<Fr>::new(1 << i).unwrap();
         println!("domain size: {}", dom.size());
-        let now = std::time::Instant::now();
-        msm_test::<ark_bls12_377::G1Projective>(&dom);
-        let elapsed = now.elapsed();
-        println!("msm time: {:?}", elapsed);
+        // msm_test::<ark_bls12_377::G1Projective>(&dom);
 
-        let network = Net::new_local_testnet(32).await.unwrap();
-        let now = std::time::Instant::now();
+        let network = Net::new_local_testnet(16).await.unwrap();
         network
             .simulate_network_round((), move |net, _| async move {
-                let pp = PackedSharingParams::<Fr>::new(8);
+                let pp = PackedSharingParams::<Fr>::new(4);
                 let dom = Radix2EvaluationDomain::<Fr>::new(1 << i).unwrap();
                 d_msm_test::<ark_bls12_377::G1Projective, _>(&pp, &dom, &net).await;
             })
             .await;
-        let elapsed = now.elapsed();
-        println!("dmsm time: {:?}", elapsed);
     }
 }

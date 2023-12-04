@@ -3,6 +3,8 @@ use async_trait::async_trait;
 
 use mpc_net::{MPCNet, MPCNetError, MultiplexedStreamID};
 
+use crate::{start_timer, end_timer};
+
 /// The MPC net can serialize and deserialize elements. Should be useful for arkworks computation.
 #[async_trait]
 pub trait MPCSerializeNet: MPCNet {
@@ -12,16 +14,15 @@ pub trait MPCSerializeNet: MPCNet {
         sid: MultiplexedStreamID,
     ) -> Result<Option<Vec<T>>, MPCNetError> {
         let mut bytes_out = Vec::new();
-        out.serialize_compressed(&mut bytes_out).unwrap();
+        out.serialize_uncompressed(&mut bytes_out).unwrap();
         let bytes_in = self.worker_send_or_leader_receive(&bytes_out, sid).await?;
-
         if let Some(bytes_in) = bytes_in {
             // This is leader
             debug_assert!(self.is_leader());
             let results: Vec<Result<T, MPCNetError>> = bytes_in
                 .into_iter()
                 .map(|b| {
-                    T::deserialize_compressed(&b[..])
+                    T::deserialize_uncompressed_unchecked(&b[..])
                         .map_err(|err| MPCNetError::Generic(err.to_string()))
                 })
                 .collect();
@@ -49,14 +50,14 @@ pub trait MPCSerializeNet: MPCNet {
             outs.iter()
                 .map(|out| {
                     let mut bytes_out = Vec::new();
-                    out.serialize_compressed(&mut bytes_out).unwrap();
+                    out.serialize_uncompressed(&mut bytes_out).unwrap();
                     bytes_out.into()
                 })
                 .collect()
         });
 
         let bytes_in = self.worker_receive_or_leader_send(bytes, sid).await?;
-        Ok(T::deserialize_compressed(&bytes_in[..])?)
+        Ok(T::deserialize_uncompressed_unchecked(&bytes_in[..])?)
     }
 
     /// Everyone sends bytes to the leader, who receives those bytes, runs a computation on them, and

@@ -7,6 +7,9 @@ build:
 run:
     {{CARGO}} run
 
+run-params params:
+    {{CARGO}} run {{params}}
+
 test:
     {{CARGO}} test
 

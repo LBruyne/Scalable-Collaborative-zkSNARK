@@ -8,3 +8,6 @@ members = [
 
 [profile.bench]
 opt-level = 3
+
+[profile.release]
+debug = true

@@ -16,18 +16,14 @@ pub async fn d_msm<G: CurveGroup, Net: MPCSerializeNet>(
 
     // First round of local computation done by parties
     log::debug!("bases: {}, scalars: {}", bases.len(), scalars.len());
-    let timer1 = start_timer!("calculate_msm", !net.is_leader());
     let c_share = G::msm(bases, scalars).unwrap();
-    end_timer!(timer1);
     // Now we do degree reduction -- psstoss
     // Send to king who reduces and sends shamir shares (not packed).
     // Should be randomized. First convert to projective share.
     log::warn!("Distributed MSM protocol should be masked by random sharing. Omitted for simplicity.");
     let n_parties = net.n_parties();
     net.leader_compute_element(&c_share, sid, |shares|{
-        let timer2 = start_timer!("leader calculation");
         let output: G = pp.unpack2(shares).iter().sum();
-        end_timer!(timer2);
         vec![output; n_parties]
     }).await
 }

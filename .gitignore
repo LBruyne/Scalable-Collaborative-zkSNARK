@@ -14,3 +14,7 @@ target/
 *.pdb
 
 dGKR.code-workspace
+
+flamegraph.svg
+perf.data
+perf.data.old
