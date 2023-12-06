@@ -17,26 +17,26 @@ pub const PAD_CHAR: &str = "·";
 pub struct TimerInfo {
     pub msg: String,
     pub time: Instant,
-    pub silent: bool,
+    pub print: bool,
     pub indent: usize,
 }
 
 #[macro_export]
 macro_rules! start_timer {
     ($msg:expr) => {{
-        start_timer!($msg, false)
+        start_timer!($msg, true)
     }};
-    ($msg:expr, $silent:expr) => {{
+    ($msg:expr, $print:expr) => {{
         use $crate::utils::timer::{
             compute_indent, Colorize, Instant, Ordering, ToString, NUM_INDENT, thread,
         };
 
         let msg = $msg;
-        if $silent {
+        if !$print {
             $crate::utils::timer::TimerInfo {
                 msg: msg.to_string(),
                 time: Instant::now(),
-                silent: $silent,
+                print: $print,
                 indent: 0,
             }
         } else {
@@ -54,7 +54,7 @@ macro_rules! start_timer {
             $crate::utils::timer::TimerInfo {
                 msg: msg.to_string(),
                 time: Instant::now(),
-                silent: $silent,
+                print: $print,
                 indent: indent_amount,
             }            
         }
@@ -74,7 +74,7 @@ macro_rules! end_timer {
 
         let time = $time.time;
         let final_time = time.elapsed();
-        if !$time.silent {
+        if $time.print {
             let final_time_str = {
                 let secs = final_time.as_secs();
                 let millis = final_time.subsec_millis();

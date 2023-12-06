@@ -15,3 +15,6 @@ test:
 
 bench:
     {{CARGO}} bench
+
+perf params:
+    {{CARGO}} flamegraph {{params}}

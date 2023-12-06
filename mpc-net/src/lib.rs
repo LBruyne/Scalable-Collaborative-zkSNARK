@@ -46,6 +46,10 @@ pub trait MPCNet: Send + Sync {
     fn party_id(&self) -> u32;
     /// Is the network layer initalized?
     fn is_init(&self) -> bool;
+
+    /// Get upload/download in bytes
+    fn get_comm(&self) -> (usize,usize);
+
     async fn recv_from(
         &self,
         id: u32,

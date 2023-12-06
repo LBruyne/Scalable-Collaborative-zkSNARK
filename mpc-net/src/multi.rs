@@ -3,6 +3,7 @@ use std::fmt::{Debug, Formatter};
 use std::future::Future;
 use std::net::SocketAddr;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
@@ -103,6 +104,8 @@ pub struct MPCNetConnection<IO: AsyncRead + AsyncWrite + Unpin> {
     pub listener: Option<TcpListener>,
     pub peers: HashMap<u32, Peer<IO>>,
     pub n_parties: usize,
+    pub upload: AtomicUsize,
+    pub download: AtomicUsize,
 }
 
 impl MPCNetConnection<TcpStream> {
@@ -247,6 +250,8 @@ impl LocalTestNet {
                 listener: Some(my_listener),
                 peers: Default::default(),
                 n_parties,
+                upload: AtomicUsize::new(0),
+                download: AtomicUsize::new(0),
             };
             for peer_id in 0..n_parties {
                 // NOTE: this is the listen addr
@@ -342,6 +347,10 @@ impl<IO: AsyncRead + AsyncWrite + Unpin + Send> MPCNet
         self.peers.iter().all(|r| r.1.streams.is_some())
     }
 
+    fn get_comm(&self) -> (usize, usize) {
+        (self.upload.load(Ordering::Relaxed), self.download.load(Ordering::Relaxed))
+    }
+
     async fn recv_from(
         &self,
         id: u32,
@@ -350,7 +359,11 @@ impl<IO: AsyncRead + AsyncWrite + Unpin + Send> MPCNet
         let peer = self.peers.get(&id).ok_or_else(|| {
             MPCNetError::Generic(format!("Peer {} not found", id))
         })?;
-        recv_stream(peer.streams.as_ref(), sid).await
+        let result = recv_stream(peer.streams.as_ref(), sid).await;
+        if let Ok(bytes) = &result {
+            self.download.fetch_add(bytes.len(), Ordering::Relaxed);
+        }
+        result
     }
 
     async fn send_to(
@@ -362,7 +375,12 @@ impl<IO: AsyncRead + AsyncWrite + Unpin + Send> MPCNet
         let peer = self.peers.get(&id).ok_or_else(|| {
             MPCNetError::Generic(format!("Peer {} not found", id))
         })?;
-        send_stream(peer.streams.as_ref(), bytes, sid).await
+        let len = bytes.len();
+        let result = send_stream(peer.streams.as_ref(), bytes, sid).await;
+        if let Ok(_) = &result {
+            self.upload.fetch_add(len, Ordering::Relaxed);
+        }
+        result
     }
 }
 
