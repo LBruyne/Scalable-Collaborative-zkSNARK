@@ -3,7 +3,7 @@ use async_trait::async_trait;
 
 use mpc_net::{MPCNet, MPCNetError, MultiplexedStreamID};
 
-use crate::{start_timer, end_timer};
+
 
 /// The MPC net can serialize and deserialize elements. Should be useful for arkworks computation.
 #[async_trait]

@@ -169,7 +169,7 @@ mod tests {
     use test::Bencher;
     use PackedSharingParams;
 
-    const L: usize = 32;
+    const L: usize = 4;
     const N: usize = L * 4;
     const T: usize = N / 2 - L - 1;
 

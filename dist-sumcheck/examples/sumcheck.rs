@@ -1,14 +1,16 @@
 #![feature(thread_id_value)]
+use std::sync::Arc;
+
 use ark_bls12_377::Fr;
 use ark_ff::fields::Field;
-use ark_poly::Radix2EvaluationDomain;
+
 use ark_std::UniformRand;
 use dist_sumcheck::{dsumcheck::d_sumcheck, utils::operator::transpose, start_timer, end_timer};
 use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
 const L: usize = 8;
-const N: usize = 24;
+const N: usize = 28;
 
 #[derive(Clone)]
 struct Worker {
@@ -109,6 +111,7 @@ fn check_sumcheck(H: Fr, proof: Vec<(Fr, Fr)>, challenge: Vec<Fr>) -> bool {
 
 #[tokio::main]
 async fn main() {
+    console_subscriber::init();
     env_logger::builder().init();
     let pp = PackedSharingParams::<Fr>::new(L);
     let delegator = Delegator::new();
@@ -124,6 +127,7 @@ async fn main() {
     let workers = delegator.delegate();
     end_timer!(sharing);
     let compute = start_timer!("Compute");
+    let workers = Arc::new(workers);
     let result = net
         .simulate_network_round(
             (workers, challenge.clone()),

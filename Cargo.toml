@@ -3,7 +3,8 @@ resolver = "2"
 members = [
     "secret-sharing",
     "dist-sumcheck",
-    "mpc-net"
+    "mpc-net",
+    "client"
 ]
 
 [profile.bench]

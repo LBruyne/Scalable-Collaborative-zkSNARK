@@ -1,6 +1,4 @@
 use crate::{dperm::d_perm, end_timer, start_timer, utils::serializing_net::MPCSerializeNet};
-use ark_bls12_377::Fr;
-use ark_ec::CurveGroup;
 
 use ark_ff::FftField;
 use mpc_net::{MPCNetError, MultiplexedStreamID};
@@ -21,9 +19,10 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     let pre_permutation = start_timer!("Pre-permutation part", net.is_leader());
     for i in 0..N {
         let parts = last_round.split_at(last_round.len() / 2);
-        let res1 = d_sum(&parts.0.iter().sum(), &vec![1; 1<<L], pp, net, sid).await?;
-        let res2 = d_sum(&parts.1.iter().sum(), &vec![1; 1<<L], pp, net, sid).await?;
+        let res1 = d_sum(&parts.0.iter().sum(), pp, net, sid).await?;
+        let res2 = d_sum(&parts.1.iter().sum(), pp, net, sid).await?;
         result.push((res1, res2));
+        // result.push((parts.0.iter().sum(), parts.1.iter().sum()));
         let this_round = parts
             .0
             .iter()
@@ -45,23 +44,37 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
             .into_iter()
             .chain(vec![1; 1 << (L - i - 1)].into_iter())
             .collect();
-        let res1 = d_sum(&last_share, &mask0, pp, net, sid).await?;
-        let res2 = d_sum(&last_share, &mask1, pp, net, sid).await?;
+        let res1 = d_sum_masked(&last_share, &mask0, pp, net, sid).await?;
+        let res2 = d_sum_masked(&last_share, &mask1, pp, net, sid).await?;
         result.push((res1, res2));
         let permutation = (1 << (L - i - 1)..1 << (L - i))
             .chain(0..1 << (L - i - 1))
             .chain(1 << (L - i)..1 << L)
             .collect();
         let this_share = d_perm(last_share, permutation, pp, net, sid).await?;
-        last_share = last_share * (F::ONE - challenge[i+N]) + this_share * challenge[i+N];
+        last_share = last_share * (F::ONE - challenge[i + N]) + this_share * challenge[i + N];
     }
     end_timer!(permutation);
-    result.push((F::ZERO, d_sum(&last_share, &vec![1], pp, net, sid).await?));
+    result.push((F::ZERO, d_sum_masked(&last_share, &vec![1], pp, net, sid).await?));
     end_timer!(d_sumcheck_timer);
     Ok(result)
 }
 
 pub async fn d_sum<F: FftField, Net: MPCSerializeNet>(
+    share: &F,
+    pp: &PackedSharingParams<F>,
+    net: &Net,
+    sid: MultiplexedStreamID,
+) -> Result<F, MPCNetError> {
+    net.leader_compute_element(share, sid, |shares| {
+        let values = pp.unpack(shares);
+        let sum = values.iter().sum();
+        pp.pack_from_public(vec![sum; pp.l])
+    })
+    .await
+}
+
+pub async fn d_sum_masked<F: FftField, Net: MPCSerializeNet>(
     share: &F,
     mask: &Vec<usize>,
     pp: &PackedSharingParams<F>,
@@ -84,17 +97,15 @@ pub async fn d_sum<F: FftField, Net: MPCSerializeNet>(
 #[cfg(test)]
 mod tests {
     use ark_ec::bls12::Bls12Config;
-    use ark_ec::CurveGroup;
+
     use ark_ec::Group;
-    use ark_ec::VariableBaseMSM;
+
     use ark_std::UniformRand;
-    use ark_std::Zero;
+
     use mpc_net::MPCNet;
     use mpc_net::MultiplexedStreamID;
     use secret_sharing::pss::PackedSharingParams;
 
-    use ark_bls12_377::G1Affine;
-    use ark_bls12_377::G1Projective as G1P;
     use mpc_net::LocalTestNet;
 
     type Fr = <ark_ec::short_weierstrass::Projective<
@@ -141,7 +152,7 @@ mod tests {
             })
         });
         let challenge: [Fr; N] = UniformRand::rand(&mut ark_std::test_rng());
-        let challenge = challenge.to_vec();
+        let _challenge = challenge.to_vec();
 
         // for i in 0..N-L.trailing_zeros() as usize {
         let mut sum0 = Vec::new();

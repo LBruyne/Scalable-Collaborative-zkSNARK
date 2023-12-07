@@ -18,3 +18,7 @@ dGKR.code-workspace
 flamegraph.svg
 perf.data
 perf.data.old
+
+worker_*.log
+test.perf
+output

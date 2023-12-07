@@ -2,10 +2,10 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::future::Future;
 use std::net::SocketAddr;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use std::time::Duration;
-use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, self};
 use tokio::net::{TcpListener, TcpStream};
 
 use crate::{MPCNetError, MultiplexedStreamID};
@@ -23,9 +23,7 @@ use super::MPCNet;
 
 pub type WrappedStream<T> = Framed<T, LengthDelimitedCodec>;
 
-pub fn wrap_stream<T: AsyncRead + AsyncWrite>(
-    stream: T,
-) -> Framed<T, LengthDelimitedCodec> {
+pub fn wrap_stream<T: AsyncRead + AsyncWrite>(stream: T) -> Framed<T, LengthDelimitedCodec> {
     LengthDelimitedCodec::builder()
         .big_endian()
         .length_field_type::<u32>()
@@ -62,9 +60,7 @@ pub type WrappedMuxStream<T> = Framed<MuxStream<T>, LengthDelimitedCodec>;
 pub const MULTIPLEXED_STREAMS: usize = 3;
 
 /// Should be called immediately after making a connection to a peer.
-pub async fn multiplex_stream<
-    T: AsyncRead + AsyncWrite + Unpin + Send + 'static,
->(
+pub async fn multiplex_stream<T: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     channels: usize,
     is_server: bool,
     stream: T,
@@ -77,17 +73,14 @@ pub async fn multiplex_stream<
         for _ in 0..channels {
             ret.push(TokioMutex::new(wrap_stream(
                 acceptor.accept().await.ok_or_else(|| {
-                    MPCNetError::Generic(
-                        "Error accepting connection".to_string(),
-                    )
+                    MPCNetError::Generic("Error accepting connection".to_string())
                 })?,
             )));
         }
 
         Ok(ret)
     } else {
-        let (connector, _acceptor, worker) =
-            MuxBuilder::client().with_connection(stream).build();
+        let (connector, _acceptor, worker) = MuxBuilder::client().with_connection(stream).build();
         tokio::spawn(worker);
         let mut ret = Vec::new();
         for _ in 0..channels {
@@ -109,7 +102,7 @@ pub struct MPCNetConnection<IO: AsyncRead + AsyncWrite + Unpin> {
 }
 
 impl MPCNetConnection<TcpStream> {
-    async fn connect_to_all(&mut self) -> Result<(), MPCNetError> {
+    pub async fn connect_to_all(&mut self) -> Result<(), MPCNetError> {
         let n_minus_1 = self.n_parties() - 1;
         let my_id = self.id;
 
@@ -135,19 +128,14 @@ impl MPCNetConnection<TcpStream> {
 
         let server_task = async move {
             for _ in 0..inbound_connections_i_will_make {
-                let (mut stream, _peer_addr) =
-                    listener.accept().await.map_err(|err| {
-                        MPCNetError::Generic(format!(
-                            "Error accepting connection: {err:?}"
-                        ))
-                    })?;
+                let (mut stream, _peer_addr) = listener.accept().await.map_err(|err| {
+                    MPCNetError::Generic(format!("Error accepting connection: {err:?}"))
+                })?;
 
                 let peer_id = stream.read_u32().await?;
                 // Now, multiplex the stream
-                let muxed =
-                    multiplex_stream(MULTIPLEXED_STREAMS, true, stream).await?;
-                new_peers_server.lock().get_mut(&peer_id).unwrap().streams =
-                    Some(muxed);
+                let muxed = multiplex_stream(MULTIPLEXED_STREAMS, true, stream).await?;
+                new_peers_server.lock().get_mut(&peer_id).unwrap().streams = Some(muxed);
                 trace!("{my_id} connected to peer {peer_id}")
             }
 
@@ -163,19 +151,25 @@ impl MPCNetConnection<TcpStream> {
                 // If I am 1, I will connect to 2
                 // If I am 2, I will connect to no one (server will make the connections)
                 let next_peer_to_connect_to = my_id + conns_made as u32 + 1;
-                let peer_listen_addr =
-                    peer_addrs.get(&next_peer_to_connect_to).unwrap();
-                let mut stream =
-                    TcpStream::connect(peer_listen_addr).await.map_err(|err| {
+                let peer_listen_addr = peer_addrs.get(&next_peer_to_connect_to).unwrap();
+                let mut stream = {
+                    let mut res=Err(io::Error::new(io::ErrorKind::Other, "Initial error"));
+                    for _ in 0..100 {
+                        res = TcpStream::connect(peer_listen_addr).await;
+                        if res.is_ok() {
+                            break;
+                        }
+                        tokio::time::sleep(Duration::from_secs(1)).await;
+                    }
+                    res.map_err(|err| {
                         MPCNetError::Generic(format!(
                             "Error connecting to peer {next_peer_to_connect_to}: {err:?}"
                         ))
-                    })?;
+                    })
+                }?;
                 stream.write_u32(my_id).await.unwrap();
 
-                let muxed =
-                    multiplex_stream(MULTIPLEXED_STREAMS, false, stream)
-                        .await?;
+                let muxed = multiplex_stream(MULTIPLEXED_STREAMS, false, stream).await?;
                 new_peers_client
                     .lock()
                     .get_mut(&next_peer_to_connect_to)
@@ -199,10 +193,7 @@ impl MPCNetConnection<TcpStream> {
 
         // Do a round with the leader, to be sure everyone is ready
         let from_all = self
-            .worker_send_or_leader_receive(
-                &[self.id as u8] as &[u8],
-                genesis_round_channel,
-            )
+            .worker_send_or_leader_receive(&[self.id as u8] as &[u8], genesis_round_channel)
             .await?;
         self.worker_receive_or_leader_send(from_all, genesis_round_channel)
             .await?;
@@ -230,9 +221,7 @@ pub struct LocalTestNet {
 }
 
 impl LocalTestNet {
-    pub async fn new_local_testnet(
-        n_parties: usize,
-    ) -> Result<Self, MPCNetError> {
+    pub async fn new_local_testnet(n_parties: usize) -> Result<Self, MPCNetError> {
         // Step 1: Generate all the Listeners for each node
         let mut listeners = HashMap::new();
         let mut listen_addrs = HashMap::new();
@@ -296,11 +285,7 @@ impl LocalTestNet {
     >(
         self,
         user_data: U,
-        f: impl Fn(MPCNetConnection<TcpStream>, U) -> F
-            + Send
-            + Sync
-            + Clone
-            + 'static,
+        f: impl Fn(MPCNetConnection<TcpStream>, U) -> F + Send + Sync + Clone + 'static,
     ) -> Vec<K> {
         let mut futures = FuturesOrdered::new();
         let mut sorted_nodes = self.nodes.into_iter().collect::<Vec<_>>();
@@ -309,8 +294,7 @@ impl LocalTestNet {
             let next_f = f.clone();
             let next_user_data = user_data.clone();
             futures.push_back(Box::pin(async move {
-                let task =
-                    async move { next_f(connections, next_user_data).await };
+                let task = async move { next_f(connections, next_user_data).await };
                 let handle = tokio::task::spawn(task);
                 handle.await.unwrap()
             }));
@@ -319,10 +303,7 @@ impl LocalTestNet {
     }
 
     /// Get the connection for a given party ID
-    pub fn get_connection(
-        &self,
-        party_id: usize,
-    ) -> &MPCNetConnection<TcpStream> {
+    pub fn get_connection(&self, party_id: usize) -> &MPCNetConnection<TcpStream> {
         self.nodes.get(&party_id).unwrap()
     }
 
@@ -332,9 +313,7 @@ impl LocalTestNet {
 }
 
 #[async_trait]
-impl<IO: AsyncRead + AsyncWrite + Unpin + Send> MPCNet
-    for MPCNetConnection<IO>
-{
+impl<IO: AsyncRead + AsyncWrite + Unpin + Send> MPCNet for MPCNetConnection<IO> {
     fn n_parties(&self) -> usize {
         self.n_parties
     }
@@ -348,17 +327,17 @@ impl<IO: AsyncRead + AsyncWrite + Unpin + Send> MPCNet
     }
 
     fn get_comm(&self) -> (usize, usize) {
-        (self.upload.load(Ordering::Relaxed), self.download.load(Ordering::Relaxed))
+        (
+            self.upload.load(Ordering::Relaxed),
+            self.download.load(Ordering::Relaxed),
+        )
     }
 
-    async fn recv_from(
-        &self,
-        id: u32,
-        sid: MultiplexedStreamID,
-    ) -> Result<Bytes, MPCNetError> {
-        let peer = self.peers.get(&id).ok_or_else(|| {
-            MPCNetError::Generic(format!("Peer {} not found", id))
-        })?;
+    async fn recv_from(&self, id: u32, sid: MultiplexedStreamID) -> Result<Bytes, MPCNetError> {
+        let peer = self
+            .peers
+            .get(&id)
+            .ok_or_else(|| MPCNetError::Generic(format!("Peer {} not found", id)))?;
         let result = recv_stream(peer.streams.as_ref(), sid).await;
         if let Ok(bytes) = &result {
             self.download.fetch_add(bytes.len(), Ordering::Relaxed);
@@ -372,9 +351,10 @@ impl<IO: AsyncRead + AsyncWrite + Unpin + Send> MPCNet
         bytes: Bytes,
         sid: MultiplexedStreamID,
     ) -> Result<(), MPCNetError> {
-        let peer = self.peers.get(&id).ok_or_else(|| {
-            MPCNetError::Generic(format!("Peer {} not found", id))
-        })?;
+        let peer = self
+            .peers
+            .get(&id)
+            .ok_or_else(|| MPCNetError::Generic(format!("Peer {} not found", id)))?;
         let len = bytes.len();
         let result = send_stream(peer.streams.as_ref(), bytes, sid).await;
         if let Ok(_) = &result {
@@ -439,13 +419,9 @@ mod tests {
                         continue;
                     }
                     for sid in sids {
-                        send_stream(
-                            peer.streams.as_ref(),
-                            vec![my_id as u8].into(),
-                            sid,
-                        )
-                        .await
-                        .unwrap();
+                        send_stream(peer.streams.as_ref(), vec![my_id as u8].into(), sid)
+                            .await
+                            .unwrap();
                     }
                 }
 
@@ -456,10 +432,7 @@ mod tests {
                         continue;
                     }
                     for sid in sids {
-                        let recv_bytes =
-                            recv_stream(peer.streams.as_ref(), sid)
-                                .await
-                                .unwrap();
+                        let recv_bytes = recv_stream(peer.streams.as_ref(), sid).await.unwrap();
                         let decoded = recv_bytes[0] as u32;
                         ids.entry(sid).or_default().push(decoded);
                     }

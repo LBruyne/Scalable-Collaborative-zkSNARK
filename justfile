@@ -1,13 +1,10 @@
-RUSTFLAGS:= "-Ctarget-cpu=native"
+RUSTFLAGS:= "\"-Ctarget-cpu=native --cfg tokio_unstable\""
 
 CARGO:= "RUSTFLAGS="+RUSTFLAGS+" cargo +nightly"
 build:
     {{CARGO}} build
 
-run:
-    {{CARGO}} run
-
-run-params params:
+run *params:
     {{CARGO}} run {{params}}
 
 test:
@@ -16,5 +13,5 @@ test:
 bench:
     {{CARGO}} bench
 
-perf params:
+perf *params:
     {{CARGO}} flamegraph {{params}}
