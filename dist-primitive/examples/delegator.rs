@@ -8,7 +8,7 @@ use ark_ff::fields::Field;
 
 use ark_std::UniformRand;
 use clap::arg;
-use dist_sumcheck::{dsumcheck::d_sumcheck, utils::operator::transpose, start_timer, end_timer};
+use dist_primitive::{dsumcheck::d_sumcheck, utils::operator::transpose, start_timer, end_timer};
 use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 use ark_serialize::{CanonicalSerialize, CanonicalDeserialize, Read};

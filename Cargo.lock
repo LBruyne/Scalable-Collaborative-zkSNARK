@@ -617,7 +617,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dist-sumcheck"
+name = "dist-primitive"
 version = "0.1.0"
 dependencies = [
  "ark-bls12-377",

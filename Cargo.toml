@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
     "secret-sharing",
-    "dist-sumcheck",
+    "dist-primitive",
     "mpc-net",
     "client"
 ]

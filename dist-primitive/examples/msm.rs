@@ -5,7 +5,7 @@ use ark_bls12_377::Fr;
 use ark_ec::CurveGroup;
 use ark_poly::{EvaluationDomain, Radix2EvaluationDomain};
 use ark_std::{UniformRand};
-use dist_sumcheck::{dmsm::d_msm, end_timer, start_timer};
+use dist_primitive::{dmsm::d_msm, end_timer, start_timer};
 use mpc_net::{LocalTestNet as Net, MPCNet, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
