@@ -1,11 +1,11 @@
-use std::{collections::HashMap, path::PathBuf, time::Duration};
+use std::{path::PathBuf, time::Duration};
 
 use ark_std::perf_trace::AtomicUsize;
 use clap::Parser;
 use log::info;
 use mpc_net::{self, multi::{MPCNetConnection, Peer}, MPCNetError};
 use serde::{Deserialize, Serialize};
-use tokio::net::{TcpListener, TcpStream, unix::SocketAddr};
+use tokio::net::{TcpListener, TcpStream};
 
 #[derive(Parser)]
 struct Cli {
@@ -70,5 +70,5 @@ async fn main() {
         let file = std::fs::File::open(cli.config).unwrap();
         serde_json::from_reader(file).unwrap()
     };
-    let mut net = initialize(cli.id, &config).await.unwrap();
+    let _net = initialize(cli.id, &config).await.unwrap();
 }
