@@ -18,28 +18,6 @@ struct Worker {
     x_shares: Vec<Fr>,
 }
 
-impl Worker {
-    fn sumcheck(&self, challenge: Vec<Fr>) -> Vec<(Fr, Fr)> {
-        let mut result = Vec::new();
-        let mut last_round = self.x_shares.clone();
-        for i in 0..N - L.trailing_zeros() as usize {
-            let parts = last_round.split_at(last_round.len() / 2);
-            result.push((parts.0.iter().sum(), parts.1.iter().sum()));
-            let this_round = parts
-                .0
-                .iter()
-                .zip(parts.1.iter())
-                .map(|(a, b)| *a * (Fr::ONE - challenge[i]) + *b * challenge[i])
-                .collect::<Vec<_>>();
-            last_round = this_round;
-        }
-        debug_assert!(last_round.len() == 1);
-        // Now comes the tricky part.
-        result.push((Fr::ZERO, last_round[0]));
-        result
-    }
-}
-
 struct Delegator {
     // the 2^N evaluations of the polynomial
     x: Vec<Fr>,
@@ -89,24 +67,6 @@ impl Delegator {
     fn sum(&self) -> Fr {
         self.x.iter().sum()
     }
-}
-
-fn check_sumcheck(H: Fr, proof: Vec<(Fr, Fr)>, challenge: Vec<Fr>) -> bool {
-    if proof[0].0 + proof[0].1 != H {
-        return false;
-    }
-    for i in 1..N {
-        let x = challenge[i - 1];
-        let target = (proof[i - 1].1 - proof[i - 1].0) * x + proof[i - 1].0;
-        if proof[i].0 + proof[i].1 != target {
-            return false;
-        }
-    }
-    // Now check the oracle query
-    // if result[N-1].1 != query(random) {
-    //     return false;
-    // }
-    true
 }
 
 #[tokio::main]

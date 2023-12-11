@@ -1,4 +1,4 @@
-use crate::{utils::serializing_net::MPCSerializeNet};
+use crate::utils::serializing_net::MPCSerializeNet;
 use ark_ec::CurveGroup;
 
 use mpc_net::{MPCNetError, MultiplexedStreamID};
@@ -11,20 +11,13 @@ pub async fn d_msm<G: CurveGroup, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<G, MPCNetError> {
-    // Using affine is important because we don't want to create an extra vector for converting Projective to Affine.
-    // Eventually we do have to convert to Projective but this will be pp.l group elements instead of m()
-
-    // First round of local computation done by parties
-    log::debug!("bases: {}, scalars: {}", bases.len(), scalars.len());
+    assert_eq!(bases.len(), scalars.len());
     let c_share = G::msm(bases, scalars).unwrap();
-    // Now we do degree reduction -- psstoss
-    // Send to king who reduces and sends shamir shares (not packed).
-    // Should be randomized. First convert to projective share.
     log::warn!("Distributed MSM protocol should be masked by random sharing. Omitted for simplicity.");
-    let n_parties = net.n_parties();
     net.leader_compute_element(&c_share, sid, |shares|{
         let output: G = pp.unpack2(shares).iter().sum();
-        vec![output; n_parties]
+        let pack = vec![output;pp.l];
+        pp.pack_from_public(pack)
     }).await
 }
 

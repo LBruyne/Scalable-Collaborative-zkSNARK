@@ -25,4 +25,5 @@ tokio = { version = "1.34.0", features = ["macros", "rt", "rt-multi-thread", "tr
 colored = "2.0.4"
 console-subscriber = "0.2.0"
 clap = {version = "4.4.11", features = ["derive"] }
+ark-bls12-381 = "0.4.0"
 
