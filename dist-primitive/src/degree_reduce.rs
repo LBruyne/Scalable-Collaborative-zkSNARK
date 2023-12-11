@@ -5,6 +5,8 @@ use log;
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
+
+/// Reduce the degree of a share from 2n to n, this function accept a batch of shares
 pub async fn degree_reduce_many<F: FftField + PrimeField, Net: MPCSerializeNet>(
     shares: Vec<F>,
     pp: &PackedSharingParams<F>,
@@ -23,6 +25,7 @@ pub async fn degree_reduce_many<F: FftField + PrimeField, Net: MPCSerializeNet>(
     .await
 }
 
+/// Reduce the degree of a share from 2n to n
 pub async fn degree_reduce<F: FftField + PrimeField, Net: MPCSerializeNet>(
     shares: F,
     pp: &PackedSharingParams<F>,

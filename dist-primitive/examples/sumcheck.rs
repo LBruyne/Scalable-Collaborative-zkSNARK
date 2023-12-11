@@ -1,4 +1,3 @@
-#![feature(thread_id_value)]
 use std::sync::Arc;
 
 use ark_bls12_377::Fr;

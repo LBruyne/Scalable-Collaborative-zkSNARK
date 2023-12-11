@@ -44,11 +44,7 @@ macro_rules! start_timer {
             let indent_amount = 2 * NUM_INDENT.fetch_add(1, Ordering::Relaxed);
             let indent = compute_indent(indent_amount);
 
-            let msg = if thread::current().id().as_u64() != std::num::NonZeroU64::new(1).unwrap() {
-                format!("{} (thread {})", &msg, thread::current().id().as_u64())
-            } else {
-                msg.to_string()
-            };
+            let msg = format!("{} (thread {:?})", &msg, thread::current().id());
 
             println!("{}{:8} {}", indent, start_info, msg);
             $crate::utils::timer::TimerInfo {
@@ -130,7 +126,6 @@ pub fn compute_indent(indent_amount: usize) -> String {
 
 #[cfg(test)]
 mod tests {
-
     #[test]
     fn should_print() {
         let timer = start_timer!("should_print1", false);
