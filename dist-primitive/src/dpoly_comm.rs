@@ -4,10 +4,12 @@ use ark_ec::VariableBaseMSM;
 use ark_ff::{One, Zero};
 use mpc_net::MPCNetError;
 use mpc_net::MultiplexedStreamID;
+use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
 
 use crate::dmsm::d_msm;
 use crate::dperm::d_perm;
+use crate::utils::operator::transpose;
 use crate::utils::serializing_net::MPCSerializeNet;
 
 /// This form is used to further pack the elements. Not eligible for computing.
@@ -41,9 +43,14 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
         for i in 0..n {
             powers_of_g[i + 1] = powers_of_g[i]
                 .clone()
-                .into_iter()
+                .into_par_iter()
                 .map(|e| e * (E::ScalarField::one() - s[n - i - 1]))
-                .chain(powers_of_g[i].clone().into_iter().map(|e| e * s[n - i - 1]))
+                .chain(
+                    powers_of_g[i]
+                        .clone()
+                        .into_par_iter()
+                        .map(|e| e * s[n - i - 1]),
+                )
                 .collect();
         }
         powers_of_g2.push(g2);
@@ -58,8 +65,8 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
     pub fn mature(&self) -> PolynomialCommitment<E> {
         let powers_of_g = self
             .powers_of_g
-            .iter()
-            .map(|v| v.into_iter().map(|e| e.clone().into()).collect())
+            .par_iter()
+            .map(|v| v.into_par_iter().map(|e| e.clone().into()).collect())
             .collect();
         PolynomialCommitment {
             powers_of_g,
@@ -76,29 +83,26 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
                 powers_of_g: vec![Vec::new(); self.powers_of_g.len()],
                 powers_of_g2: self.powers_of_g2.clone(),
             };
-            l*4
+            l * 4
         ];
         for i in 0..self.powers_of_g.len() {
             let v = &self.powers_of_g[i];
             // Last few powers may not be properly packed, fill in some dummy values
-            if v.len() < l {
+            let mut powers_of_g = transpose(if v.len() < l {
                 let mut v = v.clone();
                 v.resize(l, E::G1::zero());
-                let shares = pp.pack_from_public(v);
-                shares.into_iter().enumerate().for_each(|(j, share)| {
-                    result[j].powers_of_g[i].push(share);
-                })
+                vec![pp.pack_from_public(v)]
             } else {
                 // Since the length is always a power of 2 the chunks are exact. No remainders.
-                v.chunks_exact(l).for_each(|chunk| {
-                    let shares = pp.pack_from_public(chunk.to_vec());
-                    shares.into_iter().enumerate().for_each(|(j, share)| {
-                        result[j].powers_of_g[i].push(share);
-                    })
-                });
+                v.par_chunks_exact(l)
+                    .map(|chunk| pp.pack_from_public(chunk.to_vec()))
+                    .collect()
+            });
+            for j in (0..l * 4).rev() {
+                result[j].powers_of_g[i] = powers_of_g.remove(j);
             }
         }
-        result.into_iter().map(|e| e.mature()).collect()
+        result.into_par_iter().map(|e| e.mature()).collect()
     }
 }
 
@@ -209,7 +213,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         }
         Ok((last_r_share, result))
     }
-    fn verify(
+    pub fn verify(
         &self,
         commitment: E::G1,
         value: E::ScalarField,
@@ -243,7 +247,7 @@ mod test {
     use secret_sharing::pss::PackedSharingParams;
     const l: usize = 2;
     type E = Bls12<ark_bls12_381::Config>;
-    
+
     #[test]
     fn should_pair() {
         let rng = &mut ark_std::test_rng();

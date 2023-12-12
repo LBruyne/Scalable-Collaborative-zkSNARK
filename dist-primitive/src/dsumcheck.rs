@@ -57,6 +57,9 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     end_timer!(permutation);
     result.push((F::ZERO, d_sum_masked(&last_share, &vec![1], pp, net, sid).await?));
     end_timer!(d_sumcheck_timer);
+    if net.is_leader() {
+        println!("{:?}",net.get_comm());
+    }
     Ok(result)
 }
 

@@ -7,16 +7,11 @@ use ark_std::UniformRand;
 use dist_primitive::{dsumcheck::d_sumcheck, utils::operator::transpose, start_timer, end_timer};
 use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
+use rayon::prelude::*;
+use ark_std::Zero;
 
 const L: usize = 8;
-const N: usize = 28;
-
-#[derive(Clone)]
-struct Worker {
-    // The worker's secret input
-    x_shares: Vec<Fr>,
-}
-
+const N: usize = 24;
 struct Delegator {
     // the 2^N evaluations of the polynomial
     x: Vec<Fr>,
@@ -25,24 +20,14 @@ struct Delegator {
 impl Delegator {
     fn new() -> Self {
         let rng = &mut ark_std::test_rng();
-        let x: Vec<Fr> = (0..2usize.pow(N as u32)).map(|_| Fr::rand(rng)).collect();
+        let x: Vec<Fr> = (0..2usize.pow(N as u32)).into_par_iter().map(|_| Fr::zero()).collect();
         Self { x }
     }
-    fn delegate(&self) -> Vec<Worker> {
-        let mut workers = vec![
-            Worker {
-                x_shares: Vec::new()
-            };
-            L * 4
-        ];
+    fn delegate(&self) -> Vec<Vec<Fr>> {
         let pp = PackedSharingParams::<Fr>::new(L);
-        self.x.chunks(L).enumerate().for_each(|(_, chunk)| {
-            let shares = pp.pack_from_public(chunk.to_vec());
-            shares.into_iter().enumerate().for_each(|(j, share)| {
-                workers[j].x_shares.push(share);
-            })
-        });
-        workers
+        transpose(self.x.par_chunks_exact(L).map(|chunk| {
+            pp.pack_from_public(chunk.to_vec())
+        }).collect())
     }
     fn sumcheck(&self, challenge: Vec<Fr>) -> Vec<(Fr, Fr)> {
         let mut result = Vec::new();
@@ -93,7 +78,7 @@ async fn main() {
             |net, (workers, challenge)| async move {
                 let pp = PackedSharingParams::<Fr>::new(L);
                 d_sumcheck(
-                    &workers[net.party_id() as usize].x_shares,
+                    &workers[net.party_id() as usize],
                     &challenge,
                     &pp,
                     &net,
