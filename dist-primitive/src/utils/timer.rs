@@ -108,6 +108,19 @@ macro_rules! end_timer {
     }};
 }
 
+#[macro_export]
+macro_rules! timed {
+    ($desc:expr, $e:expr) => {{
+        timed!($desc, $e, true)
+    }};
+    ($desc:expr, $e:expr, $print:expr) => {{
+        let timer = start_timer!($desc, $print);
+        let result = {$e};
+        end_timer!(timer);
+        result
+    }};
+}
+
 pub fn compute_indent_whitespace(indent_amount: usize) -> String {
     let mut indent = String::new();
     for _ in 0..indent_amount {
@@ -126,6 +139,8 @@ pub fn compute_indent(indent_amount: usize) -> String {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     #[test]
     fn should_print() {
         let timer = start_timer!("should_print1", false);
@@ -145,5 +160,15 @@ mod tests {
     #[test]
     fn should_identify_threadid(){
         println!("{:?}",std::thread::current().id());
+    }
+
+    #[test]
+    fn timed_block(){
+        timed!("The answer to the universe",std::thread::sleep(Duration::from_millis(100)));
+        let result = timed!("test",{
+            std::thread::sleep(Duration::from_millis(100));
+            42
+        });
+        println!("{}", result);
     }
 }
