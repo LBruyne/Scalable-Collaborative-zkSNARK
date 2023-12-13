@@ -26,7 +26,7 @@ pub async fn degree_reduce_many<F: FftField + PrimeField, Net: MPCSerializeNet>(
 }
 
 /// Reduce the degree of a share from 2n to n
-pub async fn degree_reduce<F: FftField + PrimeField, Net: MPCSerializeNet>(
+pub async fn degree_reduce<F: FftField, Net: MPCSerializeNet>(
     shares: F,
     pp: &PackedSharingParams<F>,
     net: &Net,
