@@ -201,7 +201,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
                 .chain(0..1 << (L - i - 1))
                 .chain(1 << (L - i)..1 << L)
                 .collect();
-            let permuted_r_share = d_perm(last_r_share, permutation, pp, net, sid).await?;
+            let permuted_r_share = d_perm(last_r_share, &permutation, pp, net, sid).await?;
             let q_i = permuted_r_share - last_r_share;
             let r_i = (E::ScalarField::one() - point[i + N]) * last_r_share
                 + point[i + N] * permuted_r_share;

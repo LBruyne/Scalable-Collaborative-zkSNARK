@@ -12,7 +12,7 @@ pub async fn d_perm<
     Net: MPCSerializeNet,
 >(
     share: G,
-    permutation: Vec<usize>,
+    permutation: &Vec<usize>,
     pp: &PackedSharingParams<F>,
     net: &Net,
     sid: MultiplexedStreamID,
@@ -104,7 +104,7 @@ mod tests {
             let id = net.id;
             let my_share = shares[id as usize].clone();
             let permutation: Vec<usize> = (0..L).rev().collect();
-            d_perm(my_share, permutation, &pp, &net, MultiplexedStreamID::Zero).await
+            d_perm(my_share, &permutation, &pp, &net, MultiplexedStreamID::Zero).await
         })
         .await;
         let output = output.into_iter().map(Result::unwrap).collect();
