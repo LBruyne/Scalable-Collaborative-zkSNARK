@@ -19,7 +19,7 @@ struct Delegator {
 
 impl Delegator {
     fn new() -> Self {
-        let rng = &mut ark_std::test_rng();
+        let _rng = &mut ark_std::test_rng();
         let x: Vec<Fr> = (0..2usize.pow(N as u32)).into_par_iter().map(|_| Fr::zero()).collect();
         Self { x }
     }

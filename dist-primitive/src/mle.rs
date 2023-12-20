@@ -4,8 +4,8 @@ use ark_ff::FftField;
 use mpc_net::{MultiplexedStreamID, MPCNetError};
 use secret_sharing::pss::PackedSharingParams;
 
-use crate::{utils::serializing_net::MPCSerializeNet, dsumcheck::d_sum};
-use crate::dsumcheck::d_sum_masked;
+use crate::{utils::serializing_net::MPCSerializeNet};
+
 use crate::dperm::d_perm;
 
 #[derive(Clone, Debug)]

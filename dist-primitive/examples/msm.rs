@@ -4,7 +4,7 @@ use ark_std::Zero;
 use ark_bls12_377::Fr;
 use ark_ec::CurveGroup;
 use ark_poly::{EvaluationDomain, Radix2EvaluationDomain};
-use ark_std::UniformRand;
+
 use dist_primitive::{dmsm::d_msm, end_timer, start_timer};
 use mpc_net::{LocalTestNet as Net, MPCNet, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
@@ -23,7 +23,7 @@ pub async fn d_msm_test<G: CurveGroup, Net: MPCNet>(
     let _mbyl: usize = dom.size() / pp.l;
     // println!("m: {}, mbyl: {}", dom.size(), mbyl);
 
-    let rng = &mut ark_std::test_rng();
+    let _rng = &mut ark_std::test_rng();
 
     let mut y_pub: Vec<G::ScalarField> = Vec::new();
     let mut x_pub: Vec<G> = Vec::new();

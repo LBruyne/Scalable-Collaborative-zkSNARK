@@ -3,10 +3,10 @@ use crate::{
     utils::serializing_net::MPCSerializeNet,
 };
 use ark_ff::FftField;
-use futures::future::{join3, join_all, try_join3, try_join};
+use futures::future::{try_join3, try_join};
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
-use std::ops::Mul;
+
 pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     shares: &Vec<F>,
     challenge: &Vec<F>,
