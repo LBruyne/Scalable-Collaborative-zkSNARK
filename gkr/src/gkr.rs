@@ -115,18 +115,21 @@ pub async fn d_polyfill_phase_initilization<F: FftField, Net: MPCSerializeNet>(
     Ok(())
 }
 
+/// The result is a miraculous double Vec.
+/// The first Vec arranges the result for each layer
 pub async fn d_polyfill_gkr<F: FftField, Net: MPCSerializeNet>(
     layer_cnt: usize,
     layer_width: usize,
     pp: &PackedSharingParams<F>,
     net: &Net,
     sid: MultiplexedStreamID,
-) -> Result<(), MPCNetError> {
-    // In each round we actually need to run 6 sub-gkr-rounds.
-    // 2 complete rounds, with form f1(g,x,y)f2(x)f3(y)
-    // 4 incomplete rounds, 2 with form f1(g,x,y)f2(x) and 2 with form f1(g,x,y)f3(y)
-    // We can handle the 4 incomplete rounds as if we have f2(x) \equiv 1 and f3(y) \equiv 1
-    // So at last we run 6 polyfill gkr rounds in each layer.
+) -> Result<Vec<Vec<(F, F, F)>>, MPCNetError> {
+    // In each round we actually need to run 3 sub-gkr-rounds.
+    // 1 complete rounds, with form f1(g,x,y)f2(x)f3(y)
+    // 2 incomplete rounds, 1 with form f1(g,x,y)f2(x) and 1 with form f1(g,x,y)f3(y)
+    // We can handle the 2 incomplete rounds as if we have f2(x) \equiv 1 and f3(y) \equiv 1
+    // So at last we run 3 polyfill gkr rounds in each layer.
+    let mut proof = Vec::new();
     let rng = &mut ark_std::test_rng();
     let mut shares_f1 = SparseMultilinearExtension::<F>(HashMap::new());
     // Randomly generate these shares and challenges for new
@@ -147,18 +150,25 @@ pub async fn d_polyfill_gkr<F: FftField, Net: MPCSerializeNet>(
     let challenge_u: Vec<F> = vec![F::zero(); layer_width];
     let challenge_v: Vec<F> = vec![F::zero(); layer_width];
     for _ in 0..layer_cnt {
-        d_gkr_round(
-            &shares_f1,
-            &shares_f2,
-            &shares_f3,
-            &challenge_g,
-            &challenge_u,
-            &challenge_v,
-            pp,
-            net,
-            sid,
-        )
-        .await?;
+        let mut layer_proof = Vec::new();
+        for _ in 0..3 {
+            layer_proof.push(d_gkr_round(
+                &shares_f1,
+                &shares_f2,
+                &shares_f3,
+                &challenge_g,
+                &challenge_u,
+                &challenge_v,
+                pp,
+                net,
+                sid,
+            )
+            .await?);
+        }
+        
+        proof.push(layer_proof.into_iter().reduce(|acc, this|{
+            acc.iter().zip(this.iter()).map(|(a,b)| (a.0+b.0, a.1+b.1, a.2+b.2)).collect()
+        }).unwrap());
     }
-    Ok(())
+    Ok(proof)
 }
