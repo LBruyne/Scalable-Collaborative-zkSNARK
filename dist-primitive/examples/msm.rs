@@ -1,6 +1,6 @@
 #![feature(thread_id_value)]
 use std::sync::atomic::AtomicU32;
-
+use ark_std::Zero;
 use ark_bls12_377::Fr;
 use ark_ec::CurveGroup;
 use ark_poly::{EvaluationDomain, Radix2EvaluationDomain};
@@ -10,6 +10,7 @@ use mpc_net::{LocalTestNet as Net, MPCNet, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
 const L: usize = 4;
+const N: usize = 20;
 static CNT: AtomicU32 = AtomicU32::new(0);
 /// Note that the output of the function is misleading. The threads are not synchronized. So the plain msm is accurately timed, but only the last thread that start d_msm will yield a meaningful result. The time output of the other threads are meaningless since they are mostly waiting for the last thread to be ready.
 pub async fn d_msm_test<G: CurveGroup, Net: MPCNet>(
@@ -30,8 +31,8 @@ pub async fn d_msm_test<G: CurveGroup, Net: MPCNet>(
     for _ in 0..dom.size() {
         // y_pub.push(G::ScalarField::rand(rng));
         // x_pub.push(G::rand(rng));
-        y_pub.push(G::ScalarField::rand(rng));
-        x_pub.push(G::rand(rng));
+        y_pub.push(G::ScalarField::zero());
+        x_pub.push(G::zero());
     }
 
     let x_share: Vec<G> = x_pub
@@ -65,7 +66,7 @@ pub async fn d_msm_test<G: CurveGroup, Net: MPCNet>(
 async fn main() {
     env_logger::builder().init();
 
-    for i in 17..=17 {
+    for i in N..=N {
         let dom = Radix2EvaluationDomain::<Fr>::new(1 << i).unwrap();
         println!("domain size: {}", dom.size());
         // msm_test::<ark_bls12_377::G1Projective>(&dom);

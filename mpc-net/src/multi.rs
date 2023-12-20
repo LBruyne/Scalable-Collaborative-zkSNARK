@@ -332,6 +332,10 @@ impl<IO: AsyncRead + AsyncWrite + Unpin + Send> MPCNet for MPCNetConnection<IO> 
             self.download.load(Ordering::Relaxed),
         )
     }
+    fn add_comm(&self, up: usize, down: usize) {
+        self.upload.fetch_add(up, Ordering::Relaxed);
+        self.download.fetch_add(down, Ordering::Relaxed);
+    }
 
     async fn recv_from(&self, id: u32, sid: MultiplexedStreamID) -> Result<Bytes, MPCNetError> {
         let peer = self

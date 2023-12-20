@@ -10,8 +10,8 @@ use secret_sharing::pss::PackedSharingParams;
 use rayon::prelude::*;
 use ark_std::Zero;
 
-const L: usize = 8;
-const N: usize = 24;
+const L: usize = 4;
+const N: usize = 20;
 struct Delegator {
     // the 2^N evaluations of the polynomial
     x: Vec<Fr>,

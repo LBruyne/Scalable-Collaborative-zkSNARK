@@ -3,10 +3,10 @@ use crate::{
     utils::serializing_net::MPCSerializeNet,
 };
 use ark_ff::FftField;
+use futures::future::{join3, join_all, try_join3, try_join};
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 use std::ops::Mul;
-
 pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     shares: &Vec<F>,
     challenge: &Vec<F>,
@@ -92,7 +92,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
         let res = {
             // t=0
-            let part0_sum: F = d_sum2(
+            let part0_sum = d_sum2(
                 parts_f
                     .0
                     .iter()
@@ -102,10 +102,9 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                 pp,
                 net,
                 sid,
-            )
-            .await?;
+            );
             //t=1
-            let part1_sum: F = d_sum2(
+            let part1_sum = d_sum2(
                 parts_f
                     .1
                     .iter()
@@ -115,10 +114,9 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                 pp,
                 net,
                 sid,
-            )
-            .await?;
-            // t=2, 
-            // in which case, the evaluation of f and g is not present in the bookkeeping table, 
+            );
+            // t=2,
+            // in which case, the evaluation of f and g is not present in the bookkeeping table,
             // we need to calculate them from (1-t)*x0+t*x1
             let part2_f: Vec<_> = parts_f
                 .0
@@ -132,7 +130,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                 .zip(parts_g.1.iter())
                 .map(|(x, y)| -*x + *y * F::from(2_u64))
                 .collect();
-            let part2_sum: F = d_sum2(
+            let part2_sum = d_sum2(
                 part2_f
                     .iter()
                     .zip(part2_g.iter())
@@ -141,13 +139,15 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                 pp,
                 net,
                 sid,
+            );
+            let (part0_sum, part1_sum, part2_sum) =
+                try_join3(part0_sum, part1_sum, part2_sum).await?;
+            try_join3(
+                degree_reduce(part0_sum, pp, net, sid),
+                degree_reduce(part1_sum, pp, net, sid),
+                degree_reduce(part2_sum, pp, net, sid),
             )
-            .await?;
-            (
-                degree_reduce(part0_sum, pp, net, sid).await?,
-                degree_reduce(part1_sum, pp, net, sid).await?,
-                degree_reduce(part2_sum, pp, net, sid).await?,
-            )
+            .await?
         };
         result.push(res);
         // (1-u)*x0 + u*x1
@@ -187,21 +187,24 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
             .chain(0..1 << (L - i - 1))
             .chain(1 << (L - i)..1 << L)
             .collect();
-        let this_share_f = d_perm(last_share_f, &permutation, pp, net, sid).await?;
-        let this_share_g = d_perm(last_share_g, &permutation, pp, net, sid).await?;
+        let (this_share_f, this_share_g) = try_join(
+            d_perm(last_share_f, &permutation, pp, net, sid),
+            d_perm(last_share_g, &permutation, pp, net, sid),
+        )
+        .await?;
         let res = {
             // t=0
-            let part0_sum: F =
-                d_sum2_masked(last_share_f * last_share_g, &mask0, pp, net, sid).await?;
+            let part0_sum =
+                d_sum2_masked(last_share_f * last_share_g, &mask0, pp, net, sid);
             // t=1
-            let part1_sum: F =
-                d_sum2_masked(last_share_f * last_share_g, &mask1, pp, net, sid).await?;
+            let part1_sum =
+                d_sum2_masked(last_share_f * last_share_g, &mask1, pp, net, sid);
             // t=2
             let part2_f = -last_share_f + this_share_f * F::from(2_u64);
             let part2_g = -last_share_g + this_share_g * F::from(2_u64);
-            let part2_sum: F = d_sum2_masked(part2_f * part2_g, &mask0, pp, net, sid).await?;
+            let part2_sum = d_sum2_masked(part2_f * part2_g, &mask0, pp, net, sid);
             // Since the s_sum2_masked already handles the degree, no degree_reduce needed.
-            (part0_sum, part1_sum, part2_sum)
+            try_join3(part0_sum, part1_sum, part2_sum).await?
         };
         result.push(res);
         // (1-u)*x0 + u*x1
@@ -219,6 +222,128 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     }
     Ok(result)
 }
+
+pub struct SumcheckProof<F: FftField>(Vec<Vec<F>>);
+
+/// This won't work! There are too many multiplication in one step and the shares will overflow.
+/// F PSS
+// pub async fn d_sumcheck_new<F: FftField, Net: MPCSerializeNet>(
+//     shares: &Vec<DenseMultilinearExtension<F>>,
+//     challenge: &Vec<F>,
+//     pp: &PackedSharingParams<F>,
+//     net: &Net,
+//     sid: MultiplexedStreamID,
+// ) -> Result<SumcheckProof<F>, MPCNetError> {
+//     let mut result = Vec::new();
+//     let N = shares.len().trailing_zeros() as usize;
+//     let L = pp.l.trailing_zeros() as usize;
+//     // For sumcheck with t polynomial product, we need t+1 points as the proof
+//     let t: u64 = (shares.len() + 1) as u64;
+//     assert!(shares.iter().all(|x| x.0.len() == shares[0].0.len()));
+//     let mut last_round = shares.clone();
+//     // The pre-permutation part.
+//     // In this part the shares can be viewed as a whole. There's no need to go into them
+//     // The result of this part is a 2n-degree share since we did a multiplication in the code.
+//     // Need to reduce the degree or take extra care when unpacking.
+//     for i in 0..N {
+//         let len = last_round[0].0.len() / 2;
+//         let parts: Vec<_> = last_round.iter().map(|x| x.0.split_at(len)).collect();
+//         let res = {
+//             let mut evaluations = Vec::new();
+//             // t=0
+//             for j in 0..t + 1 {
+//                 let parts: F = (0..len)
+//                     .map(|index| {
+//                         let mut product = F::one();
+//                         for (first, second) in &parts {
+//                             // This causes error. You cannot multiply a share like this.
+//                             product *=
+//                                 first[index] * (F::one() - F::from(j)) * second[index] * F::from(j);
+//                         }
+//                         product
+//                     })
+//                     .sum();
+//                 evaluations
+//                     .push(degree_reduce(d_sum2(parts, pp, net, sid).await?, pp, net, sid).await?);
+//             }
+//             evaluations
+//         };
+//         result.push(res);
+//         // (1-u)*x0 + u*x1
+//         last_round = parts
+//             .iter()
+//             .map(|(a, b)| {
+//                 let res: Vec<F> = a
+//                     .iter()
+//                     .zip(b.iter())
+//                     .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+//                     .collect::<Vec<_>>();
+//                 DenseMultilinearExtension(res)
+//             })
+//             .collect::<Vec<DenseMultilinearExtension<F>>>();
+//     }
+//     assert!(last_round.iter().all(|x| x.0.len() == 1));
+//     // Break the struct since we don't need it anymore
+//     let mut last_share = last_round.iter().map(|x| x.0[0]).collect::<Vec<_>>();
+//     // Now we go into shares. The general logic is the same. The only difference being that we now do the computation using permutation.
+//     for i in 0..L {
+//         // The tail part of the shares are all garbage. Filter them with a mask
+//         // mask: 1 1 | 0 0 | 0 0 0 0
+//         let mask = vec![1; 1 << (L - i - 1)]
+//             .into_iter()
+//             .chain(vec![0; 1 << (L - i - 1)].into_iter())
+//             .collect();
+//         // The permutation "swap" the first half and the second half in the valid range. The invalid garbage is untouched.
+//         // permutation: 2 3 | 0 1 | 4 5 6 7
+//         let permutation = (1 << (L - i - 1)..1 << (L - i))
+//             .chain(0..1 << (L - i - 1))
+//             .chain(1 << (L - i)..1 << L)
+//             .collect();
+//         let this_share: Vec<_> = join_all(
+//             last_share
+//                 .iter()
+//                 .map(|x| d_perm(*x, &permutation, pp, net, sid)),
+//         )
+//         .await
+//         .into_iter()
+//         .map(Result::unwrap)
+//         .collect();
+//         let res = {
+//             let mut evaluations = Vec::new();
+//             for j in 0..t + 1 {
+//                 let product = last_share
+//                     .iter()
+//                     .zip(this_share.iter())
+//                     .map(|(first, second)| *first * (F::one() - F::from(j)) * *second * F::from(j))
+//                     .product();
+//                 evaluations.push(
+//                     degree_reduce(
+//                         d_sum2_masked(product, &mask, pp, net, sid).await?,
+//                         pp,
+//                         net,
+//                         sid,
+//                     )
+//                     .await?,
+//                 );
+//             }
+//             evaluations
+//         };
+//         result.push(res);
+//         // (1-u)*x0 + u*x1
+//         last_share = last_share
+//             .iter()
+//             .zip(this_share.iter())
+//             .map(|(a, b)| *a * (F::ONE - challenge[i + N]) + *b * challenge[i + N])
+//             .collect::<Vec<_>>();
+//     }
+//     result.push(vec![
+//         d_sum2_masked(last_share.iter().product(), &vec![1], pp, net, sid).await?,
+//     ]);
+//     if net.is_leader() {
+//         println!("{:?}", net.get_comm());
+//     }
+//     Ok(SumcheckProof(result))
+// }
 
 pub async fn d_sum<F: FftField, Net: MPCSerializeNet>(
     share: F,
@@ -523,6 +648,66 @@ mod tests {
         assert!(check_sumcheck_product(H, proof, _challenge));
     }
 
+    // #[tokio::test]
+    // #[should_panic]
+    // async fn dsumcheck_product_new_test() {
+    //     let net = LocalTestNet::new_local_testnet(L * 4).await.unwrap();
+    //     let pp = PackedSharingParams::<Fr>::new(L);
+    //     let rng = &mut ark_std::test_rng();
+    //     let x: Vec<Fr> = (0..2usize.pow(N as u32)).map(|_| Fr::rand(rng)).collect();
+    //     let mut workers_f = vec![Vec::new(); L * 4];
+    //     let mut workers_g = vec![Vec::new(); L * 4];
+    //     x.chunks(L).enumerate().for_each(|(_, chunk)| {
+    //         let shares = pp.pack_from_public(chunk.to_vec());
+    //         shares.into_iter().enumerate().for_each(|(j, share)| {
+    //             workers_f[j].push(share);
+    //             workers_g[j].push(share);
+    //         })
+    //     });
+
+    //     let challenge: [Fr; N] = UniformRand::rand(&mut ark_std::test_rng());
+    //     let challenge = challenge.to_vec();
+    //     let result = net
+    //         .simulate_network_round(
+    //             (workers_f, workers_g, challenge.clone()),
+    //             |net, (shares_f, shares_g, challenge)| async move {
+    //                 let pp = PackedSharingParams::<Fr>::new(L);
+    //                 let input: Vec<DenseMultilinearExtension<_>> = vec![
+    //                     DenseMultilinearExtension(shares_f[net.party_id() as usize].clone()),
+    //                     DenseMultilinearExtension(shares_g[net.party_id() as usize].clone()),
+    //                 ];
+    //                 d_sumcheck_new(&input, &challenge, &pp, &net, MultiplexedStreamID::Zero)
+    //                     .await
+    //                     .unwrap()
+    //             },
+    //         )
+    //         .await;
+    //     let result = result.into_iter().map(|x| x.0).collect::<Vec<_>>();
+    //     let result: Vec<Vec<Vec<Fr>>> = transpose(result);
+    //     let result: Vec<_> = result
+    //         .into_iter()
+    //         .map(|x| {
+    //             let t = x[0].len();
+    //             let mut result = Vec::new();
+    //             for i in 0..t {
+    //                 let mut tmp = Vec::new();
+    //                 for j in 0..x.len() {
+    //                     tmp.push(x[j][i]);
+    //                 }
+    //                 let secrets = pp.unpack(tmp);
+    //                 assert!(secrets.windows(2).all(|w| w[0] == w[1]));
+    //                 result.push(secrets[0]);
+    //             }
+    //             result
+    //         })
+    //         .collect();
+    //     let H: Fr = x.iter().map(|x| x * x).sum();
+    //     assert!(check_sumcheck_product(
+    //         H,
+    //         result.iter().map(|x| (x[0], x[1], x[2])).collect(),
+    //         challenge
+    //     ));
+    // }
     #[tokio::test]
     async fn dsumcheck_product_test() {
         let net = LocalTestNet::new_local_testnet(L * 4).await.unwrap();

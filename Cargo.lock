@@ -669,6 +669,7 @@ dependencies = [
  "console-subscriber",
  "digest",
  "env_logger",
+ "futures",
  "itertools 0.12.0",
  "log",
  "mpc-net",
@@ -846,6 +847,36 @@ name = "gimli"
 version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fb8d784f27acf97159b40fc4db5ecd8aa23b9ad5ef69cdd136d3bc80665f0c0"
+
+[[package]]
+name = "gkr"
+version = "0.1.0"
+dependencies = [
+ "ark-bls12-377",
+ "ark-bls12-381",
+ "ark-ec",
+ "ark-ff",
+ "ark-poly",
+ "ark-serialize",
+ "ark-std",
+ "async-trait",
+ "clap 4.4.11",
+ "colored",
+ "console-subscriber",
+ "digest",
+ "dist-primitive",
+ "env_logger",
+ "futures",
+ "itertools 0.12.0",
+ "log",
+ "mpc-net",
+ "rand",
+ "rayon",
+ "secret-sharing",
+ "sha2",
+ "structopt",
+ "tokio",
+]
 
 [[package]]
 name = "h2"

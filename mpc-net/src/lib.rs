@@ -50,6 +50,8 @@ pub trait MPCNet: Send + Sync {
     /// Get upload/download in bytes
     fn get_comm(&self) -> (usize,usize);
 
+    fn add_comm(&self, up: usize, down: usize);
+
     async fn recv_from(
         &self,
         id: u32,

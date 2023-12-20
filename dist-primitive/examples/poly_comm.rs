@@ -15,7 +15,7 @@ use mpc_net::MultiplexedStreamID;
 use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
 const l: usize = 4;
-const n: usize = 16;
+const n: usize = 20;
 
 #[tokio::main]
 async fn main() {
