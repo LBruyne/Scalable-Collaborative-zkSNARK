@@ -14,7 +14,7 @@ use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
 
 const L: usize = 4;
-const N: usize = 16;
+const N: usize = 24;
 struct Delegator {
     // the 2^N evaluations of the polynomial
     x: Vec<Fr>,

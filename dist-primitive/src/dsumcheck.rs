@@ -46,15 +46,13 @@ pub fn sumcheck_product<F: FftField>(
             .0
             .iter()
             .zip(parts_g.0.iter())
-            .map(|(x, y)| *x * *y)
-            .sum();
+            .fold(F::zero(), |acc, (x, y)| acc+  *x * *y);
         //t=1
         let part1_sum = parts_f
             .1
             .iter()
             .zip(parts_g.1.iter())
-            .map(|(x, y)| *x * *y)
-            .sum();
+            .fold(F::zero(), |acc, (x, y)| acc+  *x * *y);
         // t=2,
         // in which case, the evaluation of f and g is not present in the bookkeeping table,
         // we need to calculate them from (1-t)*x0+t*x1
@@ -73,8 +71,7 @@ pub fn sumcheck_product<F: FftField>(
         let part2_sum = part2_f
             .iter()
             .zip(part2_g.iter())
-            .map(|(x, y)| *x * *y)
-            .sum();
+            .fold(F::zero(), |acc, (x, y)| acc+  *x * *y);
         result.push((part0_sum, part1_sum, part2_sum));
         last_round_f = parts_f
             .0
@@ -183,8 +180,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                     .0
                     .iter()
                     .zip(parts_g.0.iter())
-                    .map(|(x, y)| *x * *y)
-                    .sum(),
+                    .fold(F::zero(), |acc, (x, y)| acc+  *x * *y),
                 pp,
                 net,
                 sid,
@@ -195,8 +191,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                     .1
                     .iter()
                     .zip(parts_g.1.iter())
-                    .map(|(x, y)| *x * *y)
-                    .sum(),
+                    .fold(F::zero(), |acc, (x, y)| acc+  *x * *y),
                 pp,
                 net,
                 sid,
@@ -220,8 +215,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                 part2_f
                     .iter()
                     .zip(part2_g.iter())
-                    .map(|(x, y)| *x * *y)
-                    .sum(),
+                    .fold(F::zero(), |acc, (x, y)| acc+  *x * *y),
                 pp,
                 net,
                 sid,

@@ -28,14 +28,14 @@ use std::{collections::HashMap, ops::Mul};
 pub struct SparseMultilinearExtension<F>(HashMap<(F, F, F), F>);
 
 const l: usize = 4;
-const WIDTH: usize = 16;
-const DEPTH: usize = 1<<4;
+const WIDTH: usize = 24;
+const DEPTH: usize = 1;
 
 type E = Bls12<ark_bls12_381::Config>;
 /// f1(g,x,y)f2(x)f3(y)
 #[tokio::main(flavor="current_thread")]
 async fn main() {
-    // gkr_local();
+    gkr_local();
     distributed().await;
 }
 
