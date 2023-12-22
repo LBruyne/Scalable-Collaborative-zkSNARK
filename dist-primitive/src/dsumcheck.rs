@@ -1,11 +1,99 @@
 use crate::{
-    degree_reduce::degree_reduce, dperm::d_perm, end_timer, start_timer,
-    utils::serializing_net::MPCSerializeNet,
+    degree_reduce::degree_reduce,
+    dperm::d_perm,
+    end_timer, start_timer,
+    utils::{serializing_net::MPCSerializeNet, timer},
 };
 use ark_ff::FftField;
-use futures::future::{try_join3, try_join};
+use futures::future::{try_join, try_join3};
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
+
+pub fn sumcheck<F: FftField>(evaluation: &Vec<F>, challenge: &Vec<F>) -> Vec<(F, F)> {
+    let mut result = Vec::new();
+    let mut last_round = evaluation.clone();
+    let N = evaluation.len().trailing_zeros() as usize;
+    for i in 0..N {
+        let parts = last_round.split_at(last_round.len() / 2);
+        result.push((parts.0.iter().sum(), parts.1.iter().sum()));
+        let this_round = parts
+            .0
+            .iter()
+            .zip(parts.1.iter())
+            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .collect::<Vec<_>>();
+        last_round = this_round;
+    }
+    debug_assert!(last_round.len() == 1);
+    // The last round yields (0, result).
+    result.push((F::ZERO, last_round[0]));
+    result
+}
+
+pub fn sumcheck_product<F: FftField>(
+    evaluation_f: &Vec<F>,
+    evaluation_g: &Vec<F>,
+    challenge: &Vec<F>,
+) -> Vec<(F, F, F)> {
+    let mut result = Vec::new();
+    let mut last_round_f = evaluation_f.clone();
+    let mut last_round_g = evaluation_g.clone();
+    let N = evaluation_f.len().trailing_zeros() as usize;
+    for i in 0..N {
+        let parts_f = last_round_f.split_at(last_round_f.len() / 2);
+        let parts_g = last_round_g.split_at(last_round_g.len() / 2);
+        let part0_sum = parts_f
+            .0
+            .iter()
+            .zip(parts_g.0.iter())
+            .map(|(x, y)| *x * *y)
+            .sum();
+        //t=1
+        let part1_sum = parts_f
+            .1
+            .iter()
+            .zip(parts_g.1.iter())
+            .map(|(x, y)| *x * *y)
+            .sum();
+        // t=2,
+        // in which case, the evaluation of f and g is not present in the bookkeeping table,
+        // we need to calculate them from (1-t)*x0+t*x1
+        let part2_f: Vec<_> = parts_f
+            .0
+            .iter()
+            .zip(parts_f.1.iter())
+            .map(|(x, y)| -*x + *y * F::from(2_u64))
+            .collect();
+        let part2_g: Vec<_> = parts_g
+            .0
+            .iter()
+            .zip(parts_g.1.iter())
+            .map(|(x, y)| -*x + *y * F::from(2_u64))
+            .collect();
+        let part2_sum = part2_f
+            .iter()
+            .zip(part2_g.iter())
+            .map(|(x, y)| *x * *y)
+            .sum();
+        result.push((part0_sum, part1_sum, part2_sum));
+        last_round_f = parts_f
+            .0
+            .iter()
+            .zip(parts_f.1.iter())
+            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .collect::<Vec<_>>();
+        last_round_g = parts_g
+            .0
+            .iter()
+            .zip(parts_g.1.iter())
+            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .collect::<Vec<_>>();
+    }
+    debug_assert!(last_round_f.len() == 1);
+    // The last round yields (0, result).
+    result.push((F::ZERO, last_round_f[0] * last_round_g[0], F::ZERO));
+    result
+}
 
 pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     shares: &Vec<F>,
@@ -63,9 +151,6 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
         d_sum_masked(last_share, &vec![1], pp, net, sid).await?,
     ));
     end_timer!(d_sumcheck_timer);
-    if net.is_leader() {
-        println!("{:?}", net.get_comm());
-    }
     Ok(result)
 }
 
@@ -87,6 +172,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     // In this part the shares can be viewed as a whole. There's no need to go into them
     // The result of this part is a 2n-degree share since we did a multiplication in the code.
     // Need to reduce the degree or take extra care when unpacking.
+    let timer_pre = start_timer!("Pre-permutation part", net.is_leader());
     for i in 0..N {
         let parts_f = last_round_f.split_at(last_round_f.len() / 2);
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
@@ -143,9 +229,9 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
             let (part0_sum, part1_sum, part2_sum) =
                 try_join3(part0_sum, part1_sum, part2_sum).await?;
             try_join3(
-                degree_reduce(part0_sum, pp, net, sid),
-                degree_reduce(part1_sum, pp, net, sid),
-                degree_reduce(part2_sum, pp, net, sid),
+                degree_reduce(part0_sum, pp, net, MultiplexedStreamID::Zero),
+                degree_reduce(part1_sum, pp, net, MultiplexedStreamID::One),
+                degree_reduce(part2_sum, pp, net, MultiplexedStreamID::Two),
             )
             .await?
         };
@@ -164,6 +250,8 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
             .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
             .collect::<Vec<_>>();
     }
+    end_timer!(timer_pre);
+    let timer_perm = start_timer!("Permutation part", net.is_leader());
     debug_assert!(last_round_f.len() == 1);
     debug_assert!(last_round_g.len() == 1);
     let mut last_share_f = last_round_f[0];
@@ -188,21 +276,19 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
             .chain(1 << (L - i)..1 << L)
             .collect();
         let (this_share_f, this_share_g) = try_join(
-            d_perm(last_share_f, &permutation, pp, net, sid),
-            d_perm(last_share_g, &permutation, pp, net, sid),
+            d_perm(last_share_f, &permutation, pp, net, MultiplexedStreamID::Zero),
+            d_perm(last_share_g, &permutation, pp, net, MultiplexedStreamID::One),
         )
         .await?;
         let res = {
             // t=0
-            let part0_sum =
-                d_sum2_masked(last_share_f * last_share_g, &mask0, pp, net, sid);
+            let part0_sum = d_sum2_masked(last_share_f * last_share_g, &mask0, pp, net, MultiplexedStreamID::Zero);
             // t=1
-            let part1_sum =
-                d_sum2_masked(last_share_f * last_share_g, &mask1, pp, net, sid);
+            let part1_sum = d_sum2_masked(last_share_f * last_share_g, &mask1, pp, net, MultiplexedStreamID::One);
             // t=2
             let part2_f = -last_share_f + this_share_f * F::from(2_u64);
             let part2_g = -last_share_g + this_share_g * F::from(2_u64);
-            let part2_sum = d_sum2_masked(part2_f * part2_g, &mask0, pp, net, sid);
+            let part2_sum = d_sum2_masked(part2_f * part2_g, &mask0, pp, net, MultiplexedStreamID::Two);
             // Since the s_sum2_masked already handles the degree, no degree_reduce needed.
             try_join3(part0_sum, part1_sum, part2_sum).await?
         };
@@ -211,15 +297,13 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
         last_share_f = last_share_f * (F::ONE - challenge[i + N]) + this_share_f * challenge[i + N];
         last_share_g = last_share_g * (F::ONE - challenge[i + N]) + this_share_g * challenge[i + N];
     }
+    end_timer!(timer_perm);
     // Put it in the second slot to keep consistency with vec.split_at(vec.len()/2). In which case the first part will be empty.
     result.push((
         F::ZERO,
         d_sum2_masked(last_share_f * last_share_g, &vec![1], pp, net, sid).await?,
         F::ZERO,
     ));
-    if net.is_leader() {
-        println!("{:?}", net.get_comm());
-    }
     Ok(result)
 }
 

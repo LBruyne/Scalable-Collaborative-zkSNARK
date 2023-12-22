@@ -161,6 +161,8 @@ impl<F: FftField> PackedSharingParams<F> {
 // Tests
 #[cfg(test)]
 mod tests {
+    use std::hint::black_box;
+
     use super::*;
     extern crate test;
     use ark_bls12_377::Fr as F;
@@ -278,7 +280,7 @@ mod tests {
         let secrets: [F; L] = UniformRand::rand(rng);
         let secrets = secrets.to_vec();
         b.iter(|| {
-            pp.pack_from_public_rand(secrets.clone());
+            pp.pack_from_public_rand(black_box(secrets.clone()));
         });
     }
 
@@ -290,7 +292,7 @@ mod tests {
         let secrets = secrets.to_vec();
         let secrets = pp.pack_from_public_rand(secrets.clone());
         b.iter(|| {
-            pp.unpack(secrets.clone());
+            pp.unpack(black_box(secrets.clone()));
         });
     }
 }

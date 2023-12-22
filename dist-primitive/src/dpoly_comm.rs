@@ -6,7 +6,7 @@ use mpc_net::MPCNetError;
 use mpc_net::MultiplexedStreamID;
 use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
-
+use ark_ff::UniformRand;
 use crate::dmsm::d_msm;
 use crate::dperm::d_perm;
 use crate::utils::operator::transpose;
@@ -43,12 +43,12 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
         for i in 0..n {
             powers_of_g[i + 1] = powers_of_g[i]
                 .clone()
-                .into_par_iter()
+                .into_iter()
                 .map(|e| e * (E::ScalarField::one() - s[n - i - 1]))
                 .chain(
                     powers_of_g[i]
                         .clone()
-                        .into_par_iter()
+                        .into_iter()
                         .map(|e| e * s[n - i - 1]),
                 )
                 .collect();
@@ -66,7 +66,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
         let powers_of_g = self
             .powers_of_g
             .par_iter()
-            .map(|v| v.into_par_iter().map(|e| e.clone().into()).collect())
+            .map(|v| v.into_iter().map(|e| e.clone().into()).collect())
             .collect();
         PolynomialCommitment {
             powers_of_g,
@@ -102,7 +102,29 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
                 result[j].powers_of_g[i] = powers_of_g.remove(j);
             }
         }
-        result.into_par_iter().map(|e| e.mature()).collect()
+        result.into_iter().map(|e| e.mature()).collect()
+    }
+
+    /// A toy protocol that generates a shared parameter.
+    pub fn to_single(&self, pp: &PackedSharingParams<E::ScalarField>) -> PolynomialCommitment<E> {
+        let l = pp.l;
+        let mut result = Self {
+            powers_of_g: vec![Vec::new(); self.powers_of_g.len()],
+            powers_of_g2: self.powers_of_g2.clone(),
+        };
+        let rng = &mut ark_std::test_rng();
+        for i in 0..self.powers_of_g.len() {
+            let v = &self.powers_of_g[i];
+            // Last few powers may not be properly packed, fill in some dummy values
+            let powers_of_g = if v.len() < l {
+                vec![E::G1::rand(rng)]
+            } else {
+                // Since the length is always a power of 2 the chunks are exact. No remainders.
+                (0..v.len() / l).map(|_| E::G1::rand(rng)).collect()
+            };
+            result.powers_of_g[i] = powers_of_g;
+        }
+        result.mature()
     }
 }
 

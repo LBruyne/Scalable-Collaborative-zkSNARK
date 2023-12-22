@@ -15,7 +15,7 @@ use mpc_net::MultiplexedStreamID;
 use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
 const l: usize = 4;
-const n: usize = 20;
+const n: usize = 10;
 
 #[tokio::main]
 async fn main() {
@@ -27,8 +27,8 @@ async fn main() {
         u.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
     }
     let peval: Vec<_> = (0..2_usize.pow(n as u32))
-        .into_par_iter()
-        .map(|_| <Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::zero())
+        .into_iter()
+        .map(|_| <Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng))
         .collect();
     println!("peval.len() = {}", peval.len());
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
