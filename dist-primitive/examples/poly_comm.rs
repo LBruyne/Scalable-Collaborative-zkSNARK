@@ -3,7 +3,7 @@ use std::sync::Arc;
 use ark_bls12_381::Bls12_381;
 use ark_ec::{bls12::Bls12, pairing::Pairing};
 use ark_std::UniformRand;
-use ark_std::Zero;
+
 use dist_primitive::dpoly_comm::PolynomialCommitmentCub;
 use dist_primitive::end_timer;
 use dist_primitive::start_timer;
@@ -15,7 +15,7 @@ use mpc_net::MultiplexedStreamID;
 use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
 const l: usize = 4;
-const n: usize = 10;
+const n: usize = 22;
 
 #[tokio::main]
 async fn main() {

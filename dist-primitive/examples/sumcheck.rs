@@ -5,7 +5,7 @@ use ark_bls12_377::Fr;
 use ark_ff::fields::Field;
 
 use ark_std::UniformRand;
-use ark_std::Zero;
+
 use dist_primitive::dsumcheck::d_sumcheck_product;
 use dist_primitive::dsumcheck::sumcheck_product;
 use dist_primitive::{dsumcheck::d_sumcheck, end_timer, start_timer, utils::operator::transpose};
@@ -157,12 +157,12 @@ async fn sumcheck_test(){
 }
 
 async fn sumcheck_product_test() {
-    let pp = PackedSharingParams::<Fr>::new(L);
+    let _pp = PackedSharingParams::<Fr>::new(L);
     let delegator = ProductDelegator::new();
     let challenge: [Fr; N] = UniformRand::rand(&mut ark_std::test_rng());
     let challenge = challenge.to_vec();
     let sc = start_timer!("SumcheckProduct");
-    let proof = sumcheck_product(black_box(&delegator.x),black_box(& delegator.y), black_box(&challenge));
+    let _proof = sumcheck_product(black_box(&delegator.x),black_box(& delegator.y), black_box(&challenge));
     end_timer!(sc);
 
     let net = LocalTestNet::new_local_testnet(L * 4).await.unwrap();
@@ -172,7 +172,7 @@ async fn sumcheck_product_test() {
     end_timer!(sharing);
     let compute = start_timer!("Compute");
     let workers = Arc::new(workers);
-    let result = net
+    let _result = net
         .simulate_network_round(
             (workers, challenge.clone()),
             |net, (workers, challenge)| async move {

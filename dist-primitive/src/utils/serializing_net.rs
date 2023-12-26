@@ -1,9 +1,10 @@
+use std::hint::black_box;
+
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use async_trait::async_trait;
 
 use mpc_net::{MPCNet, MPCNetError, MultiplexedStreamID};
-
-
+use rand::Rng;
 
 /// The MPC net can serialize and deserialize elements. Should be useful for arkworks computation.
 #[async_trait]
@@ -65,7 +66,7 @@ pub trait MPCSerializeNet: MPCNet {
     ///
     /// The leader's computation is given by a function, `f`
     /// proceeds.
-    async fn leader_compute_element<T: CanonicalDeserialize + CanonicalSerialize + Send>(
+    async fn _leader_compute_element<T: CanonicalDeserialize + CanonicalSerialize + Send + Clone>(
         &self,
         out: &T,
         sid: MultiplexedStreamID,
@@ -77,6 +78,33 @@ pub trait MPCSerializeNet: MPCNet {
             .map(f);
         self.worker_receive_or_leader_send_element(leader_response, sid)
             .await
+    }
+
+    /// A toy method that does not actually doing the multiparty computation.
+    /// Should only be used when you want to rule out the impact of the MPC net.
+    ///
+    /// The leader's computation is given by a function `f`
+    async fn leader_compute_element<T: CanonicalDeserialize + CanonicalSerialize + Send + Clone>(
+        &self,
+        out: &T,
+        _sid: MultiplexedStreamID,
+        f: impl Fn(Vec<T>) -> Vec<T> + Send,
+    ) -> Result<T, MPCNetError> {
+        let mut bytes_out = Vec::new();
+        out.serialize_compressed(&mut bytes_out).unwrap();
+        // For each of the N-1 non leader party, they send one T and receive one T
+        // For the leader, they receive N-1 T and send N-1 T
+        // The total communication is 2(N-1)T
+        let size = bytes_out.len() * 2 * (self.n_parties() - 1) / self.n_parties();
+        self.add_comm(size, size);
+        let mut result = vec![T::deserialize_compressed(&bytes_out[..])?;self.n_parties()];
+        // With probability 1/N, it shall run the computation
+        let random_float: f64 = rand::thread_rng().gen();
+        // With probability 1/N, it shall run the computation
+        if random_float < 1.0 / self.n_parties() as f64 {
+            result = black_box(f(black_box(result)));
+        }
+        return Ok(result.pop().unwrap());
     }
 }
 
