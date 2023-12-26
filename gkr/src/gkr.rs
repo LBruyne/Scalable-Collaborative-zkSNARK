@@ -156,8 +156,7 @@ pub async fn d_polyfill_gkr<E: Pairing, Net: MPCSerializeNet>(
     let mut proof = Vec::new();
     let rng = &mut ark_std::test_rng();
 
-    let order = CNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-    let reporter = order == pp.l * 4 - 1;
+    let reporter = net.is_leader();
     let timer_all = start_timer!("Begin dGKR", reporter);
     let commit = timed!(
         "dCommit",

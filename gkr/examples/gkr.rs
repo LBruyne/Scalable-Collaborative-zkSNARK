@@ -84,37 +84,22 @@ async fn distributed() {
     let cub = PolynomialCommitmentCub::<E>::new(g1, g2, s);
     let commit_shares = cub.to_packed(&pp);
     black_box(
-        net.simulate_network_round(
-            (
-                Arc::new(shares_f1),
-                Arc::new(shares_f2),
-                Arc::new(shares_f3),
-                Arc::new(challenge_g),
-                Arc::new(challenge_u),
-                Arc::new(challenge_v),
-                Arc::new(commit_shares),
-            ),
-            |net, params| async move {
-                let pp = PackedSharingParams::<<E as Pairing>::ScalarField>::new(l);
-                d_polyfill_gkr::<E, _>(
+                d_polyfill_gkr(
                     layer_depth,
                     layer_width,
-                    &params.0,
-                    &params.1,
-                    &params.2,
-                    &params.3,
-                    &params.4,
-                    &params.5,
-                    &params.6[net.party_id() as usize],
+                    &shares_f1,
+                    &shares_f2,
+                    &shares_f3,
+                    &challenge_g,
+                    &challenge_u,
+                    &challenge_v,
+                    &commit_shares[0],
                     &pp,
-                    &net,
+                    &net.get_leader(),
                     MultiplexedStreamID::Zero,
                 )
                 .await
                 .unwrap()
-            },
-        )
-        .await,
     );
 }
 
