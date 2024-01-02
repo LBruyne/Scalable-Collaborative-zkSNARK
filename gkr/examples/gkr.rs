@@ -4,6 +4,7 @@ use ark_ec::pairing::Pairing;
 use ark_std::One;
 use ark_std::UniformRand;
 
+use clap::Parser;
 use dist_primitive::dpoly_comm::PolynomialCommitmentCub;
 
 use dist_primitive::mle::PackedDenseMultilinearExtension;
@@ -20,23 +21,25 @@ use std::hint::black_box;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-const l: usize = 4;
-const layer_width: usize = 22;
-const layer_depth: usize = 1;
-
 type E = Bls12<ark_bls12_381::Config>;
 /// f1(g,x,y)f2(x)f3(y)
-#[tokio::main]
+#[derive(Parser)]
+struct Cli {
+    #[arg(long)]
+    l: usize,
+    #[arg(long)]
+    depth: usize,
+    #[arg(long)]
+    width: usize,
+}
+#[tokio::main(flavor = "current_thread")]
 async fn main() {
-    rayon::ThreadPoolBuilder::new()
-        .num_threads(28)
-        .build_global()
-        .unwrap();
-    gkr_local();
-    distributed().await;
+    let args = Cli::parse();
+    // gkr_local(args.width, args.depth, args.l);
+    distributed(args.width, args.depth, args.l).await;
 }
 
-async fn distributed() {
+async fn distributed(layer_width: usize, layer_depth: usize, l: usize) {
     let rng = &mut ark_std::test_rng();
     let pp = PackedSharingParams::<<E as Pairing>::ScalarField>::new(l);
     let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
@@ -52,6 +55,7 @@ async fn distributed() {
             <E as Pairing>::ScalarField::one(),
         );
     }
+    let mut _shares_f1 = vec![shares_f1; layer_depth];
     let shares_f2 =
         PackedDenseMultilinearExtension::<<E as Pairing>::ScalarField>::from_evaluations_slice(
             0,
@@ -59,6 +63,8 @@ async fn distributed() {
                 .map(|_| <E as Pairing>::ScalarField::rand(rng))
                 .collect::<Vec<_>>(),
         );
+    let mut _shares_f2 = vec![shares_f2; layer_depth];
+
     let shares_f3 =
         PackedDenseMultilinearExtension::<<E as Pairing>::ScalarField>::from_evaluations_slice(
             0,
@@ -66,44 +72,50 @@ async fn distributed() {
                 .map(|_| <E as Pairing>::ScalarField::rand(rng))
                 .collect::<Vec<_>>(),
         );
+    let mut _shares_f3 = vec![shares_f3; layer_depth];
     let challenge_g: Vec<<E as Pairing>::ScalarField> = (0..layer_width)
         .map(|_| <E as Pairing>::ScalarField::rand(rng))
         .collect::<Vec<_>>();
+    let mut _challenge_g = vec![challenge_g; layer_depth];
     let challenge_u: Vec<<E as Pairing>::ScalarField> = (0..layer_width)
         .map(|_| <E as Pairing>::ScalarField::rand(rng))
         .collect::<Vec<_>>();
+    let mut _challenge_u = vec![challenge_u; layer_depth];
     let challenge_v: Vec<<E as Pairing>::ScalarField> = (0..layer_width)
         .map(|_| <E as Pairing>::ScalarField::rand(rng))
         .collect::<Vec<_>>();
+    let mut _challenge_v = vec![challenge_v; layer_depth];
 
     let g1 = <E as Pairing>::G1::rand(rng);
     let g2 = <E as Pairing>::G2::rand(rng);
-    let s = (0..layer_width as usize)
-        .map(|_| <E as Pairing>::ScalarField::rand(rng))
-        .collect::<Vec<_>>();
-    let cub = PolynomialCommitmentCub::<E>::new(g1, g2, s);
-    let commit_shares = cub.to_packed(&pp);
+    let commit_shares = PolynomialCommitmentCub::<E>::new_single(layer_width, &pp);
     black_box(
-                d_polyfill_gkr(
-                    layer_depth,
-                    layer_width,
-                    &shares_f1,
-                    &shares_f2,
-                    &shares_f3,
-                    &challenge_g,
-                    &challenge_u,
-                    &challenge_v,
-                    &commit_shares[0],
-                    &pp,
-                    &net.get_leader(),
-                    MultiplexedStreamID::Zero,
-                )
-                .await
-                .unwrap()
+        d_polyfill_gkr(
+            layer_depth,
+            layer_width,
+            &_shares_f1[0],
+            &_shares_f2[0],
+            &_shares_f3[0],
+            &_challenge_g[0],
+            &_challenge_u[0],
+            &_challenge_v[0],
+            &commit_shares,
+            &pp,
+            &net.get_leader(),
+            MultiplexedStreamID::Zero,
+        )
+        .await
+        .unwrap(),
     );
+    black_box(&mut _shares_f1);
+    black_box(&mut _shares_f2);
+    black_box(&mut _shares_f3);
+    black_box(&mut _challenge_g);
+    black_box(&mut _challenge_u);
+    black_box(&mut _challenge_v);
 }
 
-fn gkr_local() {
+fn gkr_local(layer_width: usize, layer_depth: usize, l: usize) {
     // generate shares
     black_box(polyfill_gkr::<E>(layer_depth, layer_width));
 }

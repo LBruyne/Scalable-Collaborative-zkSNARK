@@ -13,7 +13,9 @@ ark-ec = {version = "0.4.2", default-features = false}
 ark-serialize = { version = "0.4.2", default-features = false, features = [ "derive" ] }
 ark-bls12-377 = {version = "0.4.0", default-features = false, features = ["curve"] }
 secret-sharing = { version = "0.1.0", path = "../secret-sharing" }
+dist-primitive = { version = "0.1.0", path = "../dist-primitive" }
 mpc-net ={ version = "0.1.0", path = "../mpc-net" }
+gkr ={ version = "0.1.0", path = "../gkr" }
 log = {version = "0.4"}
 rand = { version = "0.8", default-features = false, features = ["std"] }
 digest = { version = "0.10" }

@@ -6,9 +6,9 @@ use crate::utils::operator::transpose;
 use crate::utils::serializing_net::MPCSerializeNet;
 use ark_ec::pairing::Pairing;
 use ark_ec::pairing::PairingOutput;
-use ark_ec::VariableBaseMSM;
 use ark_ec::AffineRepr;
-
+use ark_ec::VariableBaseMSM;
+use ark_ff::UniformRand;
 use ark_ff::{One, Zero};
 use mpc_net::MPCNetError;
 use mpc_net::MultiplexedStreamID;
@@ -67,6 +67,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
     }
     pub fn new_toy(g: E::G1, g2: E::G2, s: Vec<E::ScalarField>) -> Self {
         let n = s.len();
+        let rng = &mut ark_std::test_rng();
         let mut powers_of_g: Vec<Vec<<E as Pairing>::G1>> = vec![Vec::new(); n + 1];
         let mut powers_of_g2: Vec<<E as Pairing>::G2> = Vec::new();
         {
@@ -74,22 +75,13 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
             powers_of_g[0].push(g);
         }
         // s_0 is in the outermost layer, i.e. in the final vec the first half is s_0, and the second half is 1-s_0
-        for i in 0..n {
-            powers_of_g[i + 1] = powers_of_g[i]
-                .clone()
-                .into_par_iter()
-                .map(|e| black_box(black_box(g)+black_box(e)))
-                .chain(
-                    powers_of_g[i]
-                        .clone()
-                        .into_par_iter()
-                        .map(|e| black_box(black_box(g)+black_box(e))),
-                )
-                .collect();
+        for i in 1..(n+1) {
+            // Last few powers may not be properly packed, fill in some dummy values
+            powers_of_g[i] = black_box((0..(1 << i)).map(|_| E::G1::rand(rng)).collect())
         }
         powers_of_g2.push(g2);
         for _ in 0..n {
-            powers_of_g2.push(black_box(g2));
+            powers_of_g2.push(E::G2::rand(rng));
         }
         black_box(g);
         black_box(g2);
@@ -155,20 +147,24 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
     }
 
     /// A toy protocol that generates a shared parameter.
-    pub fn to_single(&self, pp: &PackedSharingParams<E::ScalarField>) -> PolynomialCommitment<E> {
+    pub fn new_single(
+        len: usize,
+        pp: &PackedSharingParams<E::ScalarField>,
+    ) -> PolynomialCommitment<E> {
         let l = pp.l;
+        let rng = &mut ark_std::test_rng();
+
         let mut result = Self {
-            powers_of_g: vec![Vec::new(); self.powers_of_g.len()],
-            powers_of_g2: self.powers_of_g2.clone(),
+            powers_of_g: vec![Vec::new(); len+1],
+            powers_of_g2: (0..len+1).map(|_| E::G2::rand(rng)).collect(),
         };
-        for i in 0..self.powers_of_g.len() {
-            let v = &self.powers_of_g[i];
+        for i in 0..len+1 {
             // Last few powers may not be properly packed, fill in some dummy values
-            let powers_of_g = if v.len() < l {
-                vec![black_box(E::G1::zero())]
+            let powers_of_g = if (1 << i) < l {
+                vec![black_box(E::G1::rand(rng))]
             } else {
                 // Since the length is always a power of 2 the chunks are exact. No remainders.
-                black_box(vec![E::G1::zero(); v.len() / l])
+                black_box((0..((1 << i) / l)).map(|_| E::G1::rand(rng)).collect())
             };
             result.powers_of_g[i] = powers_of_g;
         }
