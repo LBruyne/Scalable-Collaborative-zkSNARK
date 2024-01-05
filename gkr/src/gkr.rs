@@ -82,10 +82,9 @@ pub async fn d_initialize_phase_one<F: FftField, Net: MPCSerializeNet>(
     black_box(shares_f1);
     black_box(shares_f3);
     black_box(challenge_g);
-    d_polyfill_phase_initilization(shares_f1, pp, net, sid).await?;
     Ok(PackedDenseMultilinearExtension::from_evaluations_slice(
         challenge_g.len(),
-        &vec![F::zero(); 1 << challenge_g.len() - pp.l.trailing_zeros() as usize],
+        &d_polyfill_phase_initilization(shares_f1, pp, net, sid).await?,
     ))
 }
 
@@ -101,10 +100,9 @@ pub async fn d_initialize_phase_two<F: FftField, Net: MPCSerializeNet>(
     black_box(shares_f1);
     black_box(challenge_g);
     black_box(challenge_v);
-    d_polyfill_phase_initilization(shares_f1, pp, net, sid).await?;
     Ok(PackedDenseMultilinearExtension::from_evaluations_slice(
         challenge_g.len(),
-        &vec![F::zero(); 1 << challenge_g.len() - pp.l.trailing_zeros() as usize],
+        &d_polyfill_phase_initilization(shares_f1, pp, net, sid).await?,
     ))
 }
 
@@ -113,24 +111,22 @@ pub async fn d_polyfill_phase_initilization<F: FftField, Net: MPCSerializeNet>(
     pp: &PackedSharingParams<F>,
     net: &Net,
     sid: MultiplexedStreamID,
-) -> Result<(), MPCNetError> {
+) -> Result<Vec<F>, MPCNetError> {
     // Handle each point in f1
     // Besides, only 1/N computations should be done on party 0
-    let simulation = {
-        let share: Vec<F> = pp.pack_from_public(vec![F::zero(); pp.l]);
-        let reduced_shares: Vec<_> = (0..shares_f1.0.len())
-            .map(|_| degree_reduce(black_box(share[0]) * black_box(share[0]), pp, net, sid))
-            .collect();
-        try_join_all(reduced_shares).await?
+    let mut evaluations = vec![F::zero(); shares_f1.0.len()];
+    let _simulation = {
+        for (_k, v) in &shares_f1.0 {
+            evaluations[random::<usize>() % shares_f1.0.len()] += degree_reduce(*v * *v, pp, net, sid).await?;
+        }
     };
-    black_box(simulation);
     // // Fill up the omitted comms for f1 shares, these hash map entries are transmitted from and to other parties
     // let transmit: Vec<(usize, usize, usize)> = (0..shares_f1.0.len()).map(|x| (x, x, x)).collect();
     // let mut bytes_out = Vec::new();
     // transmit.serialize_uncompressed(&mut bytes_out)?;
     // let size = bytes_out.len();
     // net.add_comm(size * (net.n_parties() - 1), size * (net.n_parties() - 1));
-    Ok(())
+    Ok(evaluations)
 }
 
 static CNT: AtomicUsize = AtomicUsize::new(0);
@@ -272,7 +268,7 @@ pub fn polyfill_phase_initilization<F: FftField>(
     let mut evaluations = vec![F::zero(); f1.0.len()];
     let _simulation = {
         for (_k, v) in &f1.0 {
-            evaluations[random::<usize>() % f1.0.len()] += v;
+            evaluations[random::<usize>() % f1.0.len()] += *v * *v;
         }
     };
     DenseMultilinearExtension::from_evaluations_slice(f1.0.len(), &evaluations)

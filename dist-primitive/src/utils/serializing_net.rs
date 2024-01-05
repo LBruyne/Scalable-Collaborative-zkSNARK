@@ -97,11 +97,11 @@ pub trait MPCSerializeNet: MPCNet {
         // The total communication is 2(N-1)T
         let size = bytes_out.len() * 2 * (self.n_parties() - 1) / self.n_parties();
         self.add_comm(size, size);
-        let mut result = vec![T::deserialize_compressed(&bytes_out[..])?;self.n_parties()];
-        // With probability 1/N, it shall run the computation
+        let mut result = vec![T::deserialize_compressed(&bytes_out[..])?];
         let random_float: f64 = rand::thread_rng().gen();
         // With probability 1/N, it shall run the computation
         if random_float < 1.0 / self.n_parties() as f64 {
+            result = vec![T::deserialize_compressed(&bytes_out[..])?;self.n_parties()];
             result = black_box(f(black_box(result)));
         }
         return Ok(result.pop().unwrap());

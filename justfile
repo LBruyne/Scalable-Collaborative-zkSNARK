@@ -1,4 +1,4 @@
-RUSTFLAGS:= "\"-Ctarget-cpu=native --cfg tokio_unstable -Awarnings\""
+RUSTFLAGS:= "\"-Ctarget-cpu=native -Awarnings\""
 
 CARGO:= "RUSTFLAGS="+RUSTFLAGS+" cargo +nightly"
 build:
