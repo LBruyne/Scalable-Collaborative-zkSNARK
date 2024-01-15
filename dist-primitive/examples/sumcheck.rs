@@ -2,7 +2,6 @@ use std::hint::black_box;
 
 
 use ark_bls12_377::Fr;
-use ark_ff::fields::Field;
 
 use ark_std::UniformRand;
 

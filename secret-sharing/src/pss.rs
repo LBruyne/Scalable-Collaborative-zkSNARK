@@ -1,5 +1,3 @@
-// This file is copied from zk-SaaS
-
 use ark_poly::{
     domain::{DomainCoeff, EvaluationDomain},
     Radix2EvaluationDomain,

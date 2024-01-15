@@ -4,7 +4,6 @@ use ark_ff::FftField;
 use ark_std::perf_trace::AtomicUsize;
 
 use ark_std::UniformRand;
-use ark_std::Zero;
 use dist_primitive::degree_reduce::degree_reduce;
 
 use dist_primitive::dpoly_comm::PolynomialCommitment;
@@ -22,13 +21,13 @@ use dist_primitive::{
     mle::PackedDenseMultilinearExtension, utils::serializing_net::MPCSerializeNet,
 };
 
-use mpc_net::{MPCNet, MPCNetError, MultiplexedStreamID};
+use mpc_net::{MPCNetError, MultiplexedStreamID};
 
 use rand::random;
 use secret_sharing::pss::PackedSharingParams;
 use std::hint::black_box;
 
-use std::{collections::HashMap, ops::Mul};
+use std::{collections::HashMap};
 
 #[derive(Clone, Debug)]
 pub struct SparseMultilinearExtension<F>(pub HashMap<(F, F, F), F>);

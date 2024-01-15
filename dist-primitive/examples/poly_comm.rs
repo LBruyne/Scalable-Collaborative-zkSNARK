@@ -1,6 +1,5 @@
 use std::hint::black_box;
 
-
 use ark_bls12_381::Bls12_381;
 use ark_ec::{bls12::Bls12, pairing::Pairing};
 use ark_std::UniformRand;
@@ -14,7 +13,6 @@ use dist_primitive::start_timer;
 use mpc_net::LocalTestNet;
 use mpc_net::MPCNet;
 use mpc_net::MultiplexedStreamID;
-use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Parser)]
