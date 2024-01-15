@@ -1,4 +1,4 @@
-# Distributed-GKR
+# Collaborative-GKR
 
 Rust implementation of the paper [Improving Collaborative zk-SNARK: Fully Distributed Proof Generation
 and Malicious Security](TODO: Fill in the link here). The project is still under development.
