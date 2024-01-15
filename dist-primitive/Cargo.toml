@@ -17,13 +17,10 @@ mpc-net ={ version = "0.1.0", path = "../mpc-net" }
 log = {version = "0.4"}
 rand = { version = "0.8", default-features = false, features = ["std"] }
 digest = { version = "0.10" }
-sha2 = "0.10"
-structopt = "0.3"
 env_logger = "0.10"
 async-trait = "0.1.74"
 tokio = { version = "1.34.0", features = ["macros", "rt", "rt-multi-thread", "tracing"] }
 colored = "2.0.4"
-console-subscriber = "0.2.0"
 clap = {version = "4.4.11", features = ["derive"] }
 ark-bls12-381 = "0.4.0"
 rayon = "1.8.0"

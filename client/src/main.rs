@@ -11,11 +11,11 @@ use mpc_net::{
     MPCNetError, MultiplexedStreamID,
 };
 use secret_sharing::pss::PackedSharingParams;
-use serde::{Deserialize, Serialize};
+
 use std::{fs::File, collections::HashMap};
 use std::hint::black_box;
 use std::io::{BufRead, BufReader};
-use std::net::SocketAddr;
+
 use std::{path::PathBuf, time::Duration};
 use tokio::net::{TcpListener, TcpStream};
 use ark_std::UniformRand;
@@ -92,7 +92,7 @@ async fn main() {
 
     let mut shares_f1 = SparseMultilinearExtension::<<E as Pairing>::ScalarField>(HashMap::new());
     // Randomly generate these shares and challenges for new
-    let mut rng = &mut ark_std::test_rng();
+    let rng = &mut ark_std::test_rng();
     for _ in 0..((1 << cli.width) / cli.l) {
         shares_f1.0.insert(
             (
@@ -127,8 +127,8 @@ async fn main() {
         .map(|_| <E as Pairing>::ScalarField::rand(rng))
         .collect::<Vec<_>>();
 
-    let g1 = <E as Pairing>::G1::rand(rng);
-    let g2 = <E as Pairing>::G2::rand(rng);
+    let _g1 = <E as Pairing>::G1::rand(rng);
+    let _g2 = <E as Pairing>::G2::rand(rng);
     let commit_shares = PolynomialCommitmentCub::<E>::new_single(cli.width, &pp);
 
     black_box(

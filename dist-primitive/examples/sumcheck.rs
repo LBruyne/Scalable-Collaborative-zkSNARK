@@ -1,5 +1,5 @@
 use std::hint::black_box;
-use std::sync::Arc;
+
 
 use ark_bls12_377::Fr;
 use ark_ff::fields::Field;
@@ -9,7 +9,7 @@ use ark_std::UniformRand;
 use clap::Parser;
 use dist_primitive::dsumcheck::d_sumcheck_product;
 use dist_primitive::dsumcheck::sumcheck_product;
-use dist_primitive::{dsumcheck::d_sumcheck, end_timer, start_timer, utils::operator::transpose};
+use dist_primitive::{end_timer, start_timer, utils::operator::transpose};
 use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
 use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;

@@ -1,5 +1,5 @@
 use std::hint::black_box;
-use std::sync::Arc;
+
 
 use ark_bls12_381::Bls12_381;
 use ark_ec::{bls12::Bls12, pairing::Pairing};
@@ -9,8 +9,8 @@ use clap::Parser;
 use dist_primitive::dpoly_comm::PolynomialCommitmentCub;
 use dist_primitive::end_timer;
 use dist_primitive::start_timer;
-use dist_primitive::timed;
-use dist_primitive::utils::operator::transpose;
+
+
 use mpc_net::LocalTestNet;
 use mpc_net::MPCNet;
 use mpc_net::MultiplexedStreamID;
@@ -53,10 +53,10 @@ async fn main() {
     {
         let timer = start_timer!("Local");
         let commit_timer = start_timer!("Commit");
-        let commit = verification.commit(&peval);
+        let _commit = verification.commit(&peval);
         end_timer!(commit_timer);
         let open_timer = start_timer!("Open");
-        let (value, proof) = verification.open(&peval, &u);
+        let (_value, _proof) = verification.open(&peval, &u);
         end_timer!(open_timer);
         end_timer!(timer);
     }

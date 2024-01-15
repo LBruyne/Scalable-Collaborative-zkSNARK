@@ -14,13 +14,16 @@ use gkr::gkr::polyfill_gkr;
 use gkr::gkr::SparseMultilinearExtension;
 
 use mpc_net::LocalTestNet;
-use mpc_net::{MPCNet, MultiplexedStreamID};
+use mpc_net::{MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 use std::hint::black_box;
 
 use std::collections::HashMap;
-use std::sync::Arc;
 
+use peak_alloc::PeakAlloc;
+
+#[global_allocator]
+static PEAK_ALLOC: PeakAlloc = PeakAlloc;
 type E = Bls12<ark_bls12_381::Config>;
 /// f1(g,x,y)f2(x)f3(y)
 #[derive(Parser)]
@@ -37,6 +40,8 @@ async fn main() {
     let args = Cli::parse();
     // gkr_local(args.width, args.depth, args.l);
     distributed(args.width, args.depth, args.l).await;
+    let peak_mem = PEAK_ALLOC.peak_usage_as_gb();
+	println!("The max amount that was used {}", peak_mem);
 }
 
 async fn distributed(layer_width: usize, layer_depth: usize, l: usize) {
@@ -86,8 +91,8 @@ async fn distributed(layer_width: usize, layer_depth: usize, l: usize) {
         .collect::<Vec<_>>();
     let mut _challenge_v = vec![challenge_v; layer_depth];
 
-    let g1 = <E as Pairing>::G1::rand(rng);
-    let g2 = <E as Pairing>::G2::rand(rng);
+    let _g1 = <E as Pairing>::G1::rand(rng);
+    let _g2 = <E as Pairing>::G2::rand(rng);
     let commit_shares = PolynomialCommitmentCub::<E>::new_single(layer_width, &pp);
     black_box(
         d_polyfill_gkr(
@@ -115,7 +120,7 @@ async fn distributed(layer_width: usize, layer_depth: usize, l: usize) {
     black_box(&mut _challenge_v);
 }
 
-fn gkr_local(layer_width: usize, layer_depth: usize, l: usize) {
+fn gkr_local(layer_width: usize, layer_depth: usize, _l: usize) {
     // generate shares
     black_box(polyfill_gkr::<E>(layer_depth, layer_width));
 }
