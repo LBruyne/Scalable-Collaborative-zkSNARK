@@ -17,8 +17,10 @@ use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Parser)]
 struct Cli {
+    /// The packing size, should be 1/4 of the party size as well as a power of 2.
     #[arg(long)]
     l: usize,
+    /// log2 of the width of the circuit (The total number of variables)
     #[arg(long)]
     width: usize,
 }

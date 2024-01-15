@@ -28,10 +28,13 @@ type E = Bls12<ark_bls12_381::Config>;
 /// f1(g,x,y)f2(x)f3(y)
 #[derive(Parser)]
 struct Cli {
+    /// The packing size, should be 1/4 of the party size as well as a power of 2.
     #[arg(long)]
     l: usize,
+    /// The depth of the circuit
     #[arg(long)]
     depth: usize,
+    /// log2 of the width of the circuit
     #[arg(long)]
     width: usize,
 }
