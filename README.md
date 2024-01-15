@@ -27,3 +27,7 @@ RUSTFLAGS="-Ctarget-cpu=native -Awarnings" cargo +nightly run --release --exampl
 - `hack`: Scripts for running the experiments.
 - `mpc-net`: The network layer for the MPC.
 - `secret-sharing`: The packed secret sharing scheme.
+
+## License
+
+This library is released under the MIT License.
