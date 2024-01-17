@@ -44,7 +44,8 @@ pub async fn d_gkr_round<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<Vec<(F, F, F)>, MPCNetError> {
-    // TROUBLE: how do we get g? How do we calculate phase one and two?
+    // This is an implementation of the linear-time algorithm for GKR functions
+    // Refer to Libra's paper and Appendix B.2 of our paper for more details.
     let timer_initialize_phase_one = start_timer!("dInitialize phase one");
     let hg = d_initialize_phase_one(shares_f1, shares_f3, challenge_g, pp, net, sid).await?;
     end_timer!(timer_initialize_phase_one);
@@ -56,7 +57,6 @@ pub async fn d_gkr_round<F: FftField, Net: MPCSerializeNet>(
     let f1 = d_initialize_phase_two(shares_f1, challenge_g, challenge_v, pp, net, sid).await?;
     end_timer!(timer_initialize_phase_two);
     let timer_f3_f2u = start_timer!("Calculate f3*f2(u)");
-    // TROUBLE: here we need to multiply f3 with f2(u), this could be costly.
     let f2_u = d_fix_variable(&shares_f2.shares, challenge_u, pp, net, sid).await?[0];
     let f2_u = d_unpack_0(f2_u, pp, net, sid).await?;
     let shares_f3_f2u = shares_f3.mul(&f2_u);
@@ -77,7 +77,6 @@ pub async fn d_initialize_phase_one<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<PackedDenseMultilinearExtension<F>, MPCNetError> {
-    // Now this comes from Father Christmas
     black_box(shares_f1);
     black_box(shares_f3);
     black_box(challenge_g);
@@ -215,7 +214,8 @@ pub fn gkr_round<F: FftField>(
     challenge_u: &Vec<F>,
     challenge_v: &Vec<F>,
 ) -> Vec<(F, F, F)> {
-    // TROUBLE: how do we get g? How do we calculate phase one and two?
+    // This is an implementation of the linear-time algorithm for GKR functions
+    // Refer to Libra's paper and Appendix B.2 of our paper for more details.
     let timer_initialize_phase_one = start_timer!("Initialize phase one");
     let hg = initialize_phase_one(f1, f3, challenge_g);
     end_timer!(timer_initialize_phase_one);
@@ -225,7 +225,6 @@ pub fn gkr_round<F: FftField>(
     let timer_initialize_phase_two = start_timer!("Initialize phase two");
     let f1 = initialize_phase_two(f1, challenge_g, challenge_v);
     end_timer!(timer_initialize_phase_two);
-    // TROUBLE: here we need to multiply f3 with f2(u), this could be costly.
     let timer_f3_f2u = start_timer!("Calculate f3*f2(u)");
     let f2_u = fix_variable(&f2.evaluations, challenge_u)[0];
     let f3_f2u = f3.mul(&f2_u);

@@ -554,7 +554,7 @@ mod tests {
         true
     }
 
-    /// Simulate the shared sumcheck, but do not actually distribute the shares
+    /// Simulate the distributed sumcheck, but do not actually distribute the shares
     #[tokio::test]
     async fn dsumcheck_local_test() {
         let pp = PackedSharingParams::<Fr>::new(L);
