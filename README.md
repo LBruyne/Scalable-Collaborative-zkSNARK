@@ -6,6 +6,10 @@ To find the evaluations, check the examples in `dist-primitive`, `gkr` and the s
 
 The project is built upon [arkworks ecosystem](https://github.com/arkworks-rs).
 
+## Illustration
+
+This is a Proof-of-Concept implementation. In the paper, we assume a P2P network for the MPC protocol to run smoothly. In the actual implementation, we only implement a peer which can be run by an low-specific instance. We estimated the overall efficiency by calculating the computational, memory, and communication costs incurred by a node during a single proof generation process.
+
 ## How to run
 
 If you got [`just`](https://github.com/casey/just) at hand, simply run:
@@ -19,12 +23,22 @@ Or run the examples with raw cargo commands:
 RUSTFLAGS="-Ctarget-cpu=native -Awarnings" cargo +nightly run --release --example <example name>
 ```
 
-For example, run the POC GKR implementation:
+### Distributed primitives
+
+For benchmarks of the distributed primitives, please check `hack/bench_poly_comm.sh` and `hack/bench_sumcheck.sh`.
+
+### Distributed GKR
+
+Run the example inside `gkr/examples`.
+
+For example, to run the POC GKR implementation (both for local and distributed setting, feel free to make modification):
 ```bash
 just run --release --example gkr -- --l 32 --depth 16 --width 21
 ```
 
-For benchmarks of the distributed primitives, please check `hack/bench_poly_comm.sh` and `hack/bench_sumcheck.sh`.
+In this command, $l$ represents the packing factor (we use $t := \frac{N}{4}$ in the paper), and the circuit size is calculated as $|C| = depth \times 2^{width}$. In a consumer instance, the example provided typically completes in about 4 minutes.
+
+The program outputs the time taken for each sub-protocol, the peak memory usage, and the actual communication cost (both incoming and outgoing data) during proof generation. This output can be redirected to a file for further analysis.
 
 ## Project layout
 
