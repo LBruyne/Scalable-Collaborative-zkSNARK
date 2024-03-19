@@ -19,6 +19,13 @@ Or run the examples with raw cargo commands:
 RUSTFLAGS="-Ctarget-cpu=native -Awarnings" cargo +nightly run --release --example <example name>
 ```
 
+For example, run the POC GKR implementation:
+```bash
+just run --release --example gkr -- --l 32 --depth 16 --width 21
+```
+
+For benchmarks of the distributed primitives, please check `hack/bench_poly_comm.sh` and `hack/bench_sumcheck.sh`.
+
 ## Project layout
 
 - `dist-primitive`: The distributed primitives, including dMSM, dPolyCommit and dSumcheck.

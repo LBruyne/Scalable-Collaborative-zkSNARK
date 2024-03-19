@@ -41,7 +41,7 @@ struct Cli {
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     let args = Cli::parse();
-    // gkr_local(args.width, args.depth, args.l);
+    gkr_local(args.width, args.depth, args.l);
     distributed(args.width, args.depth, args.l).await;
     let peak_mem = PEAK_ALLOC.peak_usage_as_gb();
 	println!("The max amount that was used {}", peak_mem);
