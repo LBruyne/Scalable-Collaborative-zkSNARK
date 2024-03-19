@@ -1,6 +1,6 @@
 # Collaborative-GKR
 
-Rust implementation of the paper Scalable Collaborative zk-SNARK: Fully Distributed Proof Generation and Malicious Security.
+Rust implementation of the paper "Scalable Collaborative zk-SNARK: Fully Distributed Proof Generation and Malicious Security".
 
 To find the evaluations, check the examples in `dist-primitive`, `gkr` and the scripts in `hack`. 
 
@@ -29,14 +29,14 @@ For benchmarks of the distributed primitives, please check `hack/bench_poly_comm
 
 ### Distributed GKR
 
-Run the example inside `gkr/examples`.
+Run examples inside the folder `gkr/examples`.
 
-For example, to run the POC GKR implementation (both for local and distributed setting, feel free to make modification):
+For example, to run the POC GKR implementation (now both for local and distributed setting, feel free to make modification):
 ```bash
-just run --release --example gkr -- --l 32 --depth 16 --width 21
+just run --release --example gkr -- --l 32 --depth 16 --width 19
 ```
 
-In this command, $l$ represents the packing factor (we use $t := \frac{N}{4}$ in the paper), and the circuit size is calculated as $|C| = depth \times 2^{width}$. In a consumer instance, the example provided typically completes in about 4 minutes.
+In this command, ll represents the packing factor (we use t:=N4t := \frac{N}{4} in the paper), and the circuit size is calculated as |C|=depth×2width|C| = depth \times 2^{width}. In a consumer instance, the example provided typically completes in about 5 minutes.
 
 The program outputs the time taken for each sub-protocol, the peak memory usage, and the actual communication cost (both incoming and outgoing data) during proof generation. This output can be redirected to a file for further analysis.
 
