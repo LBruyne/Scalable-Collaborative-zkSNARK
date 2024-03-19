@@ -1,6 +1,6 @@
 # Collaborative-GKR
 
-Rust implementation of the paper [Scalable Collaborative {zk-SNARK}: Fully Distributed Proof Generation and Malicious Security](https://eprint.iacr.org/2024/143).
+Rust implementation of the paper Scalable Collaborative zk-SNARK: Fully Distributed Proof Generation and Malicious Security.
 
 To find the evaluations, check the examples in `dist-primitive`, `gkr` and the scripts in `hack`. 
 
