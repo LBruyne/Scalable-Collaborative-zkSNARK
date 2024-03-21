@@ -28,6 +28,10 @@ use secret_sharing::pss::PackedSharingParams;
 use std::hint::black_box;
 
 use std::{collections::HashMap};
+use peak_alloc::PeakAlloc;
+
+#[global_allocator]
+pub static PEAK_ALLOC: PeakAlloc = PeakAlloc;
 
 #[derive(Clone, Debug)]
 pub struct SparseMultilinearExtension<F>(pub HashMap<(F, F, F), F>);
@@ -334,6 +338,8 @@ pub fn polyfill_gkr<E: Pairing>(
         .collect::<Vec<_>>();
     let cub = PolynomialCommitmentCub::<E>::new_toy(g1, g2, s);
     let mature = cub.mature();
+
+    // PEAK_ALLOC.reset_peak_usage();
     let timer_all = start_timer!("Begin GKR");
     let commit = timed!("Commit", mature.commit(&_f2[0].evaluations));
     let timer_gkr_rounds = start_timer!("GKR rounds");

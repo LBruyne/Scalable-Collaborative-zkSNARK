@@ -12,6 +12,7 @@ use dist_primitive::mle::PackedDenseMultilinearExtension;
 use gkr::gkr::d_polyfill_gkr;
 use gkr::gkr::polyfill_gkr;
 use gkr::gkr::SparseMultilinearExtension;
+use gkr::gkr::{PEAK_ALLOC};
 
 use mpc_net::LocalTestNet;
 use mpc_net::{MultiplexedStreamID};
@@ -20,10 +21,6 @@ use std::hint::black_box;
 
 use std::collections::HashMap;
 
-use peak_alloc::PeakAlloc;
-
-#[global_allocator]
-static PEAK_ALLOC: PeakAlloc = PeakAlloc;
 type E = Bls12<ark_bls12_381::Config>;
 /// f1(g,x,y)f2(x)f3(y)
 #[derive(Parser)]
@@ -41,10 +38,15 @@ struct Cli {
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     let args = Cli::parse();
+    // Run local GKR.
     gkr_local(args.width, args.depth, args.l);
+    // let peak_mem_1 = PEAK_ALLOC.peak_usage_as_gb();
+
+    // Run distributed GKR.
     distributed(args.width, args.depth, args.l).await;
-    let peak_mem = PEAK_ALLOC.peak_usage_as_gb();
-	println!("The max amount that was used {}", peak_mem);
+    // let peak_mem_2 = PEAK_ALLOC.peak_usage_as_gb();
+    // println!("The max memory used for local GKR: {} GB", peak_mem_1);
+	// println!("The max memory used for distributed GKR {} GB", peak_mem_2);
 }
 
 async fn distributed(layer_width: usize, layer_depth: usize, l: usize) {
@@ -94,6 +96,7 @@ async fn distributed(layer_width: usize, layer_depth: usize, l: usize) {
         .collect::<Vec<_>>();
     let mut _challenge_v = vec![challenge_v; layer_depth];
 
+    // PEAK_ALLOC.reset_peak_usage();
     let _g1 = <E as Pairing>::G1::rand(rng);
     let _g2 = <E as Pairing>::G2::rand(rng);
     let commit_shares = PolynomialCommitmentCub::<E>::new_single(layer_width, &pp);
