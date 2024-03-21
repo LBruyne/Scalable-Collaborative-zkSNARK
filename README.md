@@ -1,14 +1,12 @@
 # Collaborative-GKR
 
-Rust implementation of the paper "Scalable Collaborative zk-SNARK: Fully Distributed Proof Generation and Malicious Security".
-
-To find the evaluations, check the examples in `dist-primitive`, `gkr` and the scripts in `hack`. 
+Rust implementation of the paper "Scalable Collaborative zk-SNARK: Fully Distributed Proof Generation and Malicious Security". 
 
 The project is built upon [arkworks ecosystem](https://github.com/arkworks-rs).
 
 ## Illustration
 
-This is a Proof-of-Concept implementation. In the paper, we assume a P2P network for the MPC protocol to run smoothly. In the actual implementation, we only implement a peer which can be run by an low-specific instance. We estimated the overall efficiency by calculating the computational, memory, and communication costs incurred by a node during a single proof generation process.
+This is a Proof-of-Concept (PoC) implementation. In the paper, we assume a peer-to-peer network for smooth operation of the MPC protocol. In experimental practice, we implemented a single peer that can be executed on a low-specification instance. We estimated the overall efficiency by calculating the computational, memory, and communication costs incurred by a node during a single proof generation process. Although we did not implement actual communication (an industrial-grade implementation could address this), we ensured that each instance accurately executed its assigned tasks, and we properly tracked for the communication overhead.
 
 ## Version
 
@@ -23,13 +21,14 @@ rustup default nightly-2024-02-04
 
 ## How to run
 
-If you got [`just`](https://github.com/casey/just) at hand, simply run:
+We offer "Rust examples" for distributed primitives and the PoC implementation of distributed GKR. For a "Rust example", if you have [`just`](https://github.com/casey/just) installed, you can run: 
 
 ```bash
 just run --release --example <example name>
 ```
 
-Or run the examples with raw cargo commands:
+If you don't have just, execute the examples using the raw cargo commands:
+
 ```bash
 RUSTFLAGS="-Ctarget-cpu=native -Awarnings" cargo +nightly run --release --example <example name>
 ```
@@ -40,16 +39,19 @@ For benchmarks of the distributed primitives, please check `hack/bench_poly_comm
 
 ### Distributed GKR
 
-Run examples inside the folder `gkr/examples`.
+Run the example inside the folder `gkr/examples`.
 
-For example, to run the POC GKR implementation (now both for local and distributed setting, feel free to make modification):
+To run the comparison between PoC dGKR and GKR:
 ```bash
+# At the root directory
 just run --release --example gkr -- --l 32 --depth 16 --width 19
 ```
 
-In this command, ll represents the packing factor (we use $t := \frac{N}{4}$ in the paper), and the circuit size is calculated as $|C| = depth \times 2^{width}$. In a consumer instance, the example provided typically completes in about 5 minutes.
+This command runs proof generation in both local and distributed settings, and you can freely modify `gkr/examples/gkr.rs` as needed. If you encounter a `Too many open files` error, adjust your environment setting with `ulimit -HSn 65536`.
 
-The program outputs the time taken for each sub-protocol, the peak memory usage, and the actual communication cost (both incoming and outgoing data) during proof generation. This output can be redirected to a file for further analysis.
+In this command, $l$ represents the packing factor (we use $t := \frac{N}{4}$ in the paper), and the circuit size is calculated as $|C| = depth \times 2^{width}$.  In a consumer machine, the example provided typically completes in about 5 minutes.
+
+The program outputs the time taken for each sub-protocol and the actual communication cost (both incoming and outgoing data) during proof generation. This output can be redirected to a file for further analysis.
 
 ## Project layout
 
