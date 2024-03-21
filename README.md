@@ -10,6 +10,17 @@ The project is built upon [arkworks ecosystem](https://github.com/arkworks-rs).
 
 This is a Proof-of-Concept implementation. In the paper, we assume a P2P network for the MPC protocol to run smoothly. In the actual implementation, we only implement a peer which can be run by an low-specific instance. We estimated the overall efficiency by calculating the computational, memory, and communication costs incurred by a node during a single proof generation process.
 
+## Version
+
+It uses a nightly version of Rust.
+
+**WARNING**: The `stdsimd` feature has been recently removed in the Rust nightly build. If you have installed your Rust toolchain recently, you should switch to an "older" version:
+
+```
+rustup install 1.76.0
+rustup default nightly-2024-02-04
+```
+
 ## How to run
 
 If you got [`just`](https://github.com/casey/just) at hand, simply run:
