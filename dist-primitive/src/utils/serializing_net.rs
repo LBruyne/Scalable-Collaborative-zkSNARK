@@ -39,6 +39,41 @@ pub trait MPCSerializeNet: MPCNet {
         }
     }
 
+    async fn dynamic_worker_send_or_leader_receive_element<
+        T: CanonicalDeserialize + CanonicalSerialize,
+    >(
+        &self,
+        out: &T,
+        receiver: u32,
+        sid: MultiplexedStreamID,
+    ) -> Result<Option<Vec<T>>, MPCNetError> {
+        let mut bytes_out = Vec::new();
+        out.serialize_compressed(&mut bytes_out).unwrap();
+        let bytes_in = self
+            .dynamic_worker_send_or_leader_receive(&bytes_out, receiver, sid)
+            .await?;
+        if let Some(bytes_in) = bytes_in {
+            // This is leader
+            debug_assert!(receiver == self.party_id());
+            let results: Vec<Result<T, MPCNetError>> = bytes_in
+                .into_iter()
+                .map(|b| {
+                    T::deserialize_compressed(&b[..])
+                        .map_err(|err| MPCNetError::Generic(err.to_string()))
+                })
+                .collect();
+
+            let mut ret = Vec::new();
+            for result in results {
+                ret.push(result?);
+            }
+
+            Ok(Some(ret))
+        } else {
+            Ok(None)
+        }
+    }
+
     async fn worker_receive_or_leader_send_element<
         T: CanonicalDeserialize + CanonicalSerialize + Send,
         // A bug of rustc, T does not have to be Send actually. See https://github.com/rust-lang/rust/issues/63768
@@ -66,7 +101,9 @@ pub trait MPCSerializeNet: MPCNet {
     ///
     /// The leader's computation is given by a function, `f`
     /// proceeds.
-    async fn _leader_compute_element<T: CanonicalDeserialize + CanonicalSerialize + Send + Clone>(
+    async fn leader_compute_element<
+        T: CanonicalDeserialize + CanonicalSerialize + Send + Clone,
+    >(
         &self,
         out: &T,
         sid: MultiplexedStreamID,
@@ -84,7 +121,7 @@ pub trait MPCSerializeNet: MPCNet {
     /// Should only be used when you want to rule out the impact of the MPC net.
     ///
     /// The leader's computation is given by a function `f`
-    async fn leader_compute_element<T: CanonicalDeserialize + CanonicalSerialize + Send + Clone>(
+    async fn _leader_compute_element<T: CanonicalDeserialize + CanonicalSerialize + Send + Clone>(
         &self,
         out: &T,
         _sid: MultiplexedStreamID,
@@ -101,7 +138,7 @@ pub trait MPCSerializeNet: MPCNet {
         let random_float: f64 = rand::thread_rng().gen();
         // With probability 1/N, it shall run the computation
         if random_float < 1.0 / self.n_parties() as f64 {
-            result = vec![T::deserialize_compressed(&bytes_out[..])?;self.n_parties()];
+            result = vec![T::deserialize_compressed(&bytes_out[..])?; self.n_parties()];
             result = black_box(f(black_box(result)));
         }
         return Ok(result.pop().unwrap());

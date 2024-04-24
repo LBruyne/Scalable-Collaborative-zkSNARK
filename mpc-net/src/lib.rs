@@ -48,15 +48,11 @@ pub trait MPCNet: Send + Sync {
     fn is_init(&self) -> bool;
 
     /// Get upload/download in bytes
-    fn get_comm(&self) -> (usize,usize);
+    fn get_comm(&self) -> (usize, usize);
 
     fn add_comm(&self, up: usize, down: usize);
 
-    async fn recv_from(
-        &self,
-        id: u32,
-        sid: MultiplexedStreamID,
-    ) -> Result<Bytes, MPCNetError>;
+    async fn recv_from(&self, id: u32, sid: MultiplexedStreamID) -> Result<Bytes, MPCNetError>;
     async fn send_to(
         &self,
         id: u32,
@@ -93,7 +89,6 @@ pub trait MPCNet: Send + Sync {
             debug_assert_eq!(ret.get(&0).unwrap().clone(), bytes_out);
             // ret.entry(0).or_insert_with(|| bytes_out.clone()); //Why do we need this?
 
-
             let mut sorted_ret = Vec::new();
             for x in 0..self.n_parties() {
                 sorted_ret.push(ret.remove(&(x as u32)).unwrap());
@@ -102,6 +97,49 @@ pub trait MPCNet: Send + Sync {
             Ok(Some(sorted_ret))
         } else {
             self.send_to(0, bytes_out, sid).await?;
+            Ok(None)
+        };
+        r
+    }
+
+    /// All parties send bytes to the leader. The leader receives all the bytes
+    async fn dynamic_worker_send_or_leader_receive(
+        &self,
+        bytes: &[u8],
+        receiver: u32,
+        sid: MultiplexedStreamID,
+    ) -> Result<Option<Vec<Bytes>>, MPCNetError> {
+        let bytes_out = Bytes::copy_from_slice(bytes);
+        let own_id = self.party_id();
+
+        let r = if receiver == self.party_id() {
+            let mut r = FuturesOrdered::new();
+
+            for id in 0..self.n_parties() as u32 {
+                let bytes_out: Bytes = bytes_out.clone();
+                r.push_back(Box::pin(async move {
+                    let bytes_in = if id == own_id {
+                        bytes_out
+                    } else {
+                        self.recv_from(id, sid).await?
+                    };
+
+                    Ok::<_, MPCNetError>((id, bytes_in))
+                }));
+            }
+
+            let mut ret: HashMap<u32, Bytes> = r.try_collect().await?;
+            debug_assert_eq!(ret.get(&own_id).unwrap().clone(), bytes_out);
+            // ret.entry(0).or_insert_with(|| bytes_out.clone()); //Why do we need this?
+
+            let mut sorted_ret = Vec::new();
+            for x in 0..self.n_parties() {
+                sorted_ret.push(ret.remove(&(x as u32)).unwrap());
+            }
+
+            Ok(Some(sorted_ret))
+        } else {
+            self.send_to(receiver, bytes_out, sid).await?;
             Ok(None)
         };
         r
@@ -159,8 +197,8 @@ pub trait MPCNet: Send + Sync {
         sid: MultiplexedStreamID,
         f: impl Fn(Vec<Bytes>) -> Vec<Bytes> + Send,
     ) -> Result<Bytes, MPCNetError> {
-        let leader_response =
-            self.worker_send_or_leader_receive(bytes, sid).await?.map(f);
-        self.worker_receive_or_leader_send(leader_response, sid).await
+        let leader_response = self.worker_send_or_leader_receive(bytes, sid).await?.map(f);
+        self.worker_receive_or_leader_send(leader_response, sid)
+            .await
     }
 }

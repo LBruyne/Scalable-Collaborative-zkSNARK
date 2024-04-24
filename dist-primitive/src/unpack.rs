@@ -16,3 +16,37 @@ pub async fn d_unpack_0<F: FftField, Net: MPCSerializeNet>(
     })
     .await
 }
+
+pub async fn d_unpack<F: FftField, Net: MPCSerializeNet>(
+    share: F,
+    receiver: u32,
+    pp: &PackedSharingParams<F>,
+    net: &Net,
+    sid: MultiplexedStreamID,
+) -> Result<Vec<F>, MPCNetError> {
+    let shares = net
+        .dynamic_worker_send_or_leader_receive_element(&share, receiver, sid)
+        .await?;
+    if let Some(shares) = shares {
+        Ok(pp.unpack(shares))
+    } else {
+        Ok(Vec::new())
+    }
+}
+
+pub async fn d_unpack2<F: FftField, Net: MPCSerializeNet>(
+    share: F,
+    receiver: u32,
+    pp: &PackedSharingParams<F>,
+    net: &Net,
+    sid: MultiplexedStreamID,
+) -> Result<Vec<F>, MPCNetError> {
+    let shares = net
+        .dynamic_worker_send_or_leader_receive_element(&share, receiver, sid)
+        .await?;
+    if let Some(shares) = shares {
+        Ok(pp.unpack2(shares))
+    } else {
+        Ok(Vec::new())
+    }
+}
