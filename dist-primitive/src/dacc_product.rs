@@ -1,15 +1,11 @@
 use std::cmp::min;
 
 use crate::{
-    degree_reduce::degree_reduce,
-    dperm::d_perm,
-    end_timer, start_timer, unpack,
-    utils::{operator::transpose, serializing_net::MPCSerializeNet},
+    unpack, utils::{operator::transpose, serializing_net::MPCSerializeNet},
 };
 use ark_ff::FftField;
 use ark_std::iterable::Iterable;
-use futures::future::{join_all, try_join, try_join3};
-use itertools::Itertools;
+use futures::future::join_all;
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
@@ -79,8 +75,8 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
     Ok((subtree_result, None))
 }
 
-// Given i as a number in its binary representation, i.e. i = 1xxxx, return xxxx0 and xxxx1
-// For example, given i=26=b11010, return b10100=20 and b10101=21
+/// Given i as a number in its binary representation, i.e. i = 1xxxx, return xxxx0 and xxxx1
+/// For example, given i=26=b11010, return b10100=20 and b10101=21
 fn sub_index(i: usize) -> (usize, usize) {
     let first_one = usize::BITS - i.leading_zeros() - 1;
     let x = i & !(1 << first_one);
@@ -88,7 +84,7 @@ fn sub_index(i: usize) -> (usize, usize) {
     (x, x + 1)
 }
 
-/// Given x_0 ... x_2^m, returns the shares.
+/// Given x_0 ... x_2^m, returns the shares or f(x,0),f(x,1),f(1,x). f(1,1,..,1) will be set to 0
 /// unmask 0 unmask f(x,0)
 /// unmask 1 unmask f(x,1)
 /// unmask 2 unmask f(1,x)
@@ -255,7 +251,6 @@ mod tests {
 
     use ark_ec::bls12::Bls12Config;
     use ark_ec::Group;
-    use ark_ff::inv;
     use ark_std::UniformRand;
 
     use itertools::MultiUnzip;
