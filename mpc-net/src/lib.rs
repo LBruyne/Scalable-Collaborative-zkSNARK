@@ -186,6 +186,48 @@ pub trait MPCNet: Send + Sync {
         }
     }
 
+    /// All parties recv bytes from the leader.
+    /// Provide bytes iff you're the leader!
+    async fn dynamic_worker_receive_or_leader_send(
+        &self,
+        bytes_out: Option<Vec<Bytes>>,
+        sender: u32,
+        sid: MultiplexedStreamID,
+    ) -> Result<Bytes, MPCNetError> {
+        let own_id = self.party_id();
+
+        if let Some(bytes_out) = bytes_out {
+            if !own_id == sender {
+                return Err(MPCNetError::BadInput {
+                    err: "recv_from_leader called with bytes_out when not leader",
+                });
+            }
+
+            let m = bytes_out[0].len();
+
+            for id in (0..self.n_parties()).filter(|p| *p != own_id as usize) {
+                if bytes_out[id].len() != m {
+                    return Err(MPCNetError::Protocol {
+                        err: format!("The leader sent wrong number of bytes to Peer {}", id),
+                        party: id as u32,
+                    });
+                }
+
+                self.send_to(id as u32, bytes_out[id].clone(), sid).await?;
+            }
+
+            Ok(bytes_out[own_id as usize].clone())
+        } else {
+            if own_id == sender{
+                return Err(MPCNetError::BadInput {
+                    err: "recv_from_leader called with no bytes_out when leader",
+                });
+            }
+
+            self.recv_from(sender, sid).await
+        }
+    }
+
     /// Everyone sends bytes to the leader, who receives those bytes, runs a computation on them, and
     /// redistributes the resulting bytes.
     ///

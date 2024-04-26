@@ -96,6 +96,29 @@ pub trait MPCSerializeNet: MPCNet {
         Ok(T::deserialize_compressed(&bytes_in[..])?)
     }
 
+    async fn dynamic_worker_receive_or_leader_send_element<
+        T: CanonicalDeserialize + CanonicalSerialize + Send,
+        // A bug of rustc, T does not have to be Send actually. See https://github.com/rust-lang/rust/issues/63768
+    >(
+        &self,
+        out: Option<Vec<T>>,
+        sender: u32,
+        sid: MultiplexedStreamID,
+    ) -> Result<T, MPCNetError> {
+        let bytes = out.map(|outs| {
+            outs.iter()
+                .map(|out| {
+                    let mut bytes_out = Vec::new();
+                    out.serialize_compressed(&mut bytes_out).unwrap();
+                    bytes_out.into()
+                })
+                .collect()
+        });
+
+        let bytes_in = self.dynamic_worker_receive_or_leader_send(bytes, sender, sid).await?;
+        Ok(T::deserialize_compressed(&bytes_in[..])?)
+    }
+
     /// Everyone sends bytes to the leader, who receives those bytes, runs a computation on them, and
     /// redistributes the resulting bytes.
     ///
