@@ -1,13 +1,10 @@
-use std::{hint::black_box, mem::size_of};
-
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use async_trait::async_trait;
 
 use mpc_net::{MPCNet, MPCNetError, MultiplexedStreamID};
-use rand::Rng;
 
 /// The MPC net can serialize and deserialize elements. Should be useful for arkworks computation.
-#[cfg(not(feature="test"))]
+#[cfg(not(feature="comm"))]
 #[async_trait]
 pub trait MPCSerializeNet: MPCNet {
     async fn worker_send_or_leader_receive_element<T: CanonicalDeserialize + CanonicalSerialize>(
@@ -142,7 +139,7 @@ pub trait MPCSerializeNet: MPCNet {
     }
 }
 
-#[cfg(feature="test")]
+#[cfg(feature="comm")]
 #[async_trait]
 pub trait MPCSerializeNet: MPCNet {
     async fn worker_send_or_leader_receive_element<

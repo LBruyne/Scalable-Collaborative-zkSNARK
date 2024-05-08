@@ -5,8 +5,10 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
-default = []
-test = []
+default = ["comm"]
+local = ["comm", "single_thread"]
+single_thread = [] # tokio in single thread
+comm = [] # with actual communication
 
 [dependencies]
 ark-std = {version = "0.4.0", default-features = false, features = [ "print-trace", "std" ]}

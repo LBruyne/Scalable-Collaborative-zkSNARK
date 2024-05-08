@@ -41,6 +41,7 @@ pub async fn pss2ss<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<Vec<F>, MPCNetError> {
+    // This is a simplified version of `pss2ss`
     let shares = net
         .worker_send_or_leader_receive_element(&share, sid)
         .await?;
