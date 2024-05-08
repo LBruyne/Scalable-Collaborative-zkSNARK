@@ -98,6 +98,20 @@ impl<F: FftField> PackedSharingParams<F> {
         self.share.fft_in_place(secrets);
     }
 
+    /// Packs secret into shares in place
+    #[allow(unused)]
+    pub fn pack_single<G: DomainCoeff<F>>(&self, secret: G) -> Vec<G> {
+        // interpolating on secrets domain
+        let mut secrets = vec![secret];
+        self.secret.ifft_in_place(&mut secrets);
+
+        // evaluate on share domain
+        self.share.fft_in_place(&mut secrets);
+
+        self.pack_from_public_in_place(&mut secrets);
+        secrets
+    }
+
     /// Unpacks shares of degree t+l into secrets
     #[allow(unused)]
     pub fn unpack<G: DomainCoeff<F>>(&self, mut shares: Vec<G>) -> Vec<G> {

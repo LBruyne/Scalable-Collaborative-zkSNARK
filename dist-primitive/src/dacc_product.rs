@@ -1,11 +1,12 @@
 use std::cmp::min;
 
 use crate::{
-    unpack, utils::{operator::transpose, serializing_net::MPCSerializeNet},
+    unpack,
+    utils::{operator::transpose, serializing_net::MPCSerializeNet},
 };
 use ark_ff::FftField;
 use ark_std::iterable::Iterable;
-use futures::future::join_all;
+use futures::future::{join3, join_all};
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
@@ -84,6 +85,30 @@ fn sub_index(i: usize) -> (usize, usize) {
     (x, x + 1)
 }
 
+pub fn acc_product_share<F: FftField>(x: &Vec<F>) -> (Vec<F>, Vec<F>, Vec<F>) {
+    let mut result = Vec::with_capacity(x.len() * 2);
+    result.extend_from_slice(&x);
+    result.extend_from_slice(&x);
+    for i in x.len()..result.len() - 1 {
+        let (x0, x1) = sub_index(i);
+        result[i] = result[x0] * result[x1];
+    }
+    (
+        result.iter().step_by(2).map(F::clone).collect::<Vec<F>>(),
+        result
+            .iter()
+            .skip(1)
+            .step_by(2)
+            .map(F::clone)
+            .collect::<Vec<F>>(),
+        result
+            .iter()
+            .skip(result.len() / 2)
+            .map(F::clone)
+            .collect::<Vec<F>>(),
+    )
+}
+
 /// Given x_0 ... x_2^m, returns the shares or f(x,0),f(x,1),f(1,x). f(1,1,..,1) will be set to 0
 /// unmask 0 unmask f(x,0)
 /// unmask 1 unmask f(x,1)
@@ -152,16 +177,17 @@ pub async fn d_acc_product_share<F: FftField, Net: MPCSerializeNet>(
         } else {
             None
         };
+        let default = share0[0].clone();
         let in0 = net
-            .dynamic_worker_receive_or_leader_send_element(out0, i as u32, sid)
+            .dynamic_worker_receive_or_leader_send_element(out0, default.clone(), i as u32, sid)
             .await?;
         results0.push(in0);
         let in1 = net
-            .dynamic_worker_receive_or_leader_send_element(out1, i as u32, sid)
+            .dynamic_worker_receive_or_leader_send_element(out1, default.clone(), i as u32, sid)
             .await?;
         results1.push(in1);
         let in2 = net
-            .dynamic_worker_receive_or_leader_send_element(out2, i as u32, sid)
+            .dynamic_worker_receive_or_leader_send_element(out2, default.clone(), i as u32, sid)
             .await?;
         results2.push(in2);
     }
@@ -206,15 +232,18 @@ pub async fn d_acc_product_share<F: FftField, Net: MPCSerializeNet>(
         let share2 = transpose(share2);
         share2
     });
-
+    let length = shares.len() * 2 - unsent_result.len() / pp.l * party_count;
+    let default = (0..length)
+        .map(|_| F::rand(&mut ark_std::test_rng()))
+        .collect::<Vec<F>>();
     let global_share0 = net
-        .worker_receive_or_leader_send_element(global_out0, sid)
+        .worker_receive_or_leader_send_element(global_out0, default.clone(), sid)
         .await?;
     let global_share1 = net
-        .worker_receive_or_leader_send_element(global_out1, sid)
+        .worker_receive_or_leader_send_element(global_out1, default.clone(), sid)
         .await?;
     let global_share2 = net
-        .worker_receive_or_leader_send_element(global_out2, sid)
+        .worker_receive_or_leader_send_element(global_out2, default.clone(), sid)
         .await?;
     share0.extend_from_slice(&global_share0);
     share1.extend_from_slice(&global_share1);
@@ -270,8 +299,8 @@ mod tests {
     use crate::utils::operator::transpose;
     use ark_ff::Field;
 
-    const L: usize = 2;
-    const N: usize = 8;
+    const L: usize = 4;
+    const N: usize = 20;
 
     #[test]
     fn sub_index_test() {

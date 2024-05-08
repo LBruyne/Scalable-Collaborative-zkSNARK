@@ -55,7 +55,7 @@ pub async fn d_msm_test<G: CurveGroup, Net: MPCNet>(
     let order = CNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     let ready = order == (L * 4 - 1).try_into().unwrap();
     let dmsm = start_timer!("Distributed msm", ready);
-    let _output = d_msm::<G, Net>(&x_share_aff, &y_share, pp, net, MultiplexedStreamID::Zero).await;
+    let _output = d_msm::<G, Net>(&vec![x_share_aff], &vec![y_share], pp, net, MultiplexedStreamID::Zero).await;
     end_timer!(dmsm);
     if net.is_leader() {
         println!("Comm: {:?}", net.get_comm());

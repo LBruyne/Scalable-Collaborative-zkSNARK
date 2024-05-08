@@ -39,7 +39,7 @@ async fn main() {
         .into_iter()
         .map(|_| <Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng))
         .collect();
-    let peval_share = (0..2_usize.pow(args.width as u32) / args.l)
+    let peval_share:Vec<_> = (0..2_usize.pow(args.width as u32) / args.l)
         .into_iter()
         .map(|_| <Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng))
         .collect();
@@ -70,7 +70,7 @@ async fn main() {
         let commit_timer = start_timer!("Commit");
         let commit = adult
             .d_commit(
-                &peval_share,
+                &vec![peval_share.clone()],
                 &pp,
                 &net.get_leader(),
                 MultiplexedStreamID::Zero,

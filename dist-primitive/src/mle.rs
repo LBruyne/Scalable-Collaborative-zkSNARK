@@ -4,9 +4,7 @@ use ark_ff::FftField;
 use mpc_net::{MultiplexedStreamID, MPCNetError};
 use secret_sharing::pss::PackedSharingParams;
 
-use crate::{utils::serializing_net::MPCSerializeNet};
-
-use crate::dperm::d_perm;
+use crate::{unpack::pss2ss, utils::serializing_net::MPCSerializeNet};
 
 #[derive(Clone, Debug)]
 pub struct PackedDenseMultilinearExtension<F: FftField> {
@@ -74,16 +72,17 @@ pub async fn d_fix_variable<F: FftField, Net: MPCSerializeNet>(
         return Ok(last_round);
     }
     debug_assert!(last_round.len() == 1);
-    let mut last_share = last_round[0];
+    let mut last_round = pss2ss(last_round[0], pp, net, sid).await?;
     for i in 0..min(points_cnt-N, L) {
-        let permutation = (1 << (L - i - 1)..1 << (L - i))
-            .chain(0..1 << (L - i - 1))
-            .chain(1 << (L - i)..1 << L)
-            .collect();
-        let this_share = d_perm(last_share, &permutation, pp, net, sid).await?;
-        last_share = last_share * (F::ONE - points[i + N]) + this_share * points[i + N];
+        let parts = last_round.split_at(last_round.len() / 2);
+        last_round = parts
+            .0
+            .iter()
+            .zip(parts.1.iter())
+            .map(|(a, b)| *a * (F::ONE - points[i]) + *b * points[i])
+            .collect::<Vec<_>>();
     }
-    Ok(vec![last_share])
+    Ok(vec![last_round[0]])
 }
 
 pub fn fix_variable<F: FftField>(

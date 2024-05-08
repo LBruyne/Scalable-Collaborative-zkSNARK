@@ -169,7 +169,7 @@ pub async fn d_polyfill_gkr<E: Pairing, Net: MPCSerializeNet>(
     let timer_all = start_timer!("Begin dGKR", reporter);
     let commit = timed!(
         "dCommit",
-        mature.d_commit(&shares_f2.shares, pp, net, sid).await?,
+        mature.d_commit(&vec![shares_f2.shares.clone()], pp, net, sid).await?[0],
         reporter
     );
     let timer_gkr_rounds = start_timer!("dGKR rounds", reporter);

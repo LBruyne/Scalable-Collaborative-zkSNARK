@@ -1,6 +1,5 @@
 use crate::{
-    degree_reduce::degree_reduce, dperm::d_perm, end_timer, start_timer,
-    utils::serializing_net::MPCSerializeNet,
+    degree_reduce::degree_reduce, end_timer, start_timer, unpack::pss2ss, utils::serializing_net::MPCSerializeNet
 };
 use ark_ff::FftField;
 use futures::future::{try_join, try_join3};
@@ -117,21 +116,24 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
         last_round = this_round;
     }
     debug_assert!(last_round.len() == 1);
-    let mut last_share = last_round[0];
+    let mut last_round = pss2ss(last_round[0], pp, net, sid).await?;
     for i in 0..L {
-        let res1 = last_share;
-        let res2 = last_share;
+        let parts = last_round.split_at(last_round.len() / 2);
+        let res1 = parts.0.iter().sum();
+        let res2 = parts.1.iter().sum();
         result.push((res1, res2));
-        let permutation = (1 << (L - i - 1)..1 << (L - i))
-            .chain(0..1 << (L - i - 1))
-            .chain(1 << (L - i)..1 << L)
-            .collect();
-        let this_share = d_perm(last_share, &permutation, pp, net, sid).await?;
-        last_share = last_share * (F::ONE - challenge[i + N]) + this_share * challenge[i + N];
+        // result.push((parts.0.iter().sum(), parts.1.iter().sum()));
+        let this_round = parts
+            .0
+            .iter()
+            .zip(parts.1.iter())
+            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .collect::<Vec<_>>();
+        last_round = this_round;
     }
     result.push((
         F::ZERO,
-        last_share,
+        last_round[0],
     ));
     end_timer!(d_sumcheck_timer);
     Ok(result)
@@ -160,27 +162,19 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
         let res = {
             // t=0
-            let part0_sum = degree_reduce(
+            let part0_sum = 
                 parts_f
                     .0
                     .iter()
                     .zip(parts_g.0.iter())
-                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y),
-                pp,
-                net,
-                sid,
-            );
+                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
             //t=1
-            let part1_sum = degree_reduce(
+            let part1_sum =
                 parts_f
                     .1
                     .iter()
                     .zip(parts_g.1.iter())
-                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y),
-                pp,
-                net,
-                sid,
-            );
+                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
             // t=2,
             // in which case, the evaluation of f and g is not present in the bookkeeping table,
             // we need to calculate them from (1-t)*x0+t*x1
@@ -196,16 +190,12 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                 .zip(parts_g.1.iter())
                 .map(|(x, y)| -*x + *y * F::from(2_u64))
                 .collect();
-            let part2_sum = degree_reduce(
+            let part2_sum = 
                 part2_f
                     .iter()
                     .zip(part2_g.iter())
-                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y),
-                pp,
-                net,
-                sid,
-            );
-            try_join3(part0_sum, part1_sum, part2_sum).await?
+                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
+            (part0_sum, part1_sum, part2_sum)
         };
         result.push(res);
         // (1-u)*x0 + u*x1
@@ -224,65 +214,68 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     }
     debug_assert!(last_round_f.len() == 1);
     debug_assert!(last_round_g.len() == 1);
-    let mut last_share_f = last_round_f[0];
-    let mut last_share_g = last_round_g[0];
+    let mut last_round_f = pss2ss(last_round_f[0], pp, net, sid).await?;
+    let mut last_round_g = pss2ss(last_round_g[0], pp, net, sid).await?;
     // Now we go into shares. The general logic is the same. The only difference being that we now do the computation using permutation.
     for i in 0..L {
-        // The permutation "swap" the first half and the second half in the valid range. The invalid garbage is untouched.
-        // permutation: 2 3 | 0 1 | 4 5 6 7
-        let permutation = (1 << (L - i - 1)..1 << (L - i))
-            .chain(0..1 << (L - i - 1))
-            .chain(1 << (L - i)..1 << L)
-            .collect();
-        let (this_share_f, this_share_g) = try_join(
-            d_perm(
-                last_share_f,
-                &permutation,
-                pp,
-                net,
-                MultiplexedStreamID::Zero,
-            ),
-            d_perm(
-                last_share_g,
-                &permutation,
-                pp,
-                net,
-                MultiplexedStreamID::One,
-            ),
-        )
-        .await?;
+                let parts_f = last_round_f.split_at(last_round_f.len() / 2);
+        let parts_g = last_round_g.split_at(last_round_g.len() / 2);
         let res = {
             // t=0
-            let part0_sum = degree_reduce(
-                last_share_f * last_share_g,
-                pp,
-                net,
-                MultiplexedStreamID::Zero,
-            );
-            // t=1
-            let part1_sum = degree_reduce(
-                last_share_f * last_share_g,
-                pp,
-                net,
-                MultiplexedStreamID::One,
-            );
-            // t=2
-            let part2_f = -last_share_f + this_share_f * F::from(2_u64);
-            let part2_g = -last_share_g + this_share_g * F::from(2_u64);
-            let part2_sum =
-                degree_reduce(part2_f * part2_g,  pp, net, MultiplexedStreamID::Two);
-            // Since the s_sum2_masked already handles the degree, no degree_reduce needed.
-            try_join3(part0_sum, part1_sum, part2_sum).await?
+            let part0_sum = 
+                parts_f
+                    .0
+                    .iter()
+                    .zip(parts_g.0.iter())
+                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
+            //t=1
+            let part1_sum =
+                parts_f
+                    .1
+                    .iter()
+                    .zip(parts_g.1.iter())
+                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
+            // t=2,
+            // in which case, the evaluation of f and g is not present in the bookkeeping table,
+            // we need to calculate them from (1-t)*x0+t*x1
+            let part2_f: Vec<_> = parts_f
+                .0
+                .iter()
+                .zip(parts_f.1.iter())
+                .map(|(x, y)| -*x + *y * F::from(2_u64))
+                .collect();
+            let part2_g: Vec<_> = parts_g
+                .0
+                .iter()
+                .zip(parts_g.1.iter())
+                .map(|(x, y)| -*x + *y * F::from(2_u64))
+                .collect();
+            let part2_sum = 
+                part2_f
+                    .iter()
+                    .zip(part2_g.iter())
+                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
+            (part0_sum, part1_sum, part2_sum)
         };
         result.push(res);
         // (1-u)*x0 + u*x1
-        last_share_f = last_share_f * (F::ONE - challenge[i + N]) + this_share_f * challenge[i + N];
-        last_share_g = last_share_g * (F::ONE - challenge[i + N]) + this_share_g * challenge[i + N];
+        last_round_f = parts_f
+            .0
+            .iter()
+            .zip(parts_f.1.iter())
+            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .collect::<Vec<_>>();
+        last_round_g = parts_g
+            .0
+            .iter()
+            .zip(parts_g.1.iter())
+            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .collect::<Vec<_>>();
     }
     // Put it in the second slot to keep consistency with vec.split_at(vec.len()/2). In which case the first part will be empty.
     result.push((
         F::ZERO,
-        degree_reduce(last_share_f * last_share_g, &pp, net, sid).await?,
+        last_round_f[0] * last_round_g[0],
         F::ZERO,
     ));
     Ok(result)
