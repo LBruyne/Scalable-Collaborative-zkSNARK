@@ -68,7 +68,7 @@ async fn dacc_product_bench(width: usize, l: usize) {
             &unmask1,
             &unmask2,
             &pp,
-            &net.get_connection(1),
+            &net.get_leader(),
             MultiplexedStreamID::Zero,
         ).await
     );

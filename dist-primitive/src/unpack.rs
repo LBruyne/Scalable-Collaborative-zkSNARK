@@ -45,10 +45,10 @@ pub async fn pss2ss<F: FftField, Net: MPCSerializeNet>(
         .worker_send_or_leader_receive_element(&share, sid)
         .await?;
     if let Some(shares) = shares {
-        join_all(pp.unpack(shares).into_iter().map(|v| net.worker_receive_or_leader_send_element(Some(pp.pack_single(v)), share, sid)))
+        join_all(pp.unpack(shares).into_iter().map(|v| net.worker_receive_or_leader_send_element(Some(pp.pack_single(v)), sid)))
             .await.into_iter().collect::<Result<Vec<_>, _>>()
     } else {
-        join_all((0..pp.l).map(|_| net.worker_receive_or_leader_send_element(None, share, sid))).await.into_iter().collect::<Result<Vec<_>, _>>()
+        join_all((0..pp.l).map(|_| net.worker_receive_or_leader_send_element(None, sid))).await.into_iter().collect::<Result<Vec<_>, _>>()
     }
 }
 

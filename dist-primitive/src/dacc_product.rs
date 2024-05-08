@@ -177,19 +177,27 @@ pub async fn d_acc_product_share<F: FftField, Net: MPCSerializeNet>(
         } else {
             None
         };
-        let default = share0[0].clone();
         let in0 = net
-            .dynamic_worker_receive_or_leader_send_element(out0, default.clone(), i as u32, sid)
+            .dynamic_worker_receive_or_leader_send_element(out0, i as u32, sid)
             .await?;
-        results0.push(in0);
         let in1 = net
-            .dynamic_worker_receive_or_leader_send_element(out1, default.clone(), i as u32, sid)
+            .dynamic_worker_receive_or_leader_send_element(out1, i as u32, sid)
             .await?;
-        results1.push(in1);
         let in2 = net
-            .dynamic_worker_receive_or_leader_send_element(out2, default.clone(), i as u32, sid)
+            .dynamic_worker_receive_or_leader_send_element(out2, i as u32, sid)
             .await?;
-        results2.push(in2);
+        #[cfg(not(feature = "test"))]
+        {
+            results0.push(in0);
+            results1.push(in1);
+            results2.push(in2);
+        }
+        #[cfg(feature = "test")]
+        {
+            results0.push(share0[i].clone());
+            results1.push(share1[i].clone());
+            results2.push(share2[i].clone());
+        }
     }
     let mut share0 = merge(&results0);
     assert_eq!(share0.len(), results0[0].len() * results0.len());
@@ -232,18 +240,14 @@ pub async fn d_acc_product_share<F: FftField, Net: MPCSerializeNet>(
         let share2 = transpose(share2);
         share2
     });
-    let length = shares.len() * 2 - unsent_result.len() / pp.l * party_count;
-    let default = (0..length)
-        .map(|_| F::rand(&mut ark_std::test_rng()))
-        .collect::<Vec<F>>();
     let global_share0 = net
-        .worker_receive_or_leader_send_element(global_out0, default.clone(), sid)
+        .worker_receive_or_leader_send_element(global_out0, sid)
         .await?;
     let global_share1 = net
-        .worker_receive_or_leader_send_element(global_out1, default.clone(), sid)
+        .worker_receive_or_leader_send_element(global_out1, sid)
         .await?;
     let global_share2 = net
-        .worker_receive_or_leader_send_element(global_out2, default.clone(), sid)
+        .worker_receive_or_leader_send_element(global_out2, sid)
         .await?;
     share0.extend_from_slice(&global_share0);
     share1.extend_from_slice(&global_share1);
