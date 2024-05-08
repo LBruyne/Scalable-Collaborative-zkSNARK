@@ -6,7 +6,7 @@ members = [
     "mpc-net",
     "client",
     "gkr"
-]
+, "hyperplonk"]
 
 [profile.bench]
 opt-level = 3
