@@ -98,7 +98,7 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
 ) -> Result<Vec<(F, F)>, MPCNetError> {
     let d_sumcheck_timer = start_timer!("Distributed sumcheck", net.is_leader());
     let mut result = Vec::new();
-    // N and L must be powers of 2
+    // n and l must be powers of 2
     let n = shares.len().trailing_zeros() as usize;
     let l: usize = pp.l.trailing_zeros() as usize;
     let mut last_round = shares.clone();

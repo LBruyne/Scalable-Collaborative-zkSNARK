@@ -4,6 +4,7 @@ use ark_ec::CurveGroup;
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
+/// This protocol implement dMSM in a batched way. 
 pub async fn d_msm<G: CurveGroup, Net: MPCSerializeNet>(
     bases: &Vec<Vec<G::Affine>>,
     scalars: &Vec<Vec<G::ScalarField>>,
@@ -15,7 +16,7 @@ pub async fn d_msm<G: CurveGroup, Net: MPCSerializeNet>(
     let c_shares = bases.iter().zip(scalars.iter()).map(|(b, s)| {
         G::msm(b, s).unwrap()
     }).collect::<Vec<_>>();
-    log::warn!("Distributed MSM protocol should be masked by random sharing. Omitted for simplicity.");
+    // Should be masked by random sharing. Omitted for simplicity
     net.leader_compute_element(&c_shares, sid, |shares|{
         let results = shares.iter().map(|s| {
             let output = pp.unpack2(s.clone()).iter().sum();

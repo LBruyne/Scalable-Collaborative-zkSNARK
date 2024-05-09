@@ -10,9 +10,28 @@ use mpc_net::{LocalTestNet as Net, MPCNet, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
 const L: usize = 4;
-const N: usize = 20;
+const N: usize = 22;
 static CNT: AtomicU32 = AtomicU32::new(0);
-/// Note that the output of the function is misleading. The threads are not synchronized. So the plain msm is accurately timed, but only the last thread that start d_msm will yield a meaningful result. The time output of the other threads are meaningless since they are mostly waiting for the last thread to be ready.
+
+#[cfg_attr(feature = "single_thread", tokio::main(flavor = "current_thread"))]
+#[cfg_attr(not(feature = "single_thread"), tokio::main)]
+async fn main() {
+    for i in N..=N {
+        let dom = Radix2EvaluationDomain::<Fr>::new(1 << i).unwrap();
+        println!("domain size: {}", dom.size());
+        // msm_test::<ark_bls12_377::G1Projective>(&dom);
+
+        let network = Net::new_local_testnet(L * 4).await.unwrap();
+        network
+            .simulate_network_round((), move |net, _| async move {
+                let pp = PackedSharingParams::<Fr>::new(L);
+                let dom = Radix2EvaluationDomain::<Fr>::new(1 << i).unwrap();
+                d_msm_test::<ark_bls12_377::G1Projective, _>(&pp, &dom, &net).await;
+            })
+            .await;
+    }
+}
+
 pub async fn d_msm_test<G: CurveGroup, Net: MPCNet>(
     pp: &PackedSharingParams<G::ScalarField>,
     dom: &Radix2EvaluationDomain<G::ScalarField>,
@@ -54,30 +73,11 @@ pub async fn d_msm_test<G: CurveGroup, Net: MPCNet>(
     end_timer!(nmsm);
     let order = CNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     let ready = order == (L * 4 - 1).try_into().unwrap();
+
     let dmsm = start_timer!("Distributed msm", ready);
     let _output = d_msm::<G, Net>(&vec![x_share_aff], &vec![y_share], pp, net, MultiplexedStreamID::Zero).await;
     end_timer!(dmsm);
     if net.is_leader() {
         println!("Comm: {:?}", net.get_comm());
-    }
-}
-
-#[tokio::main]
-async fn main() {
-    env_logger::builder().init();
-
-    for i in N..=N {
-        let dom = Radix2EvaluationDomain::<Fr>::new(1 << i).unwrap();
-        println!("domain size: {}", dom.size());
-        // msm_test::<ark_bls12_377::G1Projective>(&dom);
-
-        let network = Net::new_local_testnet(L * 4).await.unwrap();
-        network
-            .simulate_network_round((), move |net, _| async move {
-                let pp = PackedSharingParams::<Fr>::new(L);
-                let dom = Radix2EvaluationDomain::<Fr>::new(1 << i).unwrap();
-                d_msm_test::<ark_bls12_377::G1Projective, _>(&pp, &dom, &net).await;
-            })
-            .await;
     }
 }

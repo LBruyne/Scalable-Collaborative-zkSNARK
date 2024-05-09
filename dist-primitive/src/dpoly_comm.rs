@@ -1,6 +1,7 @@
 use std::hint::black_box;
 
 use crate::dmsm::d_msm;
+use crate::{end_timer, start_timer};
 use crate::unpack::pss2ss;
 use crate::utils::operator::transpose;
 use crate::utils::serializing_net::MPCSerializeNet;
@@ -102,7 +103,6 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
             powers_of_g2: self.powers_of_g2.clone(),
         }
     }
-
     pub fn mature_toy(&self) -> PolynomialCommitment<E> {
         let powers_of_g = self
             .powers_of_g
@@ -114,6 +114,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
             powers_of_g2: self.powers_of_g2.clone(),
         }
     }
+
     pub fn to_packed(
         &self,
         pp: &PackedSharingParams<E::ScalarField>,
@@ -186,38 +187,32 @@ impl<E: Pairing> PolynomialCommitment<E> {
         net: &Net,
         sid: MultiplexedStreamID,
     ) -> Result<Vec<E::G1>, MPCNetError> {
+        let timer_1 = start_timer!("Clone", net.is_leader());
         let bases = &pevals.iter().map(|peval| {
             let level = (peval.len() * pp.l).trailing_zeros() as usize;
             assert!(level < self.powers_of_g.len());
             assert!(peval.len() * pp.l == 2_usize.pow(level as u32));
             self.powers_of_g[level].clone()
+            // How to select bases share?
         }).collect();
-        d_msm(bases, pevals, pp, net, sid).await
+        end_timer!(timer_1);
+        let timer_2 = start_timer!("dMSM", net.is_leader());
+        let res = d_msm(bases, pevals, pp, net, sid).await;
+        end_timer!(timer_2);
+        res
     }
-    // pub async fn d_commit_trunc<Net: MPCSerializeNet>(
-    //     &self,
-    //     peval: E::ScalarField,
-    //     take: usize,
-    //     pp: &PackedSharingParams<E::ScalarField>,
-    //     net: &Net,
-    //     sid: MultiplexedStreamID,
-    // ) -> Result<E::G1, MPCNetError> {
-    //     // An interesting point here is we filling zero dummy bases in the setup phase so actually the truncation drops from sky. Here we only need to select the correct level and the rest will be handle automatically.
-    //     let level = take.trailing_zeros() as usize;
-    //     assert!(take == 2_usize.pow(level as u32));
-    //     d_msm(&self.powers_of_g[level], &vec![peval], pp, net, sid).await
-    // }
+
     pub fn open(
         &self,
         peval: &Vec<E::ScalarField>,
         point: &Vec<E::ScalarField>,
     ) -> (E::ScalarField, Vec<E::G1>) {
         let mut result = Vec::new();
-        let N = peval.len().trailing_zeros() as usize; // peval.len = 2^n
-        assert_eq!(peval.len(), 2_usize.pow(N as u32));
+        let n = peval.len().trailing_zeros() as usize; // peval.len = 2^n
+        assert_eq!(peval.len(), 2_usize.pow(n as u32));
         let mut current_r = peval.clone();
         // If you have 2^1 elements in peval, you need to compute 1 element in result
-        for i in 0..N {
+        for i in 0..n {
             let (part0, part1) = current_r.split_at(current_r.len() / 2);
             let q_i: Vec<_> = part0
                 .iter()
@@ -234,6 +229,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         }
         (current_r[0], result)
     }
+    /// In this protocol, we make an optimization that batches all of dMSM into one round of communication.
     pub async fn d_open<Net: MPCSerializeNet>(
         &self,
         peval: &Vec<E::ScalarField>,
@@ -242,12 +238,16 @@ impl<E: Pairing> PolynomialCommitment<E> {
         net: &Net,
         sid: MultiplexedStreamID,
     ) -> Result<(E::ScalarField, Vec<E::G1>), MPCNetError> {
+        let timer = start_timer!("Distributed opening", net.is_leader());
         let mut result = Vec::new();
-        let N = peval.len().trailing_zeros() as usize; // peval.len = 2^n
-        let L = pp.l.trailing_zeros() as usize;
-        assert_eq!(peval.len(), 2_usize.pow(N as u32));
+        // n and l must be powers of 2
+        let n: usize = peval.len().trailing_zeros() as usize; // peval.len = 2^n
+        let l = pp.l.trailing_zeros() as usize;
+        assert_eq!(peval.len(), 2_usize.pow(n as u32));
         let mut current_r = peval.clone();
-        for i in 0..N {
+        // Phase 1
+        let phase_1_timer = start_timer!("Phase 1", net.is_leader());
+        for i in 0..n {
             let (part0, part1) = current_r.split_at(current_r.len() / 2);
             let q_i: Vec<_> = part0
                 .iter()
@@ -262,11 +262,13 @@ impl<E: Pairing> PolynomialCommitment<E> {
             current_r = r_i;
             result.push(q_i);
         }
+        end_timer!(phase_1_timer);
         assert!(current_r.len() == 1);
         // Next we go into packed shares
-        // Notice that msm here should use non-packed base for commitment. This is simplified and incorrect.
+        // Notice that msm here should use non-packed base for commitment. Here this is simplified.
         let mut current_r = pss2ss(current_r[0], pp, net, sid).await?;
-        for i in 0..L {
+        let phase_2_timer = start_timer!("Phase 2", net.is_leader());
+        for i in 0..l {
             let (part0, part1) = current_r.split_at(current_r.len() / 2);
             let q_i: Vec<_> = part0
                 .iter()
@@ -281,8 +283,16 @@ impl<E: Pairing> PolynomialCommitment<E> {
             result.push(q_i);
             current_r = r_i;
         }
-        Ok((current_r[0], self.d_commit(&result, pp, net, sid).await?))
+        end_timer!(phase_2_timer);
+        // Finally commit to all elements in a batch.
+        let commit_timer = start_timer!("Commit Phase", net.is_leader());
+        let res = self.d_commit(&result, pp, net, sid).await?;
+        end_timer!(commit_timer);
+        end_timer!(timer);
+        // Return the evaluation and the proof.
+        Ok((current_r[0], res))
     }
+
     pub fn verify(
         &self,
         commitment: E::G1,
@@ -306,16 +316,16 @@ impl<E: Pairing> PolynomialCommitment<E> {
 
 #[cfg(test)]
 mod test {
-    use crate::utils::operator::transpose;
+    // use crate::utils::operator::transpose;
 
     use super::PolynomialCommitmentCub;
     use ark_bls12_381::Bls12_381;
     use ark_ec::bls12::Bls12;
     use ark_ec::pairing::Pairing;
     use ark_std::UniformRand;
-    use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
-    use secret_sharing::pss::PackedSharingParams;
-    const l: usize = 2;
+    // use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
+    // use secret_sharing::pss::PackedSharingParams;
+    // const l: usize = 2;
     type E = Bls12<ark_bls12_381::Config>;
 
     #[test]
