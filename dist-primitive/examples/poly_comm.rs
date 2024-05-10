@@ -170,7 +170,8 @@ async fn mvpc_bench(n: usize, l: usize) {
                 let pp = PackedSharingParams::<
                     <Bls12<ark_bls12_381::Config> as Pairing>::ScalarField,
                 >::new(l);
-                let commit_timer = start_timer!("Commit");
+
+                let commit_timer = start_timer!("Commit", net.is_leader());
                 let commit = adult
                     .d_commit(
                         &vec![peval_shares[net.party_id() as usize].clone()],
@@ -182,7 +183,7 @@ async fn mvpc_bench(n: usize, l: usize) {
                     .unwrap();
                 end_timer!(commit_timer);
 
-                let open_timer = start_timer!("Open");
+                let open_timer = start_timer!("Open", net.is_leader());
                 let (value, proof) = adult
                     .d_open(
                         &peval_shares[net.party_id() as usize],
@@ -201,7 +202,7 @@ async fn mvpc_bench(n: usize, l: usize) {
                     println!("Comm: {:?}", net.get_comm());
                 }
             },
-        );
+        ).await;
         end_timer!(timer);
     }
 }

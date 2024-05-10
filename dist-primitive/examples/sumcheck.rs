@@ -92,6 +92,7 @@ struct Cli {
 #[cfg_attr(not(feature = "single_thread"), tokio::main)]
 async fn main() {
     let args = Cli::parse();
+    
     sumcheck_bench(args.n, args.l).await;
     sumcheck_product_bench(args.n, args.l).await;
 
