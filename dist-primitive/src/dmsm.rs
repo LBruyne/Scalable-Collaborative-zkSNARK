@@ -1,4 +1,4 @@
-use crate::utils::{operator::transpose, serializing_net::MPCSerializeNet};
+use crate::{end_timer, start_timer, utils::{operator::transpose, serializing_net::MPCSerializeNet}};
 use ark_ec::CurveGroup;
 
 use mpc_net::{MPCNetError, MultiplexedStreamID};
@@ -13,22 +13,31 @@ pub async fn d_msm<G: CurveGroup, Net: MPCSerializeNet>(
     sid: MultiplexedStreamID,
 ) -> Result<Vec<G>, MPCNetError> {
     assert_eq!(bases.len(), scalars.len());
+    // Obtain the result of each dMSM.
+    let msm_timer = start_timer!("MSM", net.is_leader());
     let c_shares = bases.iter().zip(scalars.iter()).map(|(b, s)| {
+        // if net.is_leader() {
+        //     eprintln!("MSM len: {}", s.len());
+        // }
         G::msm(b, s).unwrap()
     }).collect::<Vec<_>>();
-    // Should be masked by random sharing. Omitted for simplicity
+    end_timer!(msm_timer);
+
+    let leader_timer = start_timer!("Leader", net.is_leader());
+    // Should be masked by randoms. Omitted for simplicity.
     let result = net.leader_compute_element(&c_shares, sid, |shares|{
+        let lc_timer = start_timer!("Compute", net.is_leader());
         let shares = transpose(shares);
         let results = shares.iter().map(|s| {
             let output = pp.unpack2(s.clone()).iter().sum();
             let pack = vec![output;pp.l];
             pp.pack_from_public(pack)
         }).collect();
-        transpose(results)
+        let res = transpose(results);
+        end_timer!(lc_timer);
+        res
     }).await;
-    #[cfg(feature = "test")] 
-    return Ok(vec![G::zero();bases.len()]);
-    #[cfg(not(feature = "test"))]
+    end_timer!(leader_timer);
     return result;
 }
 

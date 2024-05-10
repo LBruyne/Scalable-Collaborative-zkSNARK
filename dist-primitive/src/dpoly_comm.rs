@@ -1,10 +1,10 @@
 use std::hint::black_box;
 
 use crate::dmsm::d_msm;
-use crate::{end_timer, start_timer};
 use crate::unpack::pss2ss;
 use crate::utils::operator::transpose;
 use crate::utils::serializing_net::MPCSerializeNet;
+use crate::{end_timer, start_timer};
 use ark_ec::pairing::Pairing;
 use ark_ec::pairing::PairingOutput;
 use ark_ec::AffineRepr;
@@ -178,6 +178,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         let level = peval.len().trailing_zeros() as usize;
         assert!(level < self.powers_of_g.len());
         assert!(peval.len() == 2_usize.pow(level as u32));
+        // eprintln!("MSM len: {}", peval.len());
         E::G1::msm(&self.powers_of_g[level], peval).unwrap()
     }
     pub async fn d_commit<Net: MPCSerializeNet>(
@@ -187,19 +188,19 @@ impl<E: Pairing> PolynomialCommitment<E> {
         net: &Net,
         sid: MultiplexedStreamID,
     ) -> Result<Vec<E::G1>, MPCNetError> {
-        let timer_1 = start_timer!("Clone", net.is_leader());
-        let bases = &pevals.iter().map(|peval| {
-            let level = (peval.len() * pp.l).trailing_zeros() as usize;
-            assert!(level < self.powers_of_g.len());
-            assert!(peval.len() * pp.l == 2_usize.pow(level as u32));
-            self.powers_of_g[level].clone()
-            // How to select bases share?
-        }).collect();
-        end_timer!(timer_1);
-        let timer_2 = start_timer!("dMSM", net.is_leader());
-        let res = d_msm(bases, pevals, pp, net, sid).await;
-        end_timer!(timer_2);
-        res
+        let bases: &Vec<Vec<_>> = &pevals
+            .iter()
+            .map(|peval| {
+                let level = (peval.len() * pp.l).trailing_zeros() as usize;
+                assert!(level < self.powers_of_g.len());
+                assert!(peval.len() * pp.l == 2_usize.pow(level as u32));
+                self.powers_of_g[level].clone()
+            })
+            .collect();
+        // if net.is_leader() {
+        //     eprintln!("dMSM batch size: {}", bases.len());
+        // }
+        d_msm(bases, pevals, pp, net, sid).await
     }
 
     pub fn open(
@@ -264,9 +265,14 @@ impl<E: Pairing> PolynomialCommitment<E> {
         }
         end_timer!(phase_1_timer);
         assert!(current_r.len() == 1);
+        // Finally commit to all elements in a batch.
+        let commit_timer = start_timer!("Batching dMSM Phase", net.is_leader());
+        let mut res = self.d_commit(&result, pp, net, sid).await?;
+        end_timer!(commit_timer);
         // Next we go into packed shares
         // Notice that msm here should use non-packed base for commitment. Here this is simplified.
         let mut current_r = pss2ss(current_r[0], pp, net, sid).await?;
+        assert!(current_r.len() == pp.l);
         let phase_2_timer = start_timer!("Phase 2", net.is_leader());
         for i in 0..l {
             let (part0, part1) = current_r.split_at(current_r.len() / 2);
@@ -280,14 +286,12 @@ impl<E: Pairing> PolynomialCommitment<E> {
                 .zip(part1.iter())
                 .map(|(&x, &y)| (E::ScalarField::one() - point[i]) * x + point[i] * y)
                 .collect();
-            result.push(q_i);
+            // Local small MSM. Note that the base should also be shares, which is omitted for simplicity.
+            // Why panic here?
+            // res.push(self.commit(&q_i));
             current_r = r_i;
         }
         end_timer!(phase_2_timer);
-        // Finally commit to all elements in a batch.
-        let commit_timer = start_timer!("Commit Phase", net.is_leader());
-        let res = self.d_commit(&result, pp, net, sid).await?;
-        end_timer!(commit_timer);
         end_timer!(timer);
         // Return the evaluation and the proof.
         Ok((current_r[0], res))
