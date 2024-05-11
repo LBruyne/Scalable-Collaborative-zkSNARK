@@ -6,78 +6,13 @@ use crate::{
 };
 use ark_ff::FftField;
 use ark_std::iterable::Iterable;
-use futures::future::{join3, join_all};
+use futures::future::join_all;
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
-/// Given x_0 ... x_2^m, returns the tree-shaped product of the masked results.
-pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
-    shares: &Vec<F>,
-    masks: &Vec<F>,
-    pp: &PackedSharingParams<F>,
-    net: &Net,
-    sid: MultiplexedStreamID,
-) -> Result<(Vec<F>, Option<Vec<F>>), MPCNetError> {
-    let party_count = pp.l * 4;
-    // Every party gets N/L of the shares.
-    let block_size = shares.len() / party_count;
-    // get masked x
-    let masked_x = join_all(shares.iter().enumerate().map(|(i, x)| async move {
-        unpack::d_unpack2(*x * masks[i], (i / block_size) as u32, pp, net, sid)
-            .await
-            .unwrap()
-    }))
-    .await
-    .into_iter()
-    .flatten()
-    .collect::<Vec<F>>();
-    // calculate this subtree
-    let mut subtree_result = Vec::with_capacity(masked_x.len() * 2);
-    subtree_result.extend_from_slice(&masked_x);
-    subtree_result.extend_from_slice(&masked_x);
-    for i in masked_x.len()..subtree_result.len() - 1 {
-        let (x0, x1) = sub_index(i);
-        subtree_result[i] = subtree_result[x0] * subtree_result[x1];
-    }
-    *subtree_result.last_mut().unwrap() = F::ZERO;
-    // get a dummy global result
-    // vec![subtree_result; party_count];
-    // Send at most n elements to leader, so that each remaining layer can be handled locally.
-
-    let num_to_send = min(party_count, subtree_result.len());
-    let subtree_results = net
-        .worker_send_or_leader_receive_element(
-            &subtree_result[subtree_result.len() - num_to_send..].to_vec(),
-            sid,
-        )
-        .await?;
-    if net.is_leader() {
-        let subtree_results = subtree_results.unwrap();
-        let mut global_result = Vec::with_capacity(num_to_send * party_count + party_count);
-        let mut num_to_retrieve = 1 << (num_to_send.trailing_zeros() - 1);
-        let mut start_index = 0;
-        while num_to_retrieve > 0 {
-            for j in 0..party_count {
-                global_result.extend_from_slice(
-                    &subtree_results[j][start_index..start_index + num_to_retrieve],
-                );
-            }
-            start_index += num_to_retrieve;
-            num_to_retrieve >>= 1;
-        }
-        for i in start_index * party_count..start_index * party_count + party_count - 1 {
-            let (x0, x1) = sub_index(i);
-            global_result.push(global_result[x0] * global_result[x1]);
-        }
-        global_result.push(F::ZERO);
-
-        return Ok((subtree_result, Some(global_result)));
-    }
-    Ok((subtree_result, None))
-}
-
-/// Given i as a number in its binary representation, i.e. i = 1xxxx, return xxxx0 and xxxx1
+/// Given i as a number in its binary representation, i.e. i = (1,x), return (x,0) and (x,1)
 /// For example, given i=26=b11010, return b10100=20 and b10101=21
+/// For a tree-product, it returns the two childs of node i.
 fn sub_index(i: usize) -> (usize, usize) {
     let first_one = usize::BITS - i.leading_zeros() - 1;
     let x = i & !(1 << first_one);
@@ -85,7 +20,12 @@ fn sub_index(i: usize) -> (usize, usize) {
     (x, x + 1)
 }
 
-pub fn acc_product_share<F: FftField>(x: &Vec<F>) -> (Vec<F>, Vec<F>, Vec<F>) {
+/// A monolithic implementation of the functionality.
+/// Given evaluations of f(x) for x in the hypercube,
+/// Returns the shares or v(x,0),v(x,1),v(1,x).
+/// s.t., v(0,x) = f(x), v(1,x) = v(x,0) * v(x,1)
+/// v(1,1,..,1) will be set to 0.
+pub fn acc_product<F: FftField>(x: &Vec<F>) -> (Vec<F>, Vec<F>, Vec<F>) {
     let mut result = Vec::with_capacity(x.len() * 2);
     result.extend_from_slice(&x);
     result.extend_from_slice(&x);
@@ -93,26 +33,25 @@ pub fn acc_product_share<F: FftField>(x: &Vec<F>) -> (Vec<F>, Vec<F>, Vec<F>) {
         let (x0, x1) = sub_index(i);
         result[i] = result[x0] * result[x1];
     }
+    result[x.len() * 2 - 1] = F::ZERO;
+    
     (
+        // v(x,0)
         result.iter().step_by(2).map(F::clone).collect::<Vec<F>>(),
-        result
-            .iter()
-            .skip(1)
-            .step_by(2)
-            .map(F::clone)
-            .collect::<Vec<F>>(),
-        result
-            .iter()
-            .skip(result.len() / 2)
-            .map(F::clone)
-            .collect::<Vec<F>>(),
+        // v(x,1)
+        result.iter().skip(1).step_by(2).map(F::clone).collect::<Vec<F>>(),
+        // v(1,x)
+        result.iter().skip(result.len() / 2).map(F::clone).collect::<Vec<F>>(),
     )
 }
 
-/// Given x_0 ... x_2^m, returns the shares or f(x,0),f(x,1),f(1,x). f(1,1,..,1) will be set to 0
-/// unmask 0 unmask f(x,0)
-/// unmask 1 unmask f(x,1)
-/// unmask 2 unmask f(1,x)
+/// Given pss of evaluations of f,
+/// Returns the shares or v(x,0),v(x,1),v(1,x).
+/// s.t., v(0,x) = f(x), v(1,x) = v(x,0) * v(x,1).
+/// v(1,1,..,1) will be set to 0.
+/// unmask 0 unmask v(x,0)
+/// unmask 1 unmask v(x,1)
+/// unmask 2 unmask v(1,x)
 pub async fn d_acc_product_share<F: FftField, Net: MPCSerializeNet>(
     shares: &Vec<F>,
     masks: &Vec<F>,
@@ -264,6 +203,74 @@ pub async fn d_acc_product_share<F: FftField, Net: MPCSerializeNet>(
     Ok((share0, share1, share2))
 }
 
+/// Given pss of evaluations of f,
+/// Returns the tree-shaped product of the masked results. 
+pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
+    shares: &Vec<F>,
+    masks: &Vec<F>,
+    pp: &PackedSharingParams<F>,
+    net: &Net,
+    sid: MultiplexedStreamID,
+) -> Result<(Vec<F>, Option<Vec<F>>), MPCNetError> {
+    let party_count = pp.l * 4;
+    // Every party gets n/N of the shares.
+    let block_size = shares.len() / party_count;
+    // Compute masked x
+    let masked_x = join_all(shares.iter().enumerate().map(|(i, x)| async move {
+        unpack::d_unpack2(*x * masks[i], (i / block_size) as u32, pp, net, sid)
+            .await
+            .unwrap()
+    }))
+    .await
+    .into_iter()
+    .flatten()
+    .collect::<Vec<F>>();
+
+    // Each party calculates a subtree
+    let mut subtree_result = Vec::with_capacity(masked_x.len() * 2);
+    subtree_result.extend_from_slice(&masked_x);
+    subtree_result.extend_from_slice(&masked_x);
+    for i in masked_x.len()..subtree_result.len() - 1 {
+        let (x0, x1) = sub_index(i);
+        subtree_result[i] = subtree_result[x0] * subtree_result[x1];
+    }
+    *subtree_result.last_mut().unwrap() = F::ZERO;
+    // get a dummy global result
+    // vec![subtree_result; party_count];
+    // Send at most n elements to leader, so that each remaining layer can be handled locally.
+
+    let num_to_send = min(party_count, subtree_result.len());
+    let subtree_results = net
+        .worker_send_or_leader_receive_element(
+            &subtree_result[subtree_result.len() - num_to_send..].to_vec(),
+            sid,
+        )
+        .await?;
+    if net.is_leader() {
+        let subtree_results = subtree_results.unwrap();
+        let mut global_result = Vec::with_capacity(num_to_send * party_count + party_count);
+        let mut num_to_retrieve = 1 << (num_to_send.trailing_zeros() - 1);
+        let mut start_index = 0;
+        while num_to_retrieve > 0 {
+            for j in 0..party_count {
+                global_result.extend_from_slice(
+                    &subtree_results[j][start_index..start_index + num_to_retrieve],
+                );
+            }
+            start_index += num_to_retrieve;
+            num_to_retrieve >>= 1;
+        }
+        for i in start_index * party_count..start_index * party_count + party_count - 1 {
+            let (x0, x1) = sub_index(i);
+            global_result.push(global_result[x0] * global_result[x1]);
+        }
+        global_result.push(F::ZERO);
+
+        return Ok((subtree_result, Some(global_result)));
+    }
+    Ok((subtree_result, None))
+}
+
 fn merge<F: FftField>(results: &Vec<Vec<F>>) -> Vec<F> {
     let mut merged = Vec::new();
     let mut num_to_retrieve = results[0].len().next_power_of_two() >> 1;
@@ -299,6 +306,7 @@ mod tests {
 
     use crate::dacc_product::d_acc_product;
     use crate::dacc_product::d_acc_product_share;
+    use crate::dacc_product::acc_product;
     use crate::dacc_product::sub_index;
     use crate::utils::operator::transpose;
     use ark_ff::Field;
@@ -312,6 +320,15 @@ mod tests {
         let (x0, x1) = sub_index(i);
         assert_eq!(x0, 20);
         assert_eq!(x1, 21);
+    }
+
+    #[test]
+    fn acc_product_test() {
+        let x: Vec<Fr> = (1..=4).map(|i| Fr::from(i)).collect();
+        let (res_0, res_1, res_2) = acc_product(&x);
+        assert_eq!(res_0, vec![Fr::from(1), Fr::from(3), Fr::from(2), Fr::from(24)]);
+        assert_eq!(res_1, vec![Fr::from(2), Fr::from(4), Fr::from(12), Fr::from(0)]);
+        assert_eq!(res_2, vec![Fr::from(2), Fr::from(12), Fr::from(24), Fr::from(0)]);
     }
 
     #[tokio::test]

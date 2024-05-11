@@ -286,9 +286,10 @@ impl<E: Pairing> PolynomialCommitment<E> {
                 .zip(part1.iter())
                 .map(|(&x, &y)| (E::ScalarField::one() - point[i]) * x + point[i] * y)
                 .collect();
-            // Local small MSM. Note that the base should also be shares, which is omitted for simplicity.
-            // Why panic here?
-            // res.push(self.commit(&q_i));
+            // Local small MSM between ss of q_i and ss of base. 
+            // Note that the base should also be regular shares, which is replaced by packed shares for simplicity here.
+            let level = (q_i.len() * pp.l).trailing_zeros() as usize;
+            res.push(E::G1::msm(&self.powers_of_g[level], &q_i).unwrap());
             current_r = r_i;
         }
         end_timer!(phase_2_timer);
