@@ -133,7 +133,7 @@ pub trait MPCSerializeNet: MPCNet {
         f: impl Fn(Vec<T>) -> Vec<T> + Send,
     ) -> Result<T, MPCNetError> {
         let leader_response = self.worker_send_or_leader_receive_element(out, sid).await?;
-        let timer = start_timer!("Leader compute element");
+        let timer = start_timer!("Leader compute element", self.is_leader());
         let leader_response = leader_response.map(f);
         end_timer!(timer);
         self.worker_receive_or_leader_send_element(leader_response, sid)
@@ -254,7 +254,7 @@ pub trait MPCSerializeNet: MPCNet {
         f: impl Fn(Vec<T>) -> Vec<T> + Send,
     ) -> Result<T, MPCNetError> {
         let leader_response = self.worker_send_or_leader_receive_element(out, sid).await?;
-        let timer = start_timer!("Leader compute element");
+        let timer = start_timer!("Leader compute element", self.is_leader());
         let leader_response = leader_response.map(f);
         end_timer!(timer);
         self.worker_receive_or_leader_send_element(leader_response, sid)

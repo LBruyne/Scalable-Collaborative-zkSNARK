@@ -34,7 +34,7 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
     ),
     MPCNetError,
 > {
-    let timer = start_timer!("Preparation");
+    let timer = start_timer!("Preparation", net.is_leader());
     let rng = &mut ark_std::test_rng();
     let gate_count = (1 << gate_count_log2) / pp.l;
     let m = random_evaluations(gate_count * 4);
@@ -84,11 +84,11 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
     end_timer!(timer);
 
     // Gate identity
-    let compute_time = start_timer!("d_hyperplonk");
-    let timer = start_timer!("Gate identity");
+    let compute_time = start_timer!("d_hyperplonk", net.is_leader());
+    let timer = start_timer!("Gate identity", net.is_leader());
     let mut gate_identity_proofs = Vec::new();
     let mut gate_identity_commitments = Vec::new();
-    let commit_timer = start_timer!("Commitments");
+    let commit_timer = start_timer!("Commitments", net.is_leader());
     let m00_commit = commitment
         .d_commit(&vec![m00.clone()], pp, net, sid)
         .await?[0];
@@ -128,7 +128,7 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
         commitment.d_open(&s2, &challenge, pp, net, sid).await?,
     ));
     end_timer!(commit_timer);
-    let sumcheck_timer = start_timer!("Sumcheck");
+    let sumcheck_timer = start_timer!("Sumcheck", net.is_leader());
     gate_identity_proofs.push(d_sumcheck_product(&eq, &s1, &challenge, pp, net, sid).await?);
     let m00p01 = m00.iter().zip(m01.iter()).map(|(a, b)| *a + *b).collect();
     gate_identity_proofs.push(d_sumcheck_product(&s1, &m00p01, &challenge, pp, net, sid).await?);
@@ -140,7 +140,7 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
     end_timer!(sumcheck_timer);
     end_timer!(timer);
     // Wire identity
-    let timer = start_timer!("Wire identity");
+    let timer = start_timer!("Wire identity", net.is_leader());
     let mut wire_identity = Vec::new();
     for evaluations in &fs {
             let mut proofs = Vec::new();
