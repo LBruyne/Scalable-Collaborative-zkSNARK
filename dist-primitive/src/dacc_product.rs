@@ -140,14 +140,14 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
         };
         // Send to all other paties.
         let in0 = net
-            .dynamic_worker_receive_or_worker_send_element(out0, net.party_id() as u32, sid)
-            .await?;
+            .dynamic_worker_receive_or_worker_send_element(out0, i as u32, sid)
+            .await.unwrap();
         let in1 = net
-            .dynamic_worker_receive_or_worker_send_element(out1, net.party_id() as u32, sid)
-            .await?;
+            .dynamic_worker_receive_or_worker_send_element(out1, i as u32, sid)
+            .await.unwrap();
         let in2 = net
-            .dynamic_worker_receive_or_worker_send_element(out2, net.party_id() as u32, sid)
-            .await?;
+            .dynamic_worker_receive_or_worker_send_element(out2, i as u32, sid)
+            .await.unwrap();
 
         #[cfg(feature = "comm")]
         {
@@ -271,7 +271,7 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
             &subtree[subtree.len() - num_to_send..].to_vec(),
             sid,
         )
-        .await?;
+        .await.unwrap();
     end_timer!(ld_receive_timer);
 
     // Leader receives N^2 elements and calculates the remaining layers.
