@@ -4,7 +4,7 @@ use ark_std::UniformRand;
 use dist_primitive::{
     dacc_product::acc_product, dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub}, dsumcheck::sumcheck_product, mle::fix_variable
 };
-pub fn polyfill_hyperplonk<E: Pairing>(
+pub fn simulate_hyperplonk<E: Pairing>(
     gate_count_log2: usize,
 ) -> (
     (
@@ -114,7 +114,7 @@ pub fn polyfill_hyperplonk<E: Pairing>(
     )
 }
 
-fn random_evaluations<F: UniformRand>(n: usize) -> Vec<F> {
+pub fn random_evaluations<F: UniformRand>(n: usize) -> Vec<F> {
     (0..n)
         .map(|_| F::rand(&mut ark_std::test_rng()))
         .collect::<Vec<_>>()
