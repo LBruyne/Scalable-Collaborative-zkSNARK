@@ -94,7 +94,7 @@ pub trait MPCSerializeNet: MPCNet {
         Ok(T::deserialize_compressed(&bytes_in[..])?)
     }
 
-    async fn dynamic_worker_receive_or_leader_send_element<
+    async fn dynamic_worker_receive_or_worker_send_element<
         T: CanonicalDeserialize + CanonicalSerialize + Send,
         // A bug of rustc, T does not have to be Send actually. See https://github.com/rust-lang/rust/issues/63768
     >(
@@ -212,7 +212,7 @@ pub trait MPCSerializeNet: MPCNet {
         }
     }
 
-    async fn dynamic_worker_receive_or_leader_send_element<
+    async fn dynamic_worker_receive_or_worker_send_element<
         T: CanonicalDeserialize + CanonicalSerialize + Send + Default,
         // A bug of rustc, T does not have to be Send actually. See https://github.com/rust-lang/rust/issues/63768
     >(

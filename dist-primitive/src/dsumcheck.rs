@@ -120,8 +120,10 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     }
     end_timer!(phase_1_timer);
     debug_assert!(last_round.len() == 1);
-    // Phase 2
+    let pss2ss_timer = start_timer!("Reshare", net.is_leader());
     let mut last_round = pss2ss(last_round[0], pp, net, sid).await?;
+    end_timer!(pss2ss_timer);
+    // Phase 2
     let phase_2_timer = start_timer!("Phase 2", net.is_leader());
     for i in 0..l {
         let parts = last_round.split_at(last_round.len() / 2);

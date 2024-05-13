@@ -29,21 +29,12 @@ struct Cli {
 async fn main() {
     let args = Cli::parse();
 
-    #[cfg(feature = "leader")]
-    {
-        product_accumulator_bench_leader(args.n, args.l).await;
-    }
-
-    #[cfg(not(feature = "leader"))]
-    {
-        product_accumulator_bench(args.n, args.l).await;
-    }
-
+    product_accumulator_bench(args.n, args.l).await;
 }
 
 /// This benchmark just runs the leader's part of the protocol without any networking involved.
 #[cfg(feature = "leader")]
-async fn product_accumulator_bench_leader(n: usize, l: usize) {
+async fn product_accumulator_bench(n: usize, l: usize) {
     // Prepare random field elements.
     let x = (0..2_usize.pow(n as u32)).into_par_iter().map(|_| Fr::rand(&mut ark_std::test_rng())).collect::<Vec<Fr>>();
     // Local
@@ -96,6 +87,7 @@ async fn product_accumulator_bench_leader(n: usize, l: usize) {
 /// This benchmark runs the protocol in a simulation mode, all parties are involved with actual LOCAL communication.
 /// Defaultly the benchmark is to run in a multi-threaded environment.
 /// When #[tokio::main(flavor = "current_thread")] feature is enabled, the benchmark is set to run in a single thread.
+#[cfg(not(feature = "leader"))]
 async fn product_accumulator_bench(n: usize, l: usize) {
     // Prepare random field elements.
     let x = (0..2_usize.pow(n as u32)).into_par_iter().map(|_| Fr::rand(&mut ark_std::test_rng())).collect::<Vec<Fr>>();

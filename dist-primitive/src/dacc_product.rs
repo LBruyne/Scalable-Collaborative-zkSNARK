@@ -84,147 +84,157 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     // Each party obtains a subtree. Leader additionally obtains a leader tree.
     let (subtree, leader_tree) = tree;
 
-    Ok((subtree.clone(), subtree.clone(), subtree))
+    // First share the subtree.
+    let compute_subtree_share_timer = start_timer!("Each party computes subtree share", net.is_leader());
+    let party_count = pp.l * 4;
+    let num_to_send = min(party_count, subtree.len());
+    // Only share the following part, and the rest will be shared by the leader.
+    let subtree_to_share = subtree[..subtree.len() - num_to_send].to_vec();
+    let subtree_vx0_share: Vec<Vec<F>> = transpose(subtree_to_share
+        .iter()
+        .step_by(2)
+        .map(F::clone)
+        .collect::<Vec<F>>()
+        .chunks(pp.l)
+        .map(|chunk| pp.pack_from_public(chunk.to_vec()))
+        .collect::<Vec<_>>());
+    let subtree_vx1_share: Vec<Vec<F>> = transpose(subtree_to_share
+        .iter()
+        .skip(1)
+        .step_by(2)
+        .map(F::clone)
+        .collect::<Vec<F>>()
+        .chunks(pp.l)
+        .map(|chunk| pp.pack_from_public(chunk.to_vec()))
+        .collect::<Vec<_>>());
+    let subtree_v1x_share: Vec<Vec<F>> = transpose(subtree_to_share
+        .iter()
+        .skip(subtree.len() / 2)
+        .map(F::clone)
+        .collect::<Vec<F>>()
+        .chunks(pp.l)
+        .map(|chunk| pp.pack_from_public(chunk.to_vec()))
+        .collect::<Vec<_>>());
+    end_timer!(compute_subtree_share_timer);
 
-    // // First share the subtree.
-    // let party_count = pp.l * 4;
-    // let num_to_send = min(party_count, subtree.len());
-    // let unsent_result = subtree[..subtree.len() - num_to_send].to_vec();
-    // let share0: Vec<Vec<F>> = unsent_result
-    //     .iter()
-    //     .step_by(2)
-    //     .map(F::clone)
-    //     .collect::<Vec<F>>()
-    //     .chunks(pp.l)
-    //     .map(|chunk| pp.pack_from_public(chunk.to_vec()))
-    //     .collect::<Vec<_>>();
-    // let share0 = transpose(share0);
-    // let share1: Vec<Vec<F>> = unsent_result
-    //     .iter()
-    //     .skip(1)
-    //     .step_by(2)
-    //     .map(F::clone)
-    //     .collect::<Vec<F>>()
-    //     .chunks(pp.l)
-    //     .map(|chunk| pp.pack_from_public(chunk.to_vec()))
-    //     .collect::<Vec<_>>();
-    // let share1 = transpose(share1);
-    // let share2: Vec<Vec<F>> = unsent_result
-    //     .iter()
-    //     .skip(subtree.len() / 2)
-    //     .map(F::clone)
-    //     .collect::<Vec<F>>()
-    //     .chunks(pp.l)
-    //     .map(|chunk| pp.pack_from_public(chunk.to_vec()))
-    //     .collect::<Vec<_>>();
-    // let share2 = transpose(share2);
+    let share_subtree_timer = start_timer!("Each party shares subtree", net.is_leader());
+    let mut results0 = Vec::with_capacity(party_count);
+    let mut results1 = Vec::with_capacity(party_count);
+    let mut results2 = Vec::with_capacity(party_count);
+    for i in 0..party_count {
+        // If I am the current party, send shares to others.
+        let out0 = if i == net.party_id() as usize {
+            Some(subtree_vx0_share.clone())
+        } else {
+            None
+        };
+        let out1 = if i == net.party_id() as usize {
+            Some(subtree_vx1_share.clone())
+        } else {
+            None
+        };
+        let out2 = if i == net.party_id() as usize {
+            Some(subtree_v1x_share.clone())
+        } else {
+            None
+        };
+        // Send to all other paties.
+        let in0 = net
+            .dynamic_worker_receive_or_worker_send_element(out0, net.party_id() as u32, sid)
+            .await?;
+        let in1 = net
+            .dynamic_worker_receive_or_worker_send_element(out1, net.party_id() as u32, sid)
+            .await?;
+        let in2 = net
+            .dynamic_worker_receive_or_worker_send_element(out2, net.party_id() as u32, sid)
+            .await?;
 
-    // let mut results0 = Vec::with_capacity(party_count);
-    // let mut results1 = Vec::with_capacity(party_count);
-    // let mut results2 = Vec::with_capacity(party_count);
-    // for i in 0..party_count {
-    //     let out0 = if i == net.party_id() as usize {
-    //         Some(share0.clone())
-    //     } else {
-    //         None
-    //     };
-    //     let out1 = if i == net.party_id() as usize {
-    //         Some(share1.clone())
-    //     } else {
-    //         None
-    //     };
-    //     let out2 = if i == net.party_id() as usize {
-    //         Some(share2.clone())
-    //     } else {
-    //         None
-    //     };
-    //     let in0 = net
-    //         .dynamic_worker_receive_or_leader_send_element(out0, i as u32, sid)
-    //         .await?;
-    //     let in1 = net
-    //         .dynamic_worker_receive_or_leader_send_element(out1, i as u32, sid)
-    //         .await?;
-    //     let in2 = net
-    //         .dynamic_worker_receive_or_leader_send_element(out2, i as u32, sid)
-    //         .await?;
-    //     #[cfg(feature = "comm")]
-    //     {
-    //         results0.push(in0);
-    //         results1.push(in1);
-    //         results2.push(in2);
-    //     }
-    //     #[cfg(not(feature = "comm"))]
-    //     {
-    //         results0.push(share0[i].clone());
-    //         results1.push(share1[i].clone());
-    //         results2.push(share2[i].clone());
-    //     }
-    // }
-    // let mut share0 = merge(&results0);
-    // assert_eq!(share0.len(), results0[0].len() * results0.len());
-    // let mut share1 = merge(&results1);
-    // assert_eq!(share1.len(), results1[0].len() * results1.len());
-    // let mut share2 = merge(&results2);
-    // assert_eq!(share2.len(), results2[0].len() * results2.len());
+        #[cfg(feature = "comm")]
+        {
+            results0.push(in0);
+            results1.push(in1);
+            results2.push(in2);
+        }
 
-    // // Now leader shares the leader tree.
-    // let global_out0 = leader_tree.clone().map(|result| {
-    //     let share0: Vec<Vec<F>> = result
-    //         .iter()
-    //         .step_by(2)
-    //         .map(F::clone)
-    //         .collect::<Vec<F>>()
-    //         .chunks(pp.l)
-    //         .map(|chunk| pp.pack_from_public(chunk.to_vec()))
-    //         .collect::<Vec<_>>();
-    //     let share0 = transpose(share0);
-    //     share0
-    // });
-    // let global_out1 = leader_tree.clone().map(|result| {
-    //     let share1: Vec<Vec<F>> = result
-    //         .iter()
-    //         .skip(1)
-    //         .step_by(2)
-    //         .map(F::clone)
-    //         .collect::<Vec<F>>()
-    //         .chunks(pp.l)
-    //         .map(|chunk| pp.pack_from_public(chunk.to_vec()))
-    //         .collect::<Vec<_>>();
-    //     let share1 = transpose(share1);
-    //     share1
-    // });
-    // let global_out2 = leader_tree.clone().map(|result| {
-    //     let share2: Vec<Vec<F>> = result
-    //         .chunks(pp.l)
-    //         .map(|chunk| pp.pack_from_public(chunk.to_vec()))
-    //         .collect::<Vec<_>>();
-    //     let share2 = transpose(share2);
-    //     share2
-    // });
-    // let global_share0 = net
-    //     .worker_receive_or_leader_send_element(global_out0, sid)
-    //     .await?;
-    // let global_share1 = net
-    //     .worker_receive_or_leader_send_element(global_out1, sid)
-    //     .await?;
-    // let global_share2 = net
-    //     .worker_receive_or_leader_send_element(global_out2, sid)
-    //     .await?;
-    // share0.extend_from_slice(&global_share0);
-    // share1.extend_from_slice(&global_share1);
-    // share2.extend_from_slice(&global_share2);
+        // If no actual communication, just use the input as a placeholder.
+        #[cfg(not(feature = "comm"))]
+        {
+            results0.push(subtree_vx0_share[i].clone());
+            results1.push(subtree_vx1_share[i].clone());
+            results2.push(subtree_v1x_share[i].clone());
+        }
+    }
+    let mut share0 = merge(&results0);
+    assert_eq!(share0.len(), results0[0].len() * results0.len());
+    let mut share1 = merge(&results1);
+    assert_eq!(share1.len(), results1[0].len() * results1.len());
+    let mut share2 = merge(&results2);
+    assert_eq!(share2.len(), results2[0].len() * results2.len());
+    end_timer!(share_subtree_timer);
 
-    // // Each party unmask the shares.
-    // share0.iter_mut().enumerate().for_each(|(i, share)| {
-    //     *share *= unmask0[i];
-    // });
-    // share1.iter_mut().enumerate().for_each(|(i, share)| {
-    //     *share *= unmask1[i];
-    // });
-    // share2.iter_mut().enumerate().for_each(|(i, share)| {
-    //     *share *= unmask2[i];
-    // });
-    // Ok((share0, share1, share2))
+    // Now leader shares the leader tree.
+    let compute_leader_tree_share_timer = start_timer!("Leader computes leader tree share", net.is_leader());
+    let leader_tree_vx0_share = leader_tree.clone().map(|result| {
+        let share0: Vec<Vec<F>> = result
+            .iter()
+            .step_by(2)
+            .map(F::clone)
+            .collect::<Vec<F>>()
+            .chunks(pp.l)
+            .map(|chunk| pp.pack_from_public(chunk.to_vec()))
+            .collect::<Vec<_>>();
+        let share0 = transpose(share0);
+        share0
+    });
+    let leader_tree_vx1_share = leader_tree.clone().map(|result| {
+        let share1: Vec<Vec<F>> = result
+            .iter()
+            .skip(1)
+            .step_by(2)
+            .map(F::clone)
+            .collect::<Vec<F>>()
+            .chunks(pp.l)
+            .map(|chunk| pp.pack_from_public(chunk.to_vec()))
+            .collect::<Vec<_>>();
+        let share1 = transpose(share1);
+        share1
+    });
+    let leader_tree_v1x_share = leader_tree.clone().map(|result| {
+        let share2: Vec<Vec<F>> = result
+            .chunks(pp.l)
+            .map(|chunk| pp.pack_from_public(chunk.to_vec()))
+            .collect::<Vec<_>>();
+        let share2 = transpose(share2);
+        share2
+    });
+    end_timer!(compute_leader_tree_share_timer);
+
+    let share_leader_tree_timer = start_timer!("Leader shares leader tree", net.is_leader());
+    let leader_out0 = net
+        .worker_receive_or_leader_send_element(leader_tree_vx0_share, sid)
+        .await?;
+    let leader_out1 = net
+        .worker_receive_or_leader_send_element(leader_tree_vx1_share, sid)
+        .await?;
+    let leader_out2 = net
+        .worker_receive_or_leader_send_element(leader_tree_v1x_share, sid)
+        .await?;
+    share0.extend_from_slice(&leader_out0);
+    share1.extend_from_slice(&leader_out1);
+    share2.extend_from_slice(&leader_out2);
+    end_timer!(share_leader_tree_timer);
+
+    // Each party unmask the shares.
+    share0.iter_mut().enumerate().for_each(|(i, share)| {
+        *share *= unmask0[i];
+    });
+    share1.iter_mut().enumerate().for_each(|(i, share)| {
+        *share *= unmask1[i];
+    });
+    share2.iter_mut().enumerate().for_each(|(i, share)| {
+        *share *= unmask2[i];
+    });
+    Ok((share0, share1, share2))
 }
 
 /// Given pss of evaluations of f,
@@ -314,32 +324,15 @@ fn merge<F: FftField>(results: &Vec<Vec<F>>) -> Vec<F> {
 
 #[cfg(test)]
 mod tests {
-    // use std::cmp::min;
-
     use ark_ec::bls12::Bls12Config;
     use ark_ec::Group;
-    // use ark_std::UniformRand;
-
-    // use itertools::MultiUnzip;
-    // use mpc_net::MPCNet;
-    // use mpc_net::MultiplexedStreamID;
-    // use secret_sharing::pss::PackedSharingParams;
-
-    // use mpc_net::LocalTestNet;
 
     type Fr = <ark_ec::short_weierstrass::Projective<
         <ark_bls12_377::Config as Bls12Config>::G1Config,
     > as Group>::ScalarField;
 
-    // use crate::dacc_product::d_acc_product;
-    // use crate::dacc_product::d_acc_product_and_share;
     use crate::dacc_product::acc_product;
     use crate::dacc_product::sub_index;
-    // use crate::utils::operator::transpose;
-    // use ark_ff::Field;
-
-    // const L: usize = 4;
-    // const N: usize = 20;
 
     #[test]
     fn sub_index_test() {
@@ -357,168 +350,4 @@ mod tests {
         assert_eq!(res_1, vec![Fr::from(2), Fr::from(4), Fr::from(12), Fr::from(0)]);
         assert_eq!(res_2, vec![Fr::from(2), Fr::from(12), Fr::from(24), Fr::from(0)]);
     }
-
-    // #[tokio::test]
-    // async fn dacc_product_test() {
-    //     let net = LocalTestNet::new_local_testnet(L * 4).await.unwrap();
-    //     let pp = PackedSharingParams::<Fr>::new(L);
-    //     let rng = &mut ark_std::test_rng();
-    //     let x: Vec<Fr> = (0..2usize.pow(N as u32)).map(|_| Fr::rand(rng)).collect();
-    //     let mask: Vec<Fr> = (0..2usize.pow(N as u32)).map(|_| Fr::rand(rng)).collect();
-    //     let mut masks = vec![Vec::new(); L * 4];
-    //     mask.chunks(L).enumerate().for_each(|(_, chunk)| {
-    //         let shares = pp.pack_from_public(chunk.to_vec());
-    //         shares.into_iter().enumerate().for_each(|(j, share)| {
-    //             masks[j].push(share);
-    //         })
-    //     });
-    //     let mut workers = vec![Vec::new(); L * 4];
-    //     x.chunks(L).enumerate().for_each(|(_, chunk)| {
-    //         let shares = pp.pack_from_public(chunk.to_vec());
-    //         shares.into_iter().enumerate().for_each(|(j, share)| {
-    //             workers[j].push(share);
-    //         })
-    //     });
-
-    //     let result = net
-    //         .simulate_network_round((workers, masks), |net, (shares, masks)| async move {
-    //             let pp = PackedSharingParams::<Fr>::new(L);
-    //             d_acc_product(
-    //                 &shares[net.party_id() as usize],
-    //                 &masks[net.party_id() as usize],
-    //                 &pp,
-    //                 &net,
-    //                 MultiplexedStreamID::Zero,
-    //             )
-    //             .await
-    //             .unwrap()
-    //         })
-    //         .await;
-    //     let num_to_send = min(L * 4, result[0].0.len());
-    //     let mut global_result = Vec::new();
-    //     // Retrieve lower layers
-    //     let mut num_to_retrieve = 1 << (result[0].0.len().trailing_zeros() - 1);
-    //     let mut start_index = 0;
-    //     while num_to_retrieve >= num_to_send {
-    //         for j in 0..L * 4 {
-    //             global_result
-    //                 .extend_from_slice(&result[j].0[start_index..start_index + num_to_retrieve]);
-    //         }
-    //         start_index += num_to_retrieve;
-    //         num_to_retrieve >>= 1;
-    //     }
-    //     global_result.extend_from_slice(result[0].1.as_ref().unwrap());
-    //     // Verification
-    //     let mut expected = Vec::with_capacity(2usize.pow((N + 1) as u32));
-    //     let masked_x = x
-    //         .iter()
-    //         .zip(mask.iter())
-    //         .map(|(x, m)| x * m)
-    //         .collect::<Vec<Fr>>();
-    //     expected.extend_from_slice(&masked_x);
-    //     expected.extend_from_slice(&masked_x);
-    //     for i in x.len()..x.len() * 2 - 1 {
-    //         let (x0, x1) = sub_index(i);
-    //         expected[i] = expected[x0] * expected[x1];
-    //     }
-    //     expected[x.len() * 2 - 1] = Fr::ZERO;
-    //     assert_eq!(global_result.len(), expected.len());
-    //     assert_eq!(global_result, expected);
-    // }
-
-    // #[tokio::test]
-    // async fn dacc_product_share_test() {
-    //     let net = LocalTestNet::new_local_testnet(L * 4).await.unwrap();
-    //     let pp = PackedSharingParams::<Fr>::new(L);
-    //     let rng = &mut ark_std::test_rng();
-    //     let x: Vec<Fr> = (0..2usize.pow(N as u32)).map(|_| Fr::rand(rng)).collect();
-    //     let mask: Vec<Fr> = (0..2usize.pow(N as u32)).map(|_| Fr::ONE).collect();
-    //     let unmask0 = mask
-    //         .iter()
-    //         .map(|x| x.inverse().unwrap())
-    //         .collect::<Vec<_>>();
-
-    //     let mut masks = vec![Vec::new(); L * 4];
-    //     mask.chunks(L).enumerate().for_each(|(_, chunk)| {
-    //         let shares = pp.pack_from_public(chunk.to_vec());
-    //         shares.into_iter().enumerate().for_each(|(j, share)| {
-    //             masks[j].push(share);
-    //         })
-    //     });
-    //     let mut workers = vec![Vec::new(); L * 4];
-    //     x.chunks(L).enumerate().for_each(|(_, chunk)| {
-    //         let shares = pp.pack_from_public(chunk.to_vec());
-    //         shares.into_iter().enumerate().for_each(|(j, share)| {
-    //             workers[j].push(share);
-    //         })
-    //     });
-
-    //     let result = net
-    //         .simulate_network_round(
-    //             (workers, masks, unmask0),
-    //             |net, (shares, masks, unmask0)| async move {
-    //                 let pp = PackedSharingParams::<Fr>::new(L);
-    //                 d_acc_product_and_share(
-    //                     &shares[net.party_id() as usize],
-    //                     &masks[net.party_id() as usize],
-    //                     &unmask0,
-    //                     &unmask0,
-    //                     &unmask0,
-    //                     &pp,
-    //                     &net,
-    //                     MultiplexedStreamID::Zero,
-    //                 )
-    //                 .await
-    //                 .unwrap()
-    //             },
-    //         )
-    //         .await;
-    //     let (result0, result1, result2): (Vec<_>, Vec<_>, Vec<_>) = result.into_iter().multiunzip();
-    //     let result0 = transpose(result0);
-    //     let result1 = transpose(result1);
-    //     let result2 = transpose(result2);
-    //     let result0_unpacked = result0
-    //         .iter()
-    //         .flat_map(|x| pp.unpack2(x.clone()))
-    //         .collect::<Vec<_>>();
-    //     let result1_unpacked = result1
-    //         .iter()
-    //         .flat_map(|x| pp.unpack2(x.clone()))
-    //         .collect::<Vec<_>>();
-    //     let result2_unpacked = result2
-    //         .iter()
-    //         .flat_map(|x| pp.unpack2(x.clone()))
-    //         .collect::<Vec<_>>();
-    //     assert_eq!(result0_unpacked.len(), result1_unpacked.len());
-    //     assert_eq!(result1_unpacked.len(), result2_unpacked.len());
-    //     assert_eq!(result0_unpacked.len(), x.len());
-
-    //     let mut expected_result = Vec::new();
-    //     expected_result.extend_from_slice(&x);
-    //     expected_result.extend_from_slice(&x);
-    //     for i in x.len()..x.len() * 2 - 1 {
-    //         let (x0, x1) = sub_index(i);
-    //         expected_result[i] = expected_result[x0] * expected_result[x1];
-    //     }
-    //     expected_result[x.len() * 2 - 1] = Fr::ZERO;
-    //     let expected_result0 = expected_result
-    //         .iter()
-    //         .step_by(2)
-    //         .map(Fr::clone)
-    //         .collect::<Vec<_>>();
-    //     let expected_result1 = expected_result
-    //         .iter()
-    //         .skip(1)
-    //         .step_by(2)
-    //         .map(Fr::clone)
-    //         .collect::<Vec<_>>();
-    //     let expected_result2 = expected_result
-    //         .iter()
-    //         .skip(x.len())
-    //         .map(Fr::clone)
-    //         .collect::<Vec<_>>();
-    //     assert_eq!(result0_unpacked, expected_result0);
-    //     assert_eq!(result1_unpacked, expected_result1);
-    //     assert_eq!(result2_unpacked, expected_result2);
-    // }
 }

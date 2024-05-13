@@ -31,20 +31,12 @@ struct Cli {
 async fn main() {
     let args = Cli::parse();
 
-    #[cfg(feature = "leader")]
-    {
-        mvpc_bench_leader(args.n, args.l).await;
-    }
-
-    #[cfg(not(feature = "leader"))]
-    {
-        mvpc_bench(args.n, args.l).await;
-    }
+    mvpc_bench(args.n, args.l).await;
 }
 
 /// This benchmark just runs the leader's part of the protocol without any networking involved.
 #[cfg(feature = "leader")]
-async fn mvpc_bench_leader(n: usize, l: usize) {
+async fn mvpc_bench(n: usize, l: usize) {
     // Prepare random elements and shares.
     let rng = &mut ark_std::test_rng();
     let mut s = Vec::new();
@@ -121,6 +113,7 @@ async fn mvpc_bench_leader(n: usize, l: usize) {
 /// This benchmark runs the protocol in a simulation mode, all parties are involved with actual LOCAL communication.
 /// Defaultly the benchmark is to run in a multi-threaded environment.
 /// When #[tokio::main(flavor = "current_thread")] feature is enabled, the benchmark is set to run in a single thread.
+#[cfg(not(feature = "leader"))]
 async fn mvpc_bench(n: usize, l: usize) {
     // Prepare random elements.
     let rng = &mut ark_std::test_rng();

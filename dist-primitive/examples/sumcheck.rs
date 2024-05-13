@@ -92,23 +92,14 @@ struct Cli {
 #[cfg_attr(not(feature = "single_thread"), tokio::main)]
 async fn main() {
     let args = Cli::parse();
-
-    #[cfg(feature = "leader")]
-    {
-        sumcheck_bench_leader(args.n, args.l).await;
-        sumcheck_product_bench_leader(args.n, args.l).await;
-    }
     
-    #[cfg(not(feature = "leader"))]
-    {
-        sumcheck_bench(args.n, args.l).await;
-        sumcheck_product_bench(args.n, args.l).await;
-    }
+    sumcheck_bench(args.n, args.l).await;
+    sumcheck_product_bench(args.n, args.l).await;
 }
 
 /// This benchmark just runs the leader's part of the sumcheck protocol without any networking involved.
 #[cfg(feature = "leader")]
-async fn sumcheck_bench_leader(n: usize, l: usize) {
+async fn sumcheck_bench(n: usize, l: usize) {
     let pp = PackedSharingParams::<Fr>::new(l);
     let delegator = Delegator::new(n);
     let challenge = (0..n)
@@ -142,6 +133,7 @@ async fn sumcheck_bench_leader(n: usize, l: usize) {
 /// This benchmark runs the sumcheck protocol in a simulation mode, all parties are involved with actual LOCAL communication.
 /// The benchmark is default to run in a multi-threaded environment.
 /// When #[tokio::main(flavor = "current_thread")] feature is enabled, the benchmark is set to run in a single thread. 
+#[cfg(not(feature = "leader"))]
 async fn sumcheck_bench(n: usize, l: usize) {
     let delegator = Delegator::new(n);
     let challenge = (0..n)
@@ -188,7 +180,7 @@ async fn sumcheck_bench(n: usize, l: usize) {
 
 /// This benchmark just runs the leader's part of the sumcheck product protocol without any networking involved.
 #[cfg(feature = "leader")]
-async fn sumcheck_product_bench_leader(n: usize, l: usize) {
+async fn sumcheck_product_bench(n: usize, l: usize) {
     let pp = PackedSharingParams::<Fr>::new(l);
     let delegator = ProductDelegator::new(n);
     let challenge = (0..n)
@@ -224,6 +216,7 @@ async fn sumcheck_product_bench_leader(n: usize, l: usize) {
 /// This benchmark runs the sumcheck product protocol in a simulation mode, all parties are involved with actual LOCAL communication.
 /// The benchmark is default to run in a multi-threaded environment.
 /// When #[tokio::main(flavor = "current_thread")] feature is enabled, the benchmark is set to run in a single thread. 
+#[cfg(not(feature = "leader"))]
 async fn sumcheck_product_bench(n: usize, l: usize) {
     let delegator = ProductDelegator::new(n);
     let challenge = (0..n)
