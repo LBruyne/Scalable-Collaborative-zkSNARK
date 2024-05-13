@@ -5,9 +5,12 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
-default = ["comm"]
-local = ["comm", "single_thread"]
-single_thread = [] # tokio in single thread
+default = []
+local = ["comm", "single_thread"] # local simulating with tokio in single-thread
+local-multihread = ["comm"] # local simulating with tokio in multi-thread
+leader = ["single_thread", "comm"] # local ONLY leader running its own part without actual communication
+
+single_thread = [] # with tokio in single thread
 comm = [] # with actual communication
 
 [dependencies]

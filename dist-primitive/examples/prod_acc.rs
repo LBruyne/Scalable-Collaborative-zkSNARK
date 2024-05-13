@@ -7,7 +7,7 @@ use ark_std::UniformRand;
 
 use clap::Parser;
 use dist_primitive::dacc_product::acc_product;
-use dist_primitive::dacc_product::d_acc_product_share;
+use dist_primitive::dacc_product::d_acc_product_and_share;
 use dist_primitive::{end_timer, start_timer};
 use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
 use rayon::prelude::*;
@@ -29,14 +29,20 @@ struct Cli {
 async fn main() {
     let args = Cli::parse();
 
-    // product_accumulator_bench(args.n, args.l).await;
-
-    #[cfg(all(not(feature = "comm"), feature = "single_thread"))]
+    #[cfg(feature = "leader")]
     {
         product_accumulator_bench_leader(args.n, args.l).await;
     }
+
+    #[cfg(not(feature = "leader"))]
+    {
+        product_accumulator_bench(args.n, args.l).await;
+    }
+
 }
 
+/// This benchmark just runs the leader's part of the protocol without any networking involved.
+#[cfg(feature = "leader")]
 async fn product_accumulator_bench_leader(n: usize, l: usize) {
     // Prepare random field elements.
     let x = (0..2_usize.pow(n as u32)).into_par_iter().map(|_| Fr::rand(&mut ark_std::test_rng())).collect::<Vec<Fr>>();
@@ -72,7 +78,7 @@ async fn product_accumulator_bench_leader(n: usize, l: usize) {
     let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
     let distributed = start_timer!("Distributed product accumulatiton");
     let _ = black_box(
-        d_acc_product_share(
+        d_acc_product_and_share(
             &x,
             &mask,
             &unmask0,
@@ -85,4 +91,64 @@ async fn product_accumulator_bench_leader(n: usize, l: usize) {
     );
     end_timer!(distributed);
     println!("Comm: {:?}", net.get_leader().get_comm());
+}
+
+/// This benchmark runs the protocol in a simulation mode, all parties are involved with actual LOCAL communication.
+/// Defaultly the benchmark is to run in a multi-threaded environment.
+/// When #[tokio::main(flavor = "current_thread")] feature is enabled, the benchmark is set to run in a single thread.
+async fn product_accumulator_bench(n: usize, l: usize) {
+    // Prepare random field elements.
+    let x = (0..2_usize.pow(n as u32)).into_par_iter().map(|_| Fr::rand(&mut ark_std::test_rng())).collect::<Vec<Fr>>();
+    // Local
+    let local = start_timer!("Local product accumulatiton");
+    black_box(acc_product(&x));
+    end_timer!(local);
+
+    // Distributed 
+    // Prepare shares and masks. Assume each party receives the same random shares.
+    let x_share: Vec<Fr> = (0..(2usize.pow(n as u32) / l))
+        .into_par_iter()
+        .map(|_| Fr::rand(&mut ark_std::test_rng()))
+        .collect();
+    let mask_share: Vec<Fr> = (0..(2usize.pow(n as u32) / l))
+        .into_par_iter()
+        .map(|_| Fr::rand(&mut ark_std::test_rng()))
+        .collect();
+    let unmask0_share: Vec<Fr> = (0..(2usize.pow(n as u32) / l))
+        .into_par_iter()
+        .map(|_| Fr::rand(&mut ark_std::test_rng()))
+        .collect();
+    let unmask1_share: Vec<Fr> = (0..(2usize.pow(n as u32) / l))
+        .into_par_iter()
+        .map(|_| Fr::rand(&mut ark_std::test_rng()))
+        .collect();
+    let unmask2_share: Vec<Fr> = (0..(2usize.pow(n as u32) / l))
+        .into_par_iter()
+        .map(|_| Fr::rand(&mut ark_std::test_rng()))
+        .collect();
+
+    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let distributed = start_timer!("Simulate distributed product accumulatiton");
+
+    let _ = net.simulate_network_round((x_share, mask_share, unmask0_share, unmask1_share, unmask2_share), move |net, (x, mask, unmask0, unmask1, unmask2)| async move {
+            let pp = PackedSharingParams::<Fr>::new(l);
+
+            let _ = d_acc_product_and_share(
+                    &x,
+                    &mask,
+                    &unmask0,
+                    &unmask1,
+                    &unmask2,
+                    &pp,
+                    &net,
+                    MultiplexedStreamID::Zero,
+                ).await
+                .unwrap();
+
+            if net.is_leader() {
+                println!("Comm: {:?}", net.get_comm());
+            }
+        }
+    ).await;
+    end_timer!(distributed);
 }

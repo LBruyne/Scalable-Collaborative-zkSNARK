@@ -31,17 +31,19 @@ struct Cli {
 async fn main() {
     let args = Cli::parse();
 
-    mvpc_bench(args.n, args.l).await;
-
-    #[cfg(all(not(feature = "comm"), feature = "single_thread"))]
+    #[cfg(feature = "leader")]
     {
         mvpc_bench_leader(args.n, args.l).await;
+    }
+
+    #[cfg(not(feature = "leader"))]
+    {
+        mvpc_bench(args.n, args.l).await;
     }
 }
 
 /// This benchmark just runs the leader's part of the protocol without any networking involved.
-/// Should with #[tokio::main(flavor = "current_thread")] feature.
-#[cfg(feature = "single_thread")]
+#[cfg(feature = "leader")]
 async fn mvpc_bench_leader(n: usize, l: usize) {
     // Prepare random elements and shares.
     let rng = &mut ark_std::test_rng();
@@ -155,7 +157,7 @@ async fn mvpc_bench(n: usize, l: usize) {
     {
         let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
         // Now simulate the protocol
-        let timer = start_timer!("Simulate polynomial commitment");
+        let timer = start_timer!("Simulate distributed polynomial commitment");
         let sharing = start_timer!("Sharing");
         let peval_shares = transpose(
             peval

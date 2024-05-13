@@ -92,20 +92,22 @@ struct Cli {
 #[cfg_attr(not(feature = "single_thread"), tokio::main)]
 async fn main() {
     let args = Cli::parse();
-    
-    sumcheck_bench(args.n, args.l).await;
-    sumcheck_product_bench(args.n, args.l).await;
 
-    #[cfg(all(not(feature = "comm"), feature = "single_thread"))]
+    #[cfg(feature = "leader")]
     {
         sumcheck_bench_leader(args.n, args.l).await;
         sumcheck_product_bench_leader(args.n, args.l).await;
     }
+    
+    #[cfg(not(feature = "leader"))]
+    {
+        sumcheck_bench(args.n, args.l).await;
+        sumcheck_product_bench(args.n, args.l).await;
+    }
 }
 
 /// This benchmark just runs the leader's part of the sumcheck protocol without any networking involved.
-/// Should with #[tokio::main(flavor = "current_thread")] feature.
-#[cfg(feature = "single_thread")]
+#[cfg(feature = "leader")]
 async fn sumcheck_bench_leader(n: usize, l: usize) {
     let pp = PackedSharingParams::<Fr>::new(l);
     let delegator = Delegator::new(n);
@@ -185,8 +187,7 @@ async fn sumcheck_bench(n: usize, l: usize) {
 }
 
 /// This benchmark just runs the leader's part of the sumcheck product protocol without any networking involved.
-/// Should with #[tokio::main(flavor = "current_thread")] feature.
-#[cfg(feature = "single_thread")]
+#[cfg(feature = "leader")]
 async fn sumcheck_product_bench_leader(n: usize, l: usize) {
     let pp = PackedSharingParams::<Fr>::new(l);
     let delegator = ProductDelegator::new(n);
