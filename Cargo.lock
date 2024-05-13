@@ -728,6 +728,27 @@ checksum = "9a3a5bfb195931eeb336b2a7b4d761daec841b97f947d34394601737a7bba5e4"
 [[package]]
 name = "hyperplonk"
 version = "0.1.0"
+dependencies = [
+ "ark-bls12-381",
+ "ark-ec",
+ "ark-ff",
+ "ark-poly",
+ "ark-serialize",
+ "ark-std",
+ "async-trait",
+ "clap 4.5.4",
+ "colored",
+ "digest",
+ "dist-primitive",
+ "futures",
+ "log",
+ "mpc-net",
+ "peak_alloc",
+ "rand",
+ "rayon",
+ "secret-sharing",
+ "tokio",
+]
 
 [[package]]
 name = "is-terminal"

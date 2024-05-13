@@ -22,3 +22,5 @@ perf.data.old
 worker_*.log
 test.perf
 output
+
+.vscode

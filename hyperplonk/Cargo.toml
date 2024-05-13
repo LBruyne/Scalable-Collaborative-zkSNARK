@@ -4,3 +4,25 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+ark-std = {version = "0.4.0", default-features = false, features = [ "print-trace", "std" ]}
+ark-ff = {version = "0.4.2", default-features = false}
+ark-poly = {version = "0.4.2", default-features = false}
+ark-ec = {version = "0.4.2", default-features = false}
+ark-serialize = { version = "0.4.2", default-features = false, features = [ "derive" ] }
+secret-sharing = { version = "0.1.0", path = "../secret-sharing" }
+mpc-net ={ version = "0.1.0", path = "../mpc-net" }
+dist-primitive ={ version = "0.1.0", path = "../dist-primitive" }
+log = {version = "0.4"}
+rand = { version = "0.8", default-features = false, features = ["std"] }
+digest = { version = "0.10" }
+async-trait = "0.1.74"
+tokio = { version = "1.34.0", features = ["macros", "rt", "rt-multi-thread", "tracing"] }
+colored = "2.0.4"
+clap = {version = "4.4.11", features = ["derive"] }
+ark-bls12-381 = "0.4.0"
+rayon = "1.8.0"
+futures = "0.3.29"
+peak_alloc = "0.2.0"
+
+[dev-dependencies]
+clap = {version = "4.4.11", features = ["derive"] }
