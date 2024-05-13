@@ -149,23 +149,23 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
 
     /// A toy protocol that generates a shared parameter.
     pub fn new_single(
-        len: usize,
+        len_log_2: usize,
         pp: &PackedSharingParams<E::ScalarField>,
     ) -> PolynomialCommitment<E> {
         let l = pp.l;
         let rng = &mut ark_std::test_rng();
 
         let mut result = Self {
-            powers_of_g: vec![Vec::new(); len + 1],
-            powers_of_g2: (0..len + 1).map(|_| E::G2::rand(rng)).collect(),
+            powers_of_g: vec![Vec::new(); len_log_2 + 1],
+            powers_of_g2: (0..len_log_2 + 1).map(|_| E::G2::rand(rng)).collect(),
         };
-        for i in 0..len + 1 {
+        for i in 0..len_log_2 + 1 {
             // Last few powers may not be properly packed, fill in some dummy values
             let powers_of_g = if (1 << i) < l {
-                vec![black_box(E::G1::rand(rng))]
+                vec![E::G1::rand(rng)]
             } else {
                 // Since the length is always a power of 2 the chunks are exact. No remainders.
-                black_box((0..((1 << i) / l)).map(|_| E::G1::rand(rng)).collect())
+                (0..((1 << i) / l)).map(|_| E::G1::rand(rng)).collect()
             };
             result.powers_of_g[i] = powers_of_g;
         }

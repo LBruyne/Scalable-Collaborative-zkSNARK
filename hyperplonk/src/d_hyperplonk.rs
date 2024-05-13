@@ -1,13 +1,16 @@
-use ark_ec::{bls12::Bls12, pairing::Pairing};
+use ark_ec::pairing::Pairing;
 use ark_ff::fields::Field;
 use ark_std::UniformRand;
 use dist_primitive::{
-    dacc_product::acc_product,
+    dacc_product::d_acc_product_and_share,
     dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub},
-    dsumcheck::{d_sumcheck_product, sumcheck_product},
+    dsumcheck::d_sumcheck_product,
+    end_timer,
     mle::fix_variable,
+    start_timer,
     utils::serializing_net::MPCSerializeNet,
 };
+use futures::future::join_all;
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
@@ -31,6 +34,7 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
     ),
     MPCNetError,
 > {
+    let timer = start_timer!("Preparation");
     let rng = &mut ark_std::test_rng();
     let gate_count = (1 << gate_count_log2) / pp.l;
     let m = random_evaluations(gate_count * 4);
@@ -41,18 +45,24 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
     let s1 = random_evaluations(gate_count);
     let s2 = random_evaluations(gate_count);
     let eq = random_evaluations(gate_count);
-    let g1 = E::G1::rand(rng);
-    let g2 = E::G2::rand(rng);
-    let s: Vec<E::ScalarField> = random_evaluations(gate_count.trailing_zeros() as usize);
-    let commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new(g1, g2, s).mature();
+    // let g1 = E::G1::rand(rng);
+    // let g2 = E::G2::rand(rng);
+    // let s: Vec<E::ScalarField> = random_evaluations(gate_count.trailing_zeros() as usize);
+    let commitment: PolynomialCommitment<E> =
+        PolynomialCommitmentCub::new_single(gate_count_log2, pp);
     let challenge = random_evaluations(gate_count_log2);
 
-    let a_evals = random_evaluations(gate_count);
-    let b_evals = random_evaluations(gate_count);
-    let c_evals = random_evaluations(gate_count);
-    let permute_s1 = random_evaluations(gate_count);
-    let permute_s2 = random_evaluations(gate_count);
-    let permute_s3 = random_evaluations(gate_count);
+    let mask = random_evaluations(gate_count);
+    let unmask0 = random_evaluations(gate_count);
+    let unmask1 = random_evaluations(gate_count);
+    let unmask2 = random_evaluations(gate_count);
+
+    let a_evals: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let b_evals: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let c_evals: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let permute_s1: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let permute_s2: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let permute_s3: Vec<E::ScalarField> = random_evaluations(gate_count);
     let beta = E::ScalarField::rand(rng);
     let gamma = E::ScalarField::rand(rng);
     let omega = E::ScalarField::rand(rng);
@@ -71,16 +81,28 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
         })
         .collect();
     let fs: Vec<Vec<E::ScalarField>> = vec![num, den];
+    end_timer!(timer);
 
     // Gate identity
+    let compute_time = start_timer!("d_hyperplonk");
+    let timer = start_timer!("Gate identity");
     let mut gate_identity_proofs = Vec::new();
     let mut gate_identity_commitments = Vec::new();
-    let m00_commit = commitment.d_commit(&vec![m00], pp, net, sid).await?[0];
-    let m01_commit = commitment.d_commit(&vec![m01], pp, net, sid).await?[0];
-    let m10_commit = commitment.d_commit(&vec![m10], pp, net, sid).await?[0];
-    let input_commit = commitment.d_commit(&vec![input], pp, net, sid).await?[0];
-    let s1_commit = commitment.d_commit(&vec![s1], pp, net, sid).await?[0];
-    let s2_commit = commitment.d_commit(&vec![s2], pp, net, sid).await?[0];
+    let commit_timer = start_timer!("Commitments");
+    let m00_commit = commitment
+        .d_commit(&vec![m00.clone()], pp, net, sid)
+        .await?[0];
+    let m01_commit = commitment
+        .d_commit(&vec![m01.clone()], pp, net, sid)
+        .await?[0];
+    let m10_commit = commitment
+        .d_commit(&vec![m10.clone()], pp, net, sid)
+        .await?[0];
+    let input_commit = commitment
+        .d_commit(&vec![input.clone()], pp, net, sid)
+        .await?[0];
+    let s1_commit = commitment.d_commit(&vec![s1.clone()], pp, net, sid).await?[0];
+    let s2_commit = commitment.d_commit(&vec![s2.clone()], pp, net, sid).await?[0];
     gate_identity_commitments.push((
         m00_commit,
         commitment.d_open(&m00, &challenge, pp, net, sid).await?,
@@ -105,7 +127,8 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
         s2_commit,
         commitment.d_open(&s2, &challenge, pp, net, sid).await?,
     ));
-
+    end_timer!(commit_timer);
+    let sumcheck_timer = start_timer!("Sumcheck");
     gate_identity_proofs.push(d_sumcheck_product(&eq, &s1, &challenge, pp, net, sid).await?);
     let m00p01 = m00.iter().zip(m01.iter()).map(|(a, b)| *a + *b).collect();
     gate_identity_proofs.push(d_sumcheck_product(&s1, &m00p01, &challenge, pp, net, sid).await?);
@@ -114,8 +137,10 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
     gate_identity_proofs.push(d_sumcheck_product(&s2, &m00, &challenge, pp, net, sid).await?);
     let m10pi = m10.iter().zip(input.iter()).map(|(a, b)| -*a + b).collect();
     gate_identity_proofs.push(d_sumcheck_product(&eq, &m10pi, &challenge, pp, net, sid).await?);
-
+    end_timer!(sumcheck_timer);
+    end_timer!(timer);
     // Wire identity
+    let timer = start_timer!("Wire identity");
     let wire_identity = fs
         .iter()
         .map(|evaluations| async {
@@ -129,10 +154,30 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
                 .d_open(evaluations, &challenge, pp, net, sid)
                 .await
                 .unwrap();
-            let (vx0, vx1, v1x) = d_acc_product(evaluations);
-            let v_commit_x0 = commitment.d_commit(&vec![vx0], pp, net, sid).await.unwrap()[0];
-            let v_commit_x1 = commitment.d_commit(&vec![vx1], pp, net, sid).await.unwrap()[0];
-            let v_commit_1x = commitment.d_commit(&vec![v1x], pp, net, sid).await.unwrap()[0];
+            let (vx0, vx1, v1x) = d_acc_product_and_share(
+                evaluations,
+                &mask,
+                &unmask0,
+                &unmask1,
+                &unmask2,
+                pp,
+                net,
+                sid,
+            )
+            .await
+            .unwrap();
+            let v_commit_x0 = commitment
+                .d_commit(&vec![vx0.clone()], pp, net, sid)
+                .await
+                .unwrap()[0];
+            let v_commit_x1 = commitment
+                .d_commit(&vec![vx1.clone()], pp, net, sid)
+                .await
+                .unwrap()[0];
+            let v_commit_1x = commitment
+                .d_commit(&vec![v1x.clone()], pp, net, sid)
+                .await
+                .unwrap()[0];
             let v_open_x0 = commitment
                 .d_open(&vx0, &challenge, pp, net, sid)
                 .await
@@ -166,7 +211,10 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
             );
             (proofs, commits)
         })
-        .collect().await;
+        .collect::<Vec<_>>();
+    let wire_identity = join_all(wire_identity).await;
+    end_timer!(timer);
+    end_timer!(compute_time);
     Ok((
         (gate_identity_proofs, gate_identity_commitments),
         wire_identity,

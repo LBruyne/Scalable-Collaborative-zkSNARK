@@ -8,7 +8,7 @@ edition = "2021"
 default = []
 local = ["comm", "single_thread"] # local simulating with tokio in single-thread
 local-multihread = ["comm"] # local simulating with tokio in multi-thread
-leader = ["single_thread", "comm"] # local ONLY leader running its own part without actual communication
+leader = ["single_thread"] # local ONLY leader running its own part without actual communication
 
 single_thread = [] # with tokio in single thread
 comm = [] # with actual communication

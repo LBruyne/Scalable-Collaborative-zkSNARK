@@ -1,8 +1,8 @@
 use ark_ec::{bls12::Bls12, pairing::Pairing};
 use ark_ff::fields::Field;
-use ark_std::UniformRand;
+use ark_std::{UniformRand};
 use dist_primitive::{
-    dacc_product::acc_product, dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub}, dsumcheck::sumcheck_product, mle::fix_variable
+    dacc_product::acc_product, dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub}, dsumcheck::sumcheck_product, end_timer, mle::fix_variable, start_timer
 };
 pub fn simulate_hyperplonk<E: Pairing>(
     gate_count_log2: usize,
@@ -17,6 +17,7 @@ pub fn simulate_hyperplonk<E: Pairing>(
     )>,
 ) {
     // Preparation
+    let timer = start_timer!("Preparation");
     let rng = &mut ark_std::test_rng();
     let gate_count = 1 << gate_count_log2;
     let m = random_evaluations(gate_count * 4);
@@ -33,12 +34,12 @@ pub fn simulate_hyperplonk<E: Pairing>(
     let commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new(g1, g2, s).mature();
     let challenge = random_evaluations(gate_count_log2);
 
-    let a_evals = random_evaluations(gate_count);
-    let b_evals = random_evaluations(gate_count);
-    let c_evals = random_evaluations(gate_count);
-    let permute_s1 = random_evaluations(gate_count);
-    let permute_s2 = random_evaluations(gate_count);
-    let permute_s3 = random_evaluations(gate_count);
+    let a_evals: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let b_evals: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let c_evals: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let permute_s1: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let permute_s2: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let permute_s3: Vec<E::ScalarField> = random_evaluations(gate_count);
     let beta = E::ScalarField::rand(rng);
     let gamma = E::ScalarField::rand(rng);
     let omega = E::ScalarField::rand(rng);
@@ -57,8 +58,10 @@ pub fn simulate_hyperplonk<E: Pairing>(
         })
         .collect();
     let fs = vec![num, den];
-
+    end_timer!(timer);
     // Gate identity
+    let compute_timer = start_timer!("hyperplonk");
+    let timer = start_timer!("Gate Identity");
     let mut gate_identity_proofs = Vec::new();
     let mut gate_identity_commitments = Vec::new();
     let m00_commit = commitment.commit(&m00);
@@ -82,8 +85,9 @@ pub fn simulate_hyperplonk<E: Pairing>(
     gate_identity_proofs.push(sumcheck_product(&s2, &m00, &challenge));
     let m10pi = m10.iter().zip(input.iter()).map(|(a, b)| -*a + b).collect();
     gate_identity_proofs.push(sumcheck_product(&eq, &m10pi, &challenge));
-
+    end_timer!(timer);
     // Wire identity
+    let timer = start_timer!("Wire Identity");
     let wire_identity = fs
         .iter()
         .map(|evaluations| {
@@ -108,6 +112,8 @@ pub fn simulate_hyperplonk<E: Pairing>(
             (proofs, commits)
         })
         .collect();
+    end_timer!(timer);
+    end_timer!(compute_timer);
     (
         (gate_identity_proofs, gate_identity_commitments),
         wire_identity,
