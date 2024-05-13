@@ -141,9 +141,8 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
     end_timer!(timer);
     // Wire identity
     let timer = start_timer!("Wire identity");
-    let wire_identity = fs
-        .iter()
-        .map(|evaluations| async {
+    let mut wire_identity = Vec::new();
+    for evaluations in &fs {
             let mut proofs = Vec::new();
             let mut commits = Vec::new();
             let f_commit = commitment
@@ -209,10 +208,8 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
                     .await
                     .unwrap(),
             );
-            (proofs, commits)
-        })
-        .collect::<Vec<_>>();
-    let wire_identity = join_all(wire_identity).await;
+            wire_identity.push((proofs, commits));
+        }
     end_timer!(timer);
     end_timer!(compute_time);
     Ok((

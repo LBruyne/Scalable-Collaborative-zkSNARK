@@ -3,8 +3,10 @@ use async_trait::async_trait;
 
 use mpc_net::{MPCNet, MPCNetError, MultiplexedStreamID};
 
+use crate::{end_timer, start_timer};
+
 /// The MPC net can serialize and deserialize elements. Should be useful for arkworks computation.
-#[cfg(feature="comm")]
+#[cfg(feature = "comm")]
 #[async_trait]
 pub trait MPCSerializeNet: MPCNet {
     async fn worker_send_or_leader_receive_element<T: CanonicalDeserialize + CanonicalSerialize>(
@@ -130,16 +132,16 @@ pub trait MPCSerializeNet: MPCNet {
         sid: MultiplexedStreamID,
         f: impl Fn(Vec<T>) -> Vec<T> + Send,
     ) -> Result<T, MPCNetError> {
-        let leader_response = self
-            .worker_send_or_leader_receive_element(out, sid)
-            .await?
-            .map(f);
+        let leader_response = self.worker_send_or_leader_receive_element(out, sid).await?;
+        let timer = start_timer!("Leader compute element");
+        let leader_response = leader_response.map(f);
+        end_timer!(timer);
         self.worker_receive_or_leader_send_element(leader_response, sid)
             .await
     }
 }
 
-#[cfg(not(feature="comm"))]
+#[cfg(not(feature = "comm"))]
 #[async_trait]
 pub trait MPCSerializeNet: MPCNet {
     async fn worker_send_or_leader_receive_element<
@@ -221,7 +223,7 @@ pub trait MPCSerializeNet: MPCNet {
         sender: u32,
         sid: MultiplexedStreamID,
     ) -> Result<T, MPCNetError> {
-                let bytes: Option<Vec<Vec<u8>>> = out.map(|outs| {
+        let bytes: Option<Vec<Vec<u8>>> = out.map(|outs| {
             outs.iter()
                 .map(|out| {
                     let mut bytes_out = Vec::new();
@@ -243,21 +245,22 @@ pub trait MPCSerializeNet: MPCNet {
     ///
     /// The leader's computation is given by a function, `f`
     /// proceeds.
-    async fn leader_compute_element<T: CanonicalDeserialize + CanonicalSerialize + Send + Clone + Default>(
+    async fn leader_compute_element<
+        T: CanonicalDeserialize + CanonicalSerialize + Send + Clone + Default,
+    >(
         &self,
         out: &T,
         sid: MultiplexedStreamID,
         f: impl Fn(Vec<T>) -> Vec<T> + Send,
     ) -> Result<T, MPCNetError> {
-        let leader_response = self
-            .worker_send_or_leader_receive_element(out, sid)
-            .await?
-            .map(f);
+        let leader_response = self.worker_send_or_leader_receive_element(out, sid).await?;
+        let timer = start_timer!("Leader compute element");
+        let leader_response = leader_response.map(f);
+        end_timer!(timer);
         self.worker_receive_or_leader_send_element(leader_response, sid)
             .await
     }
 }
-
 
 impl<N: MPCNet> MPCSerializeNet for N {}
 // impl<N: MPCNet> TestMPCSerializeNet for N {}
