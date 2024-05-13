@@ -70,7 +70,7 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
                 * (c_evals[i] + beta * omega + gamma)
         })
         .collect();
-    let fs = vec![num, den];
+    let fs: Vec<Vec<E::ScalarField>> = vec![num, den];
 
     // Gate identity
     let mut gate_identity_proofs = Vec::new();
@@ -121,27 +121,54 @@ pub async fn d_hyperplonk<E: Pairing, Net: MPCSerializeNet>(
         .map(|evaluations| async {
             let mut proofs = Vec::new();
             let mut commits = Vec::new();
-            let f_commit = commitment.d_commit(&vec![evaluations], pp, net, sid);
-            let f_open = commitment.d_open(evaluations, &challenge, pp, net, sid);
+            let f_commit = commitment
+                .d_commit(&vec![evaluations.clone()], pp, net, sid)
+                .await
+                .unwrap()[0];
+            let f_open = commitment
+                .d_open(evaluations, &challenge, pp, net, sid)
+                .await
+                .unwrap();
             let (vx0, vx1, v1x) = d_acc_product(evaluations);
-            let v_commit_x0 = commitment.d_commit(&vec![vx0], pp, net, sid).await?;
-            let v_commit_x1 = commitment.d_commit(&vec![vx1], pp, net, sid).await?;
-            let v_commit_1x = commitment.d_commit(&vec![v1x], pp, net, sid).await?;
-            let v_open_x0 = commitment.d_open(&vx0, &challenge, pp, net, sid).await?;
-            let v_open_x1 = commitment.d_open(&vx1, &challenge, pp, net, sid).await?;
-            let v_open_1x = commitment.d_open(&v1x, &challenge, pp, net, sid).await?;
+            let v_commit_x0 = commitment.d_commit(&vec![vx0], pp, net, sid).await.unwrap()[0];
+            let v_commit_x1 = commitment.d_commit(&vec![vx1], pp, net, sid).await.unwrap()[0];
+            let v_commit_1x = commitment.d_commit(&vec![v1x], pp, net, sid).await.unwrap()[0];
+            let v_open_x0 = commitment
+                .d_open(&vx0, &challenge, pp, net, sid)
+                .await
+                .unwrap();
+            let v_open_x1 = commitment
+                .d_open(&vx1, &challenge, pp, net, sid)
+                .await
+                .unwrap();
+            let v_open_1x = commitment
+                .d_open(&v1x, &challenge, pp, net, sid)
+                .await
+                .unwrap();
             commits.push((f_commit, f_open));
             commits.push((v_commit_x0, v_open_x0));
             commits.push((v_commit_x1, v_open_x1));
             commits.push((v_commit_1x, v_open_1x));
-            proofs.push(d_sumcheck_product(&v1x, &eq, &challenge, pp, net, sid).await?);
-            proofs.push(d_sumcheck_product(&vx0, &vx1, &challenge, pp, net, sid).await?);
-            proofs.push(d_sumcheck_product(&eq, &vx0, &challenge, pp, net, sid).await?);
+            proofs.push(
+                d_sumcheck_product(&v1x, &eq, &challenge, pp, net, sid)
+                    .await
+                    .unwrap(),
+            );
+            proofs.push(
+                d_sumcheck_product(&vx0, &vx1, &challenge, pp, net, sid)
+                    .await
+                    .unwrap(),
+            );
+            proofs.push(
+                d_sumcheck_product(&eq, &vx0, &challenge, pp, net, sid)
+                    .await
+                    .unwrap(),
+            );
             (proofs, commits)
         })
-        .collect();
-    (
+        .collect().await;
+    Ok((
         (gate_identity_proofs, gate_identity_commitments),
         wire_identity,
-    )
+    ))
 }
