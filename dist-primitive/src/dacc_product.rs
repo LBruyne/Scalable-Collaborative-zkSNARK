@@ -1,4 +1,4 @@
-use std::cmp::min;
+use std::{cmp::min, hint::black_box};
 
 use crate::{
     end_timer, start_timer, unpack, utils::{operator::transpose, serializing_net::MPCSerializeNet}
@@ -159,6 +159,9 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
         // If no actual communication, just use the input as a placeholder.
         #[cfg(not(feature = "comm"))]
         {
+            black_box(in0);
+            black_box(in1);
+            black_box(in2);
             results0.push(subtree_vx0_share[i].clone());
             results1.push(subtree_vx1_share[i].clone());
             results2.push(subtree_v1x_share[i].clone());

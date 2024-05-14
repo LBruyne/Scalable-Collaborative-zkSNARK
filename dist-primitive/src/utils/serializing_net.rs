@@ -149,7 +149,7 @@ pub trait MPCSerializeNet: MPCNet {
     >(
         &self,
         out: &T,
-        sid: MultiplexedStreamID,
+        _sid: MultiplexedStreamID,
     ) -> Result<Option<Vec<T>>, MPCNetError> {
         let mut bytes_out = Vec::new();
         out.serialize_compressed(&mut bytes_out).unwrap();
@@ -172,7 +172,7 @@ pub trait MPCSerializeNet: MPCNet {
         &self,
         out: &T,
         receiver: u32,
-        sid: MultiplexedStreamID,
+        _sid: MultiplexedStreamID,
     ) -> Result<Option<Vec<T>>, MPCNetError> {
         let mut bytes_out = Vec::new();
         out.serialize_compressed(&mut bytes_out).unwrap();
@@ -195,7 +195,7 @@ pub trait MPCSerializeNet: MPCNet {
     >(
         &self,
         out: Option<Vec<T>>,
-        sid: MultiplexedStreamID,
+        _sid: MultiplexedStreamID,
     ) -> Result<T, MPCNetError> {
         let bytes: Option<Vec<Vec<u8>>> = out.map(|outs| {
             outs.iter()
@@ -220,8 +220,8 @@ pub trait MPCSerializeNet: MPCNet {
     >(
         &self,
         out: Option<Vec<T>>,
-        sender: u32,
-        sid: MultiplexedStreamID,
+        _sender: u32,
+        _sid: MultiplexedStreamID,
     ) -> Result<T, MPCNetError> {
         let bytes: Option<Vec<Vec<u8>>> = out.map(|outs| {
             outs.iter()
@@ -254,9 +254,9 @@ pub trait MPCSerializeNet: MPCNet {
         f: impl Fn(Vec<T>) -> Vec<T> + Send,
     ) -> Result<T, MPCNetError> {
         let leader_response = self.worker_send_or_leader_receive_element(out, sid).await?;
-        let timer = start_timer!("Leader compute element", self.is_leader());
+        // let timer = start_timer!("Leader compute element", self.is_leader());
         let leader_response = leader_response.map(f);
-        end_timer!(timer);
+        // end_timer!(timer);
         self.worker_receive_or_leader_send_element(leader_response, sid)
             .await
     }

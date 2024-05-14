@@ -72,6 +72,7 @@ pub fn initialize_phase_two<F: FftField>(
     phase_initilization(f1)
 }
 
+/// This is a simplified version to mimic the complexity.
 pub fn phase_initilization<F: FftField>(
     f1: &SparseMultilinearExtension<F>,
 ) -> DenseMultilinearExtension<F> {
@@ -84,7 +85,7 @@ pub fn phase_initilization<F: FftField>(
     DenseMultilinearExtension::from_evaluations_slice(f1.0.len(), &evaluations)
 }
 
-/// A simplified local GKR for benchmarking purposes.
+/// A simplified local GKR without any optimization only for benchmarking purposes.
 pub fn local_gkr<E: Pairing>(
     depth: usize,
     width: usize,
@@ -120,15 +121,12 @@ pub fn local_gkr<E: Pairing>(
     let challenge_g: Vec<E::ScalarField> = (0..width)
         .map(|_| E::ScalarField::rand(rng))
         .collect::<Vec<_>>();
-    let mut _challenge_g: Vec<Vec<<E as Pairing>::ScalarField>> = vec![challenge_g; depth];
     let challenge_u: Vec<E::ScalarField> = (0..width)
         .map(|_| E::ScalarField::rand(rng))
         .collect::<Vec<_>>();
-    let mut _challenge_u = vec![challenge_u; depth];
     let challenge_v: Vec<E::ScalarField> = (0..width)
         .map(|_| E::ScalarField::rand(rng))
         .collect::<Vec<_>>();
-    let mut _challenge_v = vec![challenge_v; depth];
     let challenge_r: Vec<E::ScalarField> = (0..width)
     .map(|_| E::ScalarField::rand(rng))
     .collect::<Vec<_>>();
@@ -161,9 +159,9 @@ pub fn local_gkr<E: Pairing>(
                 black_box(&f1s[0]),
                 black_box(&poly_vs[0]),
                 black_box(&poly_vs.clone()[0]),
-                black_box(&_challenge_g[0]),
-                black_box(&_challenge_u[0]),
-                black_box(&_challenge_v[0]),
+                black_box(&challenge_g.clone()),
+                black_box(&challenge_u.clone()),
+                black_box(&challenge_v.clone()),
             ));
         }
         proof.push(layer_proof);
