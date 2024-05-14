@@ -136,14 +136,13 @@ pub fn local_gkr<E: Pairing>(
     let s = (0..width as usize)
         .map(|_| E::ScalarField::rand(rng))
         .collect::<Vec<_>>();
-    let cub = PolynomialCommitmentCub::<E>::new_toy(g1, g2, s);
-    let mature = cub.mature();
+    let commitment = PolynomialCommitmentCub::<E>::new_toy(g1, g2, s).mature();
 
     // Now run the protocol.
     let timer_all = start_timer!("Local GKR");
 
     // Commit to V_d
-    let commit = timed!("Commit", mature.commit(&poly_vs[0].evaluations));
+    let commit = timed!("Commit", commitment.commit(&poly_vs[0].evaluations));
 
     // GKR prover
     let gkr_timer = start_timer!("GKR Prover");
@@ -170,7 +169,7 @@ pub fn local_gkr<E: Pairing>(
 
     // Open V_d at a random challenge point.
     let timer_open = start_timer!("Open");
-    let (value, com_proof) = mature.open(&poly_vs[0].evaluations, &challenge_r);
+    let (value, com_proof) = commitment.open(&poly_vs[0].evaluations, &challenge_r);
     end_timer!(timer_open);
 
     end_timer!(timer_all);

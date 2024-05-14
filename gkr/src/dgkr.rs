@@ -90,18 +90,19 @@ pub async fn d_initialize_phase_two<F: FftField, Net: MPCSerializeNet>(
     ))
 }
 
+/// This is a simplified version to mimic the complexity.
 pub async fn d_phase_initilization<F: FftField, Net: MPCSerializeNet>(
     shares_f1: &SparseMultilinearExtension<F>,
     pp: &PackedSharingParams<F>,
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<Vec<F>, MPCNetError> {
-    // Handle each point in f1
-    // Besides, only 1/N computations should be done on party 0
     let mut evaluations = vec![F::zero(); shares_f1.0.len()];
-    shares_f1.0.iter().enumerate().for_each(|(k, (_, v))| {
-        evaluations[k] += *v * *v;
+    shares_f1.0.iter().enumerate().for_each(|(id, (_, v))| {
+        evaluations[id] += *v * *v;
     });
+    // Act a degree reduction.
+    // Note that each party only suffers from 1/N cost.
     let shares = evaluations[..shares_f1.0.len() / net.n_parties()].to_vec();
     let shares = degree_reduce_many(shares, pp, net, sid)
         .await?
@@ -110,6 +111,8 @@ pub async fn d_phase_initilization<F: FftField, Net: MPCSerializeNet>(
         .take(shares_f1.0.len())
         .cloned()
         .collect::<Vec<_>>();
+    // Add the communication it should have.
+    // Is this correct?
     net.add_comm(
         F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),
         F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),

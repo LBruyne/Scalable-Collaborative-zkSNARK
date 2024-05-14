@@ -1,5 +1,5 @@
 use crate::{utils::serializing_net::MPCSerializeNet, utils::operator::transpose};
-use ark_ff::{FftField, PrimeField};
+use ark_ff::FftField;
 use log;
 
 use mpc_net::{MPCNetError, MultiplexedStreamID};

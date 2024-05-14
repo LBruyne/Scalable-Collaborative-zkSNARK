@@ -201,7 +201,6 @@ async fn gkr_distributed_bench(width: usize, depth: usize, l: usize) {
 }
 
 fn gkr_local_bench(width: usize, depth: usize) {
-    // generate shares
     let res = local_gkr::<E>(depth, width);
     black_box(res);
 }
