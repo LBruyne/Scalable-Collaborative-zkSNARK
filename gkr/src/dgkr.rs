@@ -3,7 +3,17 @@ use std::hint::black_box;
 use ark_ec::pairing::Pairing;
 use ark_ff::FftField;
 
-use dist_primitive::{degree_reduce::degree_reduce, dpoly_comm::PolynomialCommitment, dsumcheck::d_sumcheck_product, end_timer, mle::{d_fix_variable, PackedDenseMultilinearExtension}, start_timer, unpack::d_unpack_0, utils::serializing_net::MPCSerializeNet};
+use ark_serialize::{CanonicalSerialize, Compress};
+use dist_primitive::{
+    degree_reduce::{degree_reduce, degree_reduce_many},
+    dpoly_comm::PolynomialCommitment,
+    dsumcheck::d_sumcheck_product,
+    end_timer,
+    mle::{d_fix_variable, PackedDenseMultilinearExtension},
+    start_timer,
+    unpack::d_unpack_0,
+    utils::serializing_net::MPCSerializeNet,
+};
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use rand::random;
 use secret_sharing::pss::PackedSharingParams;
@@ -89,12 +99,22 @@ pub async fn d_phase_initilization<F: FftField, Net: MPCSerializeNet>(
     // Handle each point in f1
     // Besides, only 1/N computations should be done on party 0
     let mut evaluations = vec![F::zero(); shares_f1.0.len()];
-    let _simulation = {
-        for (_k, v) in &shares_f1.0 {
-            evaluations[random::<usize>() % shares_f1.0.len()] += degree_reduce(*v * *v, pp, net, sid).await?;
-        }
-    };
-    Ok(evaluations)
+    shares_f1.0.iter().enumerate().for_each(|(k, (_, v))| {
+        evaluations[k] += *v * *v;
+    });
+    let shares = evaluations[..shares_f1.0.len() / net.n_parties()].to_vec();
+    let shares = degree_reduce_many(shares, pp, net, sid)
+        .await?
+        .iter()
+        .cycle()
+        .take(shares_f1.0.len())
+        .cloned()
+        .collect::<Vec<_>>();
+    net.add_comm(
+        F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),
+        F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),
+    );
+    Ok(shares)
 }
 
 /// A proof-of-concept implementation of distributed GKR proof.
@@ -123,11 +143,14 @@ pub async fn d_gkr<E: Pairing, Net: MPCSerializeNet>(
     let _ = width;
     let mut proof = Vec::new();
 
-    let timer_all: dist_primitive::utils::timer::TimerInfo = start_timer!("Distributed GKR", net.is_leader());
+    let timer_all: dist_primitive::utils::timer::TimerInfo =
+        start_timer!("Distributed GKR", net.is_leader());
 
     // Commit
     let commit_timer = start_timer!("dCommit", net.is_leader());
-    let commit = mature.d_commit(&vec![poly_vs_shares[0].shares.clone()], pp, net, sid).await?;
+    let commit = mature
+        .d_commit(&vec![poly_vs_shares[0].shares.clone()], pp, net, sid)
+        .await?;
     end_timer!(commit_timer);
 
     let timer_gkr_rounds = start_timer!("dGKR rounds", net.is_leader());
@@ -160,7 +183,9 @@ pub async fn d_gkr<E: Pairing, Net: MPCSerializeNet>(
 
     // Open
     let open_timer = start_timer!("dOpen", net.is_leader());
-    let open = mature.d_open(&poly_vs_shares[0].shares, &challenge_r, pp, net, sid).await?;
+    let open = mature
+        .d_open(&poly_vs_shares[0].shares, &challenge_r, pp, net, sid)
+        .await?;
     end_timer!(open_timer);
 
     end_timer!(timer_all);

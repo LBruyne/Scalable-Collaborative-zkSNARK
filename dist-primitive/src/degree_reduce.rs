@@ -7,7 +7,7 @@ use secret_sharing::pss::PackedSharingParams;
 
 
 /// Reduce the degree of a share from 2n to n, this function accept a batch of shares
-pub async fn degree_reduce_many<F: FftField + PrimeField, Net: MPCSerializeNet>(
+pub async fn degree_reduce_many<F: FftField, Net: MPCSerializeNet>(
     shares: Vec<F>,
     pp: &PackedSharingParams<F>,
     net: &Net,
