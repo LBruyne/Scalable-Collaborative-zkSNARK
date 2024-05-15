@@ -4,6 +4,8 @@ use ark_std::UniformRand;
 use dist_primitive::{
     dacc_product::acc_product, dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub}, dsumcheck::sumcheck_product, end_timer, mle::fix_variable, start_timer
 };
+
+/// This is a simplified version without any optimization to simulate the complexity.
 pub fn local_hyperplonk<E: Pairing>(
     n: usize, // n is the log2 of the circuit size
 ) -> (
@@ -117,10 +119,8 @@ pub fn local_hyperplonk<E: Pairing>(
             let com_v0x = commitment.commit(evaluations);
             let com_v1x = commitment.commit(&v1x);
             // Open (Here we omit repeated openings on the same polynomial).
-            let vx0_open = commitment.open(evaluations, &challenge);
-            let v1x_open = commitment.open(&v1x, &challenge);
-            commits.push((com_v0x, vx0_open));
-            commits.push((com_v1x, v1x_open));
+            commits.push((com_v0x, commitment.open(evaluations, &challenge)));
+            commits.push((com_v1x, commitment.open(&v1x, &challenge)));
             // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
             proofs.push(sumcheck_product(&eq, &v1x, &challenge));
             proofs.push(sumcheck_product(&eq, &vx0, &challenge));
