@@ -5,6 +5,8 @@ use dist_primitive::{
     dacc_product::acc_product, dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub}, dsumcheck::sumcheck_product, end_timer, mle::fix_variable, start_timer
 };
 
+use crate::random_evaluations;
+
 /// This is a simplified version without any optimization to simulate the complexity.
 pub fn local_hyperplonk<E: Pairing>(
     n: usize, // n is the log2 of the circuit size
@@ -148,10 +150,4 @@ pub fn local_hyperplonk<E: Pairing>(
         (gate_identity_proofs, gate_identity_commitments),
         wire_identity,
     )
-}
-
-pub fn random_evaluations<F: UniformRand>(n: usize) -> Vec<F> {
-    (0..n)
-        .map(|_| F::rand(&mut ark_std::test_rng()))
-        .collect::<Vec<_>>()
 }

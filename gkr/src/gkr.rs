@@ -72,7 +72,7 @@ pub fn initialize_phase_two<F: FftField>(
     phase_initilization(f1)
 }
 
-/// This is a simplified version to mimic the complexity.
+/// This is a simplified version to simulate the complexity.
 pub fn phase_initilization<F: FftField>(
     f1: &SparseMultilinearExtension<F>,
 ) -> DenseMultilinearExtension<F> {

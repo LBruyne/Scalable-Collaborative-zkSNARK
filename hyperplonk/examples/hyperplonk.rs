@@ -1,4 +1,5 @@
 use std::hint::black_box;
+use std::path::Prefix;
 
 use ark_ec::{bls12::Bls12, pairing::Pairing};
 
@@ -6,7 +7,8 @@ use clap::Parser;
 use dist_primitive::end_timer;
 use dist_primitive::start_timer;
 
-use hyperplonk::d_hyperplonk::d_hyperplonk;
+use hyperplonk::dhyperplonk::dhyperplonk;
+use hyperplonk::dhyperplonk::PackedProvingParameters;
 use hyperplonk::hyperplonk::local_hyperplonk;
 use mpc_net::LocalTestNet;
 use mpc_net::MPCNet;
@@ -30,76 +32,61 @@ async fn main() {
 
     hyperplonk_local_bench(args.n);
 
-    // hyperplonk_distributed_bench(args.n, args.l).await;
+    hyperplonk_distributed_bench(args.n, args.l).await;
 }
 
 /// This benchmark just runs the leader's part of the protocol without any networking involved.
 #[cfg(feature = "leader")]
 async fn hyperplonk_distributed_bench(n: usize, l: usize) {
-    // Prepare random elements and shares.
-    let rng = &mut ark_std::test_rng();
-
-    // Distributed
-    {
-        let pp =
-            PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
-        let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
-        // Now simulate the protocol
-        let timer = start_timer!("Distributed");
-        black_box(
-            d_hyperplonk::<Bls12<ark_bls12_381::Config>, _>(
-                n,
-                &pp,
-                net.get_leader(),
-                MultiplexedStreamID::Zero,
-            )
-            .await
-            .unwrap(),
-        );
-
-        println!("Comm: {:?}", net.get_leader().get_comm());
-
-        end_timer!(timer);
-    }
+    let pp =
+    PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l,);
+    let params = PackedProvingParameters::new(n, l);
+    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    // Now simulate the protocol
+    black_box(
+        dhyperplonk::<Bls12<ark_bls12_381::Config>, _>(
+            n,
+            &params,
+            &pp,
+            net.get_leader(),
+            MultiplexedStreamID::Zero,
+        )
+        .await
+        .unwrap(),
+    );
 }
 
 #[cfg(not(feature = "leader"))]
 async fn hyperplonk_distributed_bench(n: usize, l: usize) {
-    // Local
-    {
-        let timer = start_timer!("Local");
-        black_box(local_hyperplonk::<Bls12<ark_bls12_381::Config>>(n));
-        end_timer!(timer);
-    }
-    // Distributed
-    {
-        let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
-        // Now simulate the protocol
-        let timer = start_timer!("Simulate distributed hyperplonk");
-        let _ = net
-            .simulate_network_round((), move |net, ()| async move {
-                let pp = PackedSharingParams::<
-                    <Bls12<ark_bls12_381::Config> as Pairing>::ScalarField,
-                >::new(l);
-
-                black_box(
-                    d_hyperplonk::<Bls12<ark_bls12_381::Config>, _>(
-                        n,
-                        &pp,
-                        &net,
-                        MultiplexedStreamID::Zero,
-                    )
-                    .await
-                    .unwrap(),
+    let params = PackedProvingParameters::new(n, l);
+    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    // Now simulate the protocol
+    let timer = start_timer!("Simulate distributed Hyperplonk");
+    let _ = net
+        .simulate_network_round(params, move |net, params| async move {
+            let pp =
+                PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(
+                    l,
                 );
 
-                if net.is_leader() {
-                    println!("Comm: {:?}", net.get_comm());
-                }
-            })
-            .await;
-        end_timer!(timer);
-    }
+            black_box(
+                dhyperplonk::<Bls12<ark_bls12_381::Config>, _>(
+                    n,
+                    &params,
+                    &pp,
+                    &net,
+                    MultiplexedStreamID::Zero,
+                )
+                .await
+                .unwrap(),
+            );
+
+            if net.is_leader() {
+                println!("Comm: {:?}", net.get_comm());
+            }
+        })
+        .await;
+    end_timer!(timer);
 }
 
 fn hyperplonk_local_bench(n: usize) {
