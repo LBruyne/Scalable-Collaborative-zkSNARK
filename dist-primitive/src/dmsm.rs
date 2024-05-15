@@ -17,7 +17,7 @@ pub async fn d_msm<G: CurveGroup, Net: MPCSerializeNet>(
     let msm_timer = start_timer!("MSM", net.is_leader());
     let c_shares = bases.iter().zip(scalars.iter()).map(|(b, s)| {
         // if net.is_leader() {
-        //     eprintln!("MSM len: {}", s.len());
+        //     eprintln!("MSM len: {}, {}", s.len(), b.len());
         // }
         G::msm(b, s).unwrap()
     }).collect::<Vec<_>>();

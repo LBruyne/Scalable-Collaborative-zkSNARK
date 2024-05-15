@@ -31,7 +31,6 @@ pub fn sumcheck_product<F: FftField>(
     evaluation_g: &Vec<F>,
     challenge: &Vec<F>,
 ) -> Vec<(F, F, F)> {
-    eprintln!("{},{},{}", evaluation_f.len(), evaluation_g.len(), challenge.len());
     let mut result = Vec::new();
     let mut last_round_f = evaluation_f.clone();
     let mut last_round_g = evaluation_g.clone();

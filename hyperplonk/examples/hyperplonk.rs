@@ -1,5 +1,4 @@
 use std::hint::black_box;
-use std::path::Prefix;
 
 use ark_ec::{bls12::Bls12, pairing::Pairing};
 
@@ -38,9 +37,8 @@ async fn main() {
 /// This benchmark just runs the leader's part of the protocol without any networking involved.
 #[cfg(feature = "leader")]
 async fn hyperplonk_distributed_bench(n: usize, l: usize) {
-    let pp =
-    PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l,);
-    let params = PackedProvingParameters::new(n, l);
+    let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
+    let params = PackedProvingParameters::new(n, l, &pp);
     let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
     // Now simulate the protocol
     black_box(
@@ -58,16 +56,14 @@ async fn hyperplonk_distributed_bench(n: usize, l: usize) {
 
 #[cfg(not(feature = "leader"))]
 async fn hyperplonk_distributed_bench(n: usize, l: usize) {
-    let params = PackedProvingParameters::new(n, l);
+    let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
+    let params = PackedProvingParameters::new(n, l, &pp);
     let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
     // Now simulate the protocol
     let timer = start_timer!("Simulate distributed Hyperplonk");
     let _ = net
         .simulate_network_round(params, move |net, params| async move {
-            let pp =
-                PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(
-                    l,
-                );
+            let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
 
             black_box(
                 dhyperplonk::<Bls12<ark_bls12_381::Config>, _>(

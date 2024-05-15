@@ -208,7 +208,6 @@ impl<E: Pairing> PolynomialCommitment<E> {
         peval: &Vec<E::ScalarField>,
         point: &Vec<E::ScalarField>,
     ) -> (E::ScalarField, Vec<E::G1>) {
-        eprintln!("{},{}",peval.len(), point.len());
         let mut result = Vec::new();
         let n = peval.len().trailing_zeros() as usize; // peval.len = 2^n
         assert_eq!(peval.len(), 2_usize.pow(n as u32));

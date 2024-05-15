@@ -61,8 +61,10 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<(Vec<F>, Vec<F>, Vec<F>), MPCNetError> {
+    let timer = start_timer!("Distributed product accumulation and sharing");
     let party_count = pp.l * 4;
     // Every party gets n/N of the shares.
+    assert!(shares.len() > party_count);
     let block_size = shares.len() / party_count;
 
     // Compute masked x
@@ -237,6 +239,8 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     share2.iter_mut().enumerate().for_each(|(i, share)| {
         *share *= unmask2[i];
     });
+    
+    end_timer!(timer);
     Ok((share0, share1, share2))
 }
 
@@ -248,6 +252,7 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<(Vec<F>, Option<Vec<F>>), MPCNetError> {
+    let timer = start_timer!("Distributed product accumulation", net.is_leader());
     let party_count = pp.l * 4;
 
     // Each party calculates a sub-tree
@@ -308,6 +313,7 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
         return Ok((subtree, Some(leader_tree)));
     }
     
+    end_timer!(timer);
     Ok((subtree, None))
 }
 
