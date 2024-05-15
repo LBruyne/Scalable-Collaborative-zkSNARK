@@ -1,6 +1,7 @@
 use ark_ec::pairing::Pairing;
 use ark_ff::fields::Field;
 use ark_std::UniformRand;
+use dist_primitive::random_evaluations;
 use dist_primitive::{
     dacc_product::d_acc_product_and_share,
     dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub},
@@ -12,9 +13,6 @@ use dist_primitive::{
 };
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
-
-use crate::random_evaluations;
-
 #[derive(Clone, Debug)]
 pub struct PackedProvingParameters<E: Pairing> {
     pub a_evals: Vec<E::ScalarField>,
@@ -40,9 +38,10 @@ pub struct PackedProvingParameters<E: Pairing> {
     pub unmask2: Vec<E::ScalarField>,
 }
 
-impl <E: Pairing> PackedProvingParameters<E> {
+impl<E: Pairing> PackedProvingParameters<E> {
     pub fn new(n: usize, l: usize) -> Self {
-        let rng = &mut ark_std::test_rng();
+        use rand::{rngs::StdRng, SeedableRng};
+        let rng = &mut StdRng::from_entropy();
         let gate_count = (1 << n) / l;
         // Shares of witness polynomial M
         let m = random_evaluations(gate_count * 4);
@@ -60,15 +59,16 @@ impl <E: Pairing> PackedProvingParameters<E> {
         let sigma_b = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
         let sigma_c = fix_variable(&ssigma, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
         let sid: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count);
-    
+
         // Shares of eq polynomial. For benchmarking purposes, we generate it in advance and use it repeatedly in the protocol.
         let eq = random_evaluations(gate_count);
-        // Distributed polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice. 
+        // Distributed polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice.
         let g1 = E::G1::rand(rng);
         let g2 = E::G2::rand(rng);
         let s: Vec<E::ScalarField> = random_evaluations(n);
-        let commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_toy(g1, g2, s).mature();
-        // Challenge for polynomial commitment opening. 
+        let commitment: PolynomialCommitment<E> =
+            PolynomialCommitmentCub::new_toy(g1, g2, s).mature();
+        // Challenge for polynomial commitment opening.
         let challenge = random_evaluations(n);
         // Other challenges.
         let beta = E::ScalarField::rand(rng);
@@ -98,7 +98,7 @@ impl <E: Pairing> PackedProvingParameters<E> {
             mask,
             unmask0,
             unmask1,
-            unmask2
+            unmask2,
         }
     }
 }
@@ -123,7 +123,7 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     MPCNetError,
 > {
     let gate_count = (1 << n) / pp.l;
-    
+
     // Now run the protocol.
     let timer_all = start_timer!("Distributed HyperPlonk", net.is_leader());
 
@@ -131,29 +131,51 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     let commit_timer = start_timer!("dCommit polynomials", net.is_leader());
     let com_a = pk
         .commitment
-        .d_commit(&vec![pk.a_evals.clone()], &pp, &net, sid).await.unwrap()[0];
+        .d_commit(&vec![pk.a_evals.clone()], &pp, &net, sid)
+        .await
+        .unwrap()[0];
     let com_b = pk
         .commitment
-        .d_commit(&vec![pk.b_evals.clone()], &pp, &net, sid).await.unwrap()[0];
+        .d_commit(&vec![pk.b_evals.clone()], &pp, &net, sid)
+        .await
+        .unwrap()[0];
     let com_c = pk
         .commitment
-        .d_commit(&vec![pk.c_evals.clone()], &pp, &net, sid).await.unwrap()[0];
+        .d_commit(&vec![pk.c_evals.clone()], &pp, &net, sid)
+        .await
+        .unwrap()[0];
     let com_in = pk
         .commitment
-        .d_commit(&vec![pk.input.clone()], &pp, &net, sid).await.unwrap()[0];
+        .d_commit(&vec![pk.input.clone()], &pp, &net, sid)
+        .await
+        .unwrap()[0];
 
-    let com_q1 = pk.commitment.d_commit(&vec![pk.q1.clone()], &pp, &net, sid).await.unwrap()[0];
-    let com_q2 = pk.commitment.d_commit(&vec![pk.q2.clone()], &pp, &net, sid).await.unwrap()[0];
+    let com_q1 = pk
+        .commitment
+        .d_commit(&vec![pk.q1.clone()], &pp, &net, sid)
+        .await
+        .unwrap()[0];
+    let com_q2 = pk
+        .commitment
+        .d_commit(&vec![pk.q2.clone()], &pp, &net, sid)
+        .await
+        .unwrap()[0];
 
     let com_ssigma_a = pk
         .commitment
-        .d_commit(&vec![pk.sigma_a.clone()], &pp, &net, sid).await.unwrap()[0];
+        .d_commit(&vec![pk.sigma_a.clone()], &pp, &net, sid)
+        .await
+        .unwrap()[0];
     let com_ssigma_b = pk
         .commitment
-        .d_commit(&vec![pk.sigma_b.clone()], &pp, &net, sid).await.unwrap()[0];
+        .d_commit(&vec![pk.sigma_b.clone()], &pp, &net, sid)
+        .await
+        .unwrap()[0];
     let com_ssigma_c = pk
         .commitment
-        .d_commit(&vec![pk.sigma_c.clone()], &pp, &net, sid).await.unwrap()[0];
+        .d_commit(&vec![pk.sigma_c.clone()], &pp, &net, sid)
+        .await
+        .unwrap()[0];
     end_timer!(commit_timer);
 
     // Gate identity
@@ -230,15 +252,29 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
         .await
         .unwrap();
         // Commit
-        let com_v0x = pk.commitment.d_commit(&vec![evaluations.clone()], &pp, &net, sid).await.unwrap()[0];
-        let com_v1x = pk.commitment.d_commit(&vec![v1x.clone()], &pp, &net, sid).await.unwrap()[0];
+        let com_v0x = pk
+            .commitment
+            .d_commit(&vec![evaluations.clone()], &pp, &net, sid)
+            .await
+            .unwrap()[0];
+        let com_v1x = pk
+            .commitment
+            .d_commit(&vec![v1x.clone()], &pp, &net, sid)
+            .await
+            .unwrap()[0];
         // Open
-        commits.push((com_v0x, pk.commitment
-            .d_open(&vx0, &pk.challenge, pp, net, sid)
-            .await?));
-        commits.push((com_v1x, pk.commitment
-            .d_open(&vx0, &pk.challenge, pp, net, sid)
-            .await?));
+        commits.push((
+            com_v0x,
+            pk.commitment
+                .d_open(&vx0, &pk.challenge, pp, net, sid)
+                .await?,
+        ));
+        commits.push((
+            com_v1x,
+            pk.commitment
+                .d_open(&vx0, &pk.challenge, pp, net, sid)
+                .await?,
+        ));
         // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
         proofs.push(
             d_sumcheck_product(&pk.eq, &v1x, &pk.challenge, pp, net, sid)
@@ -263,39 +299,57 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     let open_timer = start_timer!("dOpen polynomials", net.is_leader());
     gate_identity_commitments.push((
         com_a,
-        pk.commitment.d_open(&pk.a_evals, &pk.challenge, pp, net, sid).await?,
+        pk.commitment
+            .d_open(&pk.a_evals, &pk.challenge, pp, net, sid)
+            .await?,
     ));
     gate_identity_commitments.push((
         com_b,
-        pk.commitment.d_open(&pk.b_evals, &pk.challenge, pp, net, sid).await?,
+        pk.commitment
+            .d_open(&pk.b_evals, &pk.challenge, pp, net, sid)
+            .await?,
     ));
     gate_identity_commitments.push((
         com_c,
-        pk.commitment.d_open(&pk.c_evals, &pk.challenge, pp, net, sid).await?,
+        pk.commitment
+            .d_open(&pk.c_evals, &pk.challenge, pp, net, sid)
+            .await?,
     ));
     gate_identity_commitments.push((
         com_in,
-        pk.commitment.d_open(&pk.input, &pk.challenge, pp, net, sid).await?,
+        pk.commitment
+            .d_open(&pk.input, &pk.challenge, pp, net, sid)
+            .await?,
     ));
     gate_identity_commitments.push((
         com_q1,
-        pk.commitment.d_open(&pk.q1, &pk.challenge, pp, net, sid).await?,
+        pk.commitment
+            .d_open(&pk.q1, &pk.challenge, pp, net, sid)
+            .await?,
     ));
     gate_identity_commitments.push((
         com_q2,
-        pk.commitment.d_open(&pk.q2, &pk.challenge, pp, net, sid).await?,
+        pk.commitment
+            .d_open(&pk.q2, &pk.challenge, pp, net, sid)
+            .await?,
     ));
     gate_identity_commitments.push((
         com_ssigma_a,
-        pk.commitment.d_open(&pk.sigma_a, &pk.challenge, pp, net, sid).await?,
+        pk.commitment
+            .d_open(&pk.sigma_a, &pk.challenge, pp, net, sid)
+            .await?,
     ));
     gate_identity_commitments.push((
         com_ssigma_b,
-        pk.commitment.d_open(&pk.sigma_b, &pk.challenge, pp, net, sid).await?,
+        pk.commitment
+            .d_open(&pk.sigma_b, &pk.challenge, pp, net, sid)
+            .await?,
     ));
     gate_identity_commitments.push((
         com_ssigma_c,
-        pk.commitment.d_open(&pk.sigma_c, &pk.challenge, pp, net, sid).await?,
+        pk.commitment
+            .d_open(&pk.sigma_c, &pk.challenge, pp, net, sid)
+            .await?,
     ));
     end_timer!(open_timer);
 

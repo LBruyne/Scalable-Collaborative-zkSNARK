@@ -50,7 +50,9 @@ async fn main() {
 
 #[cfg(feature = "leader")]
 async fn gkr_distributed_bench(width: usize, depth: usize, l: usize) {
-    let rng = &mut ark_std::test_rng();
+    use rand::{rngs::StdRng, SeedableRng};
+
+    let rng = &mut StdRng::from_entropy();
     let pp = PackedSharingParams::<<E as Pairing>::ScalarField>::new(l);
     let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
     // Shares of a polynomial representing mult and add.
@@ -113,7 +115,9 @@ async fn gkr_distributed_bench(width: usize, depth: usize, l: usize) {
 
 #[cfg(not(feature = "leader"))]
 async fn gkr_distributed_bench(width: usize, depth: usize, l: usize) {
-    let rng = &mut ark_std::test_rng();
+    use rand::{rngs::StdRng, SeedableRng};
+
+    let rng = &mut StdRng::from_entropy();
     let pp = PackedSharingParams::<<E as Pairing>::ScalarField>::new(l);
     let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
     // Shares of a polynomial representing mult and add.

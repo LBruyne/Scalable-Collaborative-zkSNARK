@@ -95,7 +95,9 @@ pub fn local_gkr<E: Pairing>(
     (E::ScalarField, Vec<E::G1>),
 ) {
     let mut proof = Vec::new();
-    let rng = &mut ark_std::test_rng();
+    use rand::{rngs::StdRng, SeedableRng};
+
+    let rng = &mut StdRng::from_entropy();
     // A polynomial representing mult and add.
     let mut f1 = SparseMultilinearExtension::<E::ScalarField>(HashMap::new());
     for _ in 0..(1 << width) {

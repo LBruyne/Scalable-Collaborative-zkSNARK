@@ -5,7 +5,7 @@ use dist_primitive::{
     dacc_product::acc_product, dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub}, dsumcheck::sumcheck_product, end_timer, mle::fix_variable, start_timer
 };
 
-use crate::random_evaluations;
+use dist_primitive::random_evaluations;
 
 /// This is a simplified version without any optimization to simulate the complexity.
 pub fn local_hyperplonk<E: Pairing>(
@@ -20,7 +20,8 @@ pub fn local_hyperplonk<E: Pairing>(
         Vec<(E::G1, (E::ScalarField, Vec<E::G1>))>,
     )>,
 ) {
-    let rng = &mut ark_std::test_rng();
+    use rand::{rngs::StdRng, SeedableRng};
+    let rng = &mut StdRng::from_entropy();
     let gate_count = 1 << n;
     // Witness polynomial M (with n+2 variables)
     let m = random_evaluations(gate_count * 4);
