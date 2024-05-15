@@ -1,21 +1,16 @@
 use std::hint::black_box;
 
-use ark_bls12_381::Bls12_381;
 use ark_ec::{bls12::Bls12, pairing::Pairing};
-use ark_std::UniformRand;
 
 use clap::Parser;
-use dist_primitive::dpoly_comm::PolynomialCommitmentCub;
 use dist_primitive::end_timer;
 use dist_primitive::start_timer;
 
-use dist_primitive::utils::operator::transpose;
 use hyperplonk::d_hyperplonk::d_hyperplonk;
-use hyperplonk::hyperplonk::simulate_hyperplonk;
+use hyperplonk::hyperplonk::local_hyperplonk;
 use mpc_net::LocalTestNet;
 use mpc_net::MPCNet;
 use mpc_net::MultiplexedStreamID;
-use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Parser)]
@@ -32,21 +27,17 @@ struct Cli {
 #[cfg_attr(not(feature = "single_thread"), tokio::main)]
 async fn main() {
     let args = Cli::parse();
-    hyperplonk_bench(args.n, args.l).await;
+
+    hyperplonk_local_bench(args.n);
+
+    // hyperplonk_distributed_bench(args.n, args.l).await;
 }
 
 /// This benchmark just runs the leader's part of the protocol without any networking involved.
 #[cfg(feature = "leader")]
-async fn hyperplonk_bench(n: usize, l: usize) {
+async fn hyperplonk_distributed_bench(n: usize, l: usize) {
     // Prepare random elements and shares.
     let rng = &mut ark_std::test_rng();
-
-    // Local
-    {
-        let timer = start_timer!("Local");
-        black_box(simulate_hyperplonk::<Bls12<ark_bls12_381::Config>>(n));
-        end_timer!(timer);
-    }
 
     // Distributed
     {
@@ -72,16 +63,12 @@ async fn hyperplonk_bench(n: usize, l: usize) {
     }
 }
 
-/// This benchmark runs the protocol in a simulation mode, all parties are involved with actual LOCAL communication.
-/// Defaultly the benchmark is to run in a multi-threaded environment.
-/// When #[tokio::main(flavor = "current_thread")] feature is enabled, the benchmark is set to run in a single thread.
-///
 #[cfg(not(feature = "leader"))]
-async fn hyperplonk_bench(n: usize, l: usize) {
+async fn hyperplonk_distributed_bench(n: usize, l: usize) {
     // Local
     {
         let timer = start_timer!("Local");
-        black_box(simulate_hyperplonk::<Bls12<ark_bls12_381::Config>>(n));
+        black_box(local_hyperplonk::<Bls12<ark_bls12_381::Config>>(n));
         end_timer!(timer);
     }
     // Distributed
@@ -113,4 +100,10 @@ async fn hyperplonk_bench(n: usize, l: usize) {
             .await;
         end_timer!(timer);
     }
+}
+
+fn hyperplonk_local_bench(n: usize) {
+    // generate shares
+    let res = local_hyperplonk::<Bls12<ark_bls12_381::Config>>(n);
+    black_box(res);
 }

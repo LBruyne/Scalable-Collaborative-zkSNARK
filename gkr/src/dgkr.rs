@@ -3,9 +3,9 @@ use std::hint::black_box;
 use ark_ec::pairing::Pairing;
 use ark_ff::FftField;
 
-use ark_serialize::{CanonicalSerialize, Compress};
+use ark_serialize::Compress;
 use dist_primitive::{
-    degree_reduce::{degree_reduce, degree_reduce_many},
+    degree_reduce::degree_reduce_many,
     dpoly_comm::PolynomialCommitment,
     dsumcheck::d_sumcheck_product,
     end_timer,
@@ -15,7 +15,6 @@ use dist_primitive::{
     utils::serializing_net::MPCSerializeNet,
 };
 use mpc_net::{MPCNetError, MultiplexedStreamID};
-use rand::random;
 use secret_sharing::pss::PackedSharingParams;
 
 use crate::gkr::SparseMultilinearExtension;
