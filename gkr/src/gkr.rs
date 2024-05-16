@@ -29,22 +29,17 @@ pub fn local_gkr_function<F: FftField>(
     challenge_u: &Vec<F>,
     challenge_v: &Vec<F>,
 ) -> Vec<(F, F, F)> {
-    let timer_initialize_phase_one = start_timer!("Initialize phase one");
+    // Initialize phase one.
     let hg = initialize_phase_one(f1, f3, challenge_g);
-    end_timer!(timer_initialize_phase_one);
-    let timer_sumcheck_product = start_timer!("Sumcheck product 1");
+    // Sumcheck product 1.
     let mut proof1 = sumcheck_product(&hg.evaluations, &f2.evaluations, challenge_u);
-    end_timer!(timer_sumcheck_product);
-    let timer_initialize_phase_two = start_timer!("Initialize phase two");
+    // Initialize phase two.
     let f1 = initialize_phase_two(f1, challenge_g, challenge_v);
-    end_timer!(timer_initialize_phase_two);
-    let timer_f3_f2u = start_timer!("Calculate f3*f2(u)");
+    // Compute polynomial
     let f2_u = fix_variable(&f2.evaluations, challenge_u)[0];
     let f3_f2u = f3.mul(&f2_u);
-    end_timer!(timer_f3_f2u);
-    let timer_sumcheck_product = start_timer!("Sumcheck product 2");
+    // Sumcheck product 2.
     let proof2 = sumcheck_product(&f1.evaluations, &f3_f2u.evaluations, challenge_v);
-    end_timer!(timer_sumcheck_product);
     proof1.extend(proof2);
     proof1
 }
@@ -81,7 +76,8 @@ pub fn phase_initilization<F: FftField>(
             evaluations[random::<usize>() % f1.0.len()] += *v * *v;
         }
     };
-    DenseMultilinearExtension::from_evaluations_slice(f1.0.len(), &evaluations)
+    let res = DenseMultilinearExtension::from_evaluations_slice(f1.0.len(), &evaluations);
+    res
 }
 
 /// A simplified local GKR without any optimization only for benchmarking purposes.
@@ -147,8 +143,10 @@ pub fn local_gkr<E: Pairing>(
     let commit = commitment.commit(&poly_vs[0].evaluations);
     end_timer!(commit_timer);
 
+    let prover_timer = start_timer!("GKR Prover");
+
     // GKR prover
-    let gkr_timer = start_timer!("GKR Prover");
+    let gkr_timer = start_timer!("GKR Round");
     for _ in 0..depth {
         let mut layer_proof = Vec::new();
         // For GKR relation,
@@ -174,6 +172,8 @@ pub fn local_gkr<E: Pairing>(
     let timer_open = start_timer!("Open");
     let (value, com_proof) = commitment.open(&poly_vs[depth-1].evaluations, &challenge_r);
     end_timer!(timer_open);
+
+    end_timer!(prover_timer);
 
     end_timer!(timer_all);
 

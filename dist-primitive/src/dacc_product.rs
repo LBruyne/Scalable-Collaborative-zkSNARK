@@ -1,4 +1,7 @@
-use std::{cmp::min, hint::black_box};
+use std::cmp::min;
+
+#[cfg(not(feature = "comm"))]
+use std::hint::black_box;
 
 use crate::{
     end_timer, start_timer, unpack, utils::{operator::transpose, serializing_net::MPCSerializeNet}
@@ -68,7 +71,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     let block_size = shares.len() / party_count;
 
     // Compute masked x
-    let mask_timer = start_timer!("Mask and Leader distributes elements", net.is_leader());
+    let mask_timer = start_timer!("Comm: Leader distribute masked elements", net.is_leader());
     let masked_x = join_all(shares.iter().enumerate().map(|(i, x)| async move {
         unpack::d_unpack2(*x * masks[i], (i / block_size) as u32, pp, net, sid)
             .await
@@ -87,7 +90,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     let (subtree, leader_tree) = tree;
 
     // First share the subtree.
-    let compute_subtree_share_timer = start_timer!("Each party computes subtree share", net.is_leader());
+    let compute_subtree_share_timer = start_timer!("Local: Compute subtree share", net.is_leader());
     let party_count = pp.l * 4;
     let num_to_send = min(party_count, subtree.len());
     // Only share the following part, and the rest will be shared by the leader.
@@ -119,7 +122,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
         .collect::<Vec<_>>());
     end_timer!(compute_subtree_share_timer);
 
-    let share_subtree_timer = start_timer!("Each party shares subtree", net.is_leader());
+    let share_subtree_timer = start_timer!("Comm: Share subtree", net.is_leader());
     let mut results0 = Vec::with_capacity(party_count);
     let mut results1 = Vec::with_capacity(party_count);
     let mut results2 = Vec::with_capacity(party_count);
@@ -178,7 +181,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     end_timer!(share_subtree_timer);
 
     // Now leader shares the leader tree.
-    let compute_leader_tree_share_timer = start_timer!("Leader computes leader tree share", net.is_leader());
+    let compute_leader_tree_share_timer = start_timer!("Leader: Compute leader tree share", net.is_leader());
     let leader_tree_vx0_share = leader_tree.clone().map(|result| {
         let share0: Vec<Vec<F>> = result
             .iter()
@@ -214,7 +217,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     });
     end_timer!(compute_leader_tree_share_timer);
 
-    let share_leader_tree_timer = start_timer!("Leader shares leader tree", net.is_leader());
+    let share_leader_tree_timer = start_timer!("Comm: Share leader tree", net.is_leader());
     let leader_out0 = net
         .worker_receive_or_leader_send_element(leader_tree_vx0_share, sid)
         .await?;
@@ -252,11 +255,10 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<(Vec<F>, Option<Vec<F>>), MPCNetError> {
-    let timer = start_timer!("Distributed product accumulation", net.is_leader());
     let party_count = pp.l * 4;
 
     // Each party calculates a sub-tree
-    let subtree_timer = start_timer!("Each party computes subtree", net.is_leader());
+    let subtree_timer = start_timer!("Local: Computes subtree", net.is_leader());
     let mut subtree = Vec::with_capacity(inputs.len() * 2);
     subtree.extend_from_slice(&inputs);
     subtree.extend_from_slice(&inputs);
@@ -273,7 +275,7 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
     // where the extra elements can guarantee the later sharing can be done smoothly.
     // So that the remaining computation and sharing can be done locally by each party.
     let num_to_send = min(party_count, subtree.len());
-    let ld_receive_timer = start_timer!("Leader receives elements", net.is_leader());
+    let ld_receive_timer = start_timer!("Comm: Send elements to leader", net.is_leader());
     let leader_receiving = net
         .worker_send_or_leader_receive_element(
             &subtree[subtree.len() - num_to_send..].to_vec(),
@@ -285,7 +287,7 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
     // Leader receives N^2 elements and calculates the remaining layers.
     if net.is_leader() {
         let leader_receiving = leader_receiving.unwrap();
-        let ld_compute_timer = start_timer!("Leader computes leadertree", net.is_leader());
+        let ld_compute_timer = start_timer!("Leader: Compute leader tree", net.is_leader());
         // Leader first merge the N^2 elements to the bottem of the leader tree.
         // This is done in a level-order traveral manner.
         let leader_tree_len = num_to_send * party_count;
@@ -313,7 +315,6 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
         return Ok((subtree, Some(leader_tree)));
     }
     
-    end_timer!(timer);
     Ok((subtree, None))
 }
 

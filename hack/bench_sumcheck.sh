@@ -1,7 +1,6 @@
-
 #!/bin/bash
 
-for i in {5..32}
+for i in {18..30}
 do
-    just run --release --example sumcheck -- --l 32 --width $i > sumcheck_$i.txt
+    just run --release -F leader --example sumcheck -- --l 32 --n $i > sumcheck_$i.txt
 done

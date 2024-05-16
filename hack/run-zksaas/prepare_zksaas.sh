@@ -3,13 +3,14 @@ export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
 
 source $HOME/.cargo/env
 if ! which cargo &> /dev/null; then
-    echo "Cargo is not installed. Running the script..."
+    echo "Cargo is not installed. Install cargo first..."
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s - -y --default-toolchain nightly
     source $HOME/.cargo/env
 else
     echo "Cargo is installed. Skipping the script."
 fi
 
+# Change the mirror of crates.io
 mkdir -vp ${CARGO_HOME:-$HOME/.cargo}
 rm ${CARGO_HOME:-$HOME/.cargo}/config
 cat << EOF | tee -a ${CARGO_HOME:-$HOME/.cargo}/config

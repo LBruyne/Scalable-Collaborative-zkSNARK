@@ -57,7 +57,7 @@ pub fn local_hyperplonk<E: Pairing>(
     let timer_all = start_timer!("Local HyperPlonk");
 
     // Commit to 4+2+3=9 polynomials 
-    let commit_timer = start_timer!("Commit polynomials");
+    let commit_timer = start_timer!("Commit");
     let com_a = commitment.commit(&a_evals);
     let com_b = commitment.commit(&b_evals);
     let com_c = commitment.commit(&c_evals);
@@ -70,6 +70,8 @@ pub fn local_hyperplonk<E: Pairing>(
     let com_ssigma_b = commitment.commit(&ssigma_b_evals);
     let com_ssigma_c = commitment.commit(&ssigma_c_evals);
     end_timer!(commit_timer);
+
+    let prover_timer = start_timer!("HyperPlonk Prover");
 
     // Gate identity
     let gate_timer = start_timer!("Gate identity");
@@ -134,7 +136,7 @@ pub fn local_hyperplonk<E: Pairing>(
     end_timer!(wire_timer);
 
     // Open 
-    let open_timer = start_timer!("Open polynomials");
+    let open_timer = start_timer!("Open");
     gate_identity_commitments.push((com_a, commitment.open(&a_evals, &challenge)));
     gate_identity_commitments.push((com_b, commitment.open(&b_evals, &challenge)));
     gate_identity_commitments.push((com_c, commitment.open(&c_evals, &challenge)));
@@ -145,6 +147,8 @@ pub fn local_hyperplonk<E: Pairing>(
     gate_identity_commitments.push((com_ssigma_b, commitment.open(&ssigma_b_evals, &challenge)));
     gate_identity_commitments.push((com_ssigma_c, commitment.open(&ssigma_c_evals, &challenge)));
     end_timer!(open_timer);
+
+    end_timer!(prover_timer);
 
     end_timer!(timer_all);
     (

@@ -3,7 +3,7 @@ use futures::future::join_all;
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
-use crate::utils::serializing_net::MPCSerializeNet;
+use crate::{start_timer, end_timer, timed, utils::serializing_net::MPCSerializeNet};
 
 pub async fn d_unpack_0<F: FftField, Net: MPCSerializeNet>(
     share: F,
@@ -58,14 +58,27 @@ pub async fn pss2ss<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<Vec<F>, MPCNetError> {
-    // This is a simplified version of `pss2ss`
-    let shares = net
-        .worker_send_or_leader_receive_element(&share, sid)
-        .await?;
-    if let Some(shares) = shares {
-        join_all(pp.unpack(shares).into_iter().map(|v| net.worker_receive_or_leader_send_element(Some(pp.pack_single(v)), sid)))
-            .await.into_iter().collect::<Result<Vec<_>, _>>()
-    } else {
-        join_all((0..pp.l).map(|_| net.worker_receive_or_leader_send_element(None, sid))).await.into_iter().collect::<Result<Vec<_>, _>>()
-    }
+    timed!(
+        "PSStoSS",
+        {
+            // This is a simplified version of `pss2ss`
+            let shares = net
+                .worker_send_or_leader_receive_element(&share, sid)
+                .await?;
+            if let Some(shares) = shares {
+                join_all(pp.unpack(shares).into_iter().map(|v| {
+                    net.worker_receive_or_leader_send_element(Some(pp.pack_single(v)), sid)
+                }))
+                .await
+                .into_iter()
+                .collect::<Result<Vec<_>, _>>()
+            } else {
+                join_all((0..pp.l).map(|_| net.worker_receive_or_leader_send_element(None, sid)))
+                    .await
+                    .into_iter()
+                    .collect::<Result<Vec<_>, _>>()
+            }
+        },
+        net.is_leader()
+    )
 }

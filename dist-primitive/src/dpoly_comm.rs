@@ -188,6 +188,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         net: &Net,
         sid: MultiplexedStreamID,
     ) -> Result<Vec<E::G1>, MPCNetError> {
+        let timer = start_timer!("Local: Something", net.is_leader());
         let bases: &Vec<Vec<_>> = &pevals
             .iter()
             .map(|peval| {
@@ -197,6 +198,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
                 self.powers_of_g[level].clone()
             })
             .collect();
+        end_timer!(timer);
         // if net.is_leader() {
         //     eprintln!("dMSM batch size: {}", bases.len());
         // }
@@ -239,7 +241,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         net: &Net,
         sid: MultiplexedStreamID,
     ) -> Result<(E::ScalarField, Vec<E::G1>), MPCNetError> {
-        let timer = start_timer!("Distributed opening", net.is_leader());
+        let all_timer = start_timer!("Distributed opening", net.is_leader());
         let mut result = Vec::new();
         // n and l must be powers of 2
         let n: usize = peval.len().trailing_zeros() as usize; // peval.len = 2^n
@@ -247,7 +249,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         assert_eq!(peval.len(), 2_usize.pow(n as u32));
         let mut current_r = peval.clone();
         // Phase 1
-        let phase_1_timer = start_timer!("Phase 1", net.is_leader());
+        let timer = start_timer!("Local: Phase 1", net.is_leader());
         for i in 0..n {
             let (part0, part1) = current_r.split_at(current_r.len() / 2);
             let q_i: Vec<_> = part0
@@ -263,17 +265,15 @@ impl<E: Pairing> PolynomialCommitment<E> {
             current_r = r_i;
             result.push(q_i);
         }
-        end_timer!(phase_1_timer);
+        end_timer!(timer);
         assert!(current_r.len() == 1);
         // Finally commit to all elements in a batch.
-        let commit_timer = start_timer!("Batching dMSM Phase", net.is_leader());
         let mut res = self.d_commit(&result, pp, net, sid).await?;
-        end_timer!(commit_timer);
         // Next we go into packed shares
         // Notice that msm here should use non-packed base for commitment. Here this is simplified.
         let mut current_r = pss2ss(current_r[0], pp, net, sid).await?;
         assert!(current_r.len() == pp.l);
-        let phase_2_timer = start_timer!("Phase 2", net.is_leader());
+        let timer = start_timer!("Local: Phase 2", net.is_leader());
         for i in 0..l {
             let (part0, part1) = current_r.split_at(current_r.len() / 2);
             let q_i: Vec<_> = part0
@@ -292,8 +292,8 @@ impl<E: Pairing> PolynomialCommitment<E> {
             res.push(E::G1::msm(&self.powers_of_g[level], &q_i).unwrap());
             current_r = r_i;
         }
-        end_timer!(phase_2_timer);
         end_timer!(timer);
+        end_timer!(all_timer);
         // Return the evaluation and the proof.
         Ok((current_r[0], res))
     }

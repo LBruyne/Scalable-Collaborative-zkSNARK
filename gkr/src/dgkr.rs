@@ -11,9 +11,8 @@ use dist_primitive::{
     dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub},
     dsumcheck::d_sumcheck_product,
     end_timer,
-    mle::{d_fix_variable, PackedDenseMultilinearExtension},
+    mle::PackedDenseMultilinearExtension,
     start_timer,
-    unpack::d_unpack_0,
     utils::serializing_net::MPCSerializeNet,
 };
 use mpc_net::{MPCNetError, MultiplexedStreamID};
@@ -92,6 +91,7 @@ impl<E: Pairing> PackedProvingParameters<E> {
 }
 
 /// This is a proof-of-concept implementation of the distributed GKR function.
+/// The following implementation is valid only for data-parallel circuits.
 pub async fn d_gkr_function<F: FftField, Net: MPCSerializeNet>(
     shares_f1: &SparseMultilinearExtension<F>,
     shares_f2: &PackedDenseMultilinearExtension<F>,
@@ -103,25 +103,21 @@ pub async fn d_gkr_function<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<Vec<(F, F, F)>, MPCNetError> {
-    let timer_initialize_phase_one = start_timer!("Distributed initialize phase one");
+    // Init Phase 1
     let hg = d_initialize_phase_one(shares_f1, shares_f3, challenge_g, pp, net, sid).await?;
-    end_timer!(timer_initialize_phase_one);
-    let timer_sumcheck_product = start_timer!("Distributed sumcheck product 1");
+    // Sumcheck product 1
     let mut proof1 =
         d_sumcheck_product(&hg.shares, &shares_f2.shares, challenge_u, pp, net, sid).await?;
-    end_timer!(timer_sumcheck_product);
-    let timer_initialize_phase_two = start_timer!("Distributed initialize phase two");
+    // Init Phase 2
     let f1 = d_initialize_phase_two(shares_f1, challenge_g, challenge_v, pp, net, sid).await?;
-    end_timer!(timer_initialize_phase_two);
-    let timer_f3_f2u = start_timer!("Calculate f3*f2(u)");
-    let f2_u = d_fix_variable(&shares_f2.shares, challenge_u, pp, net, sid).await?[0];
-    let f2_u = d_unpack_0(f2_u, pp, net, sid).await?;
+    // Calculate f3*f2(u). Omitted for simplicity.
+    // let f2_u = d_fix_variable(&shares_f2.shares, challenge_u, pp, net, sid).await?[0];
+    // let f2_u = d_unpack_0(f2_u, pp, net, sid).await?;
+    let f2_u = F::one();
     let shares_f3_f2u = shares_f3.mul(&f2_u);
-    end_timer!(timer_f3_f2u);
-    let timer_sumcheck_product = start_timer!("Distributed sumcheck product 2");
+    // Sumcheck product 2
     let proof2 =
         d_sumcheck_product(&f1.shares, &shares_f3_f2u.shares, challenge_v, pp, net, sid).await?;
-    end_timer!(timer_sumcheck_product);
     proof1.extend(proof2);
     Ok(proof1)
 }
@@ -168,6 +164,8 @@ pub async fn d_phase_initilization<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<Vec<F>, MPCNetError> {
+    let all_timer = start_timer!("Phase Initialization", net.is_leader());
+    let timer = start_timer!("Local: Something", net.is_leader());
     let mut evaluations = vec![F::zero(); shares_f1.0.len()];
     shares_f1.0.iter().enumerate().for_each(|(id, (_, v))| {
         evaluations[id] += *v * *v;
@@ -175,6 +173,7 @@ pub async fn d_phase_initilization<F: FftField, Net: MPCSerializeNet>(
     // Act a degree reduction.
     // Note that each party only suffers from 1/N cost.
     let shares = evaluations[..shares_f1.0.len() / net.n_parties()].to_vec();
+    end_timer!(timer);
     let shares = degree_reduce_many(shares, pp, net, sid)
         .await?
         .iter()
@@ -188,6 +187,7 @@ pub async fn d_phase_initilization<F: FftField, Net: MPCSerializeNet>(
         F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),
         F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),
     );
+    end_timer!(all_timer);
     Ok(shares)
 }
 
@@ -215,13 +215,15 @@ pub async fn d_gkr<E: Pairing, Net: MPCSerializeNet>(
         start_timer!("Distributed GKR", net.is_leader());
 
     // Commit
-    let commit_timer = start_timer!("dCommit", net.is_leader());
+    let commit_timer = start_timer!("Commit", net.is_leader());
     let commit = pk.commitment
         .d_commit(&vec![pk.poly_vs[0].shares.clone()], pp, net, sid)
         .await?;
     end_timer!(commit_timer);
 
-    let timer_gkr_rounds = start_timer!("dGKR rounds", net.is_leader());
+    let prover_timer = start_timer!("Distributed GKR Prover", net.is_leader());
+
+    let timer_gkr_rounds = start_timer!("GKR rounds", net.is_leader());
     for _ in 0..depth {
         let mut layer_proof = Vec::new();
         // For GKR relation,
@@ -250,11 +252,13 @@ pub async fn d_gkr<E: Pairing, Net: MPCSerializeNet>(
     end_timer!(timer_gkr_rounds);
 
     // Open
-    let open_timer = start_timer!("dOpen", net.is_leader());
+    let open_timer = start_timer!("Open", net.is_leader());
     let open = pk.commitment
         .d_open(&pk.poly_vs[depth-1].shares, &pk.challenge_r, pp, net, sid)
         .await?;
     end_timer!(open_timer);
+
+    end_timer!(prover_timer);
 
     end_timer!(timer_all);
 

@@ -103,7 +103,7 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     let l: usize = pp.l.trailing_zeros() as usize;
     let mut last_round = shares.clone();
     // Phase 1  
-    let phase_1_timer = start_timer!("Phase 1", net.is_leader());
+    let timer = start_timer!("Local: Phase 1", net.is_leader());
     for i in 0..n {
         let parts = last_round.split_at(last_round.len() / 2);
         let res1 = parts.0.iter().sum();
@@ -118,13 +118,11 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
             .collect::<Vec<_>>();
         last_round = this_round;
     }
-    end_timer!(phase_1_timer);
+    end_timer!(timer);
     debug_assert!(last_round.len() == 1);
-    let pss2ss_timer = start_timer!("Reshare", net.is_leader());
     let mut last_round = pss2ss(last_round[0], pp, net, sid).await?;
-    end_timer!(pss2ss_timer);
     // Phase 2
-    let phase_2_timer = start_timer!("Phase 2", net.is_leader());
+    let timer = start_timer!("Local: Phase 2", net.is_leader());
     for i in 0..l {
         let parts = last_round.split_at(last_round.len() / 2);
         let res1 = parts.0.iter().sum();
@@ -139,7 +137,7 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
             .collect::<Vec<_>>();
         last_round = this_round;
     }
-    end_timer!(phase_2_timer);
+    end_timer!(timer);
     result.push((
         F::ZERO,
         last_round[0],
@@ -166,6 +164,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     // Phase 1
     // In this part the shares can be viewed as a whole. There's no need to go into them
     // The result of this part is a degree 2d share since we perform multiplication between shares.
+    let timer = start_timer!("Local: Phase 1", net.is_leader());
     for i in 0..n {
         let parts_f = last_round_f.split_at(last_round_f.len() / 2);
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
@@ -221,11 +220,13 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
             .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
             .collect::<Vec<_>>();
     }
+    end_timer!(timer);
     debug_assert!(last_round_f.len() == 1);
     debug_assert!(last_round_g.len() == 1);
     // Phase 2
     let mut last_round_f = pss2ss(last_round_f[0], pp, net, sid).await?;
     let mut last_round_g = pss2ss(last_round_g[0], pp, net, sid).await?;
+    let timer = start_timer!("Local: Phase 2", net.is_leader());
     for i in 0..l {
         let parts_f = last_round_f.split_at(last_round_f.len() / 2);
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
@@ -281,6 +282,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
             .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
             .collect::<Vec<_>>();
     }
+    end_timer!(timer);
     // Put it in the second slot to keep consistency with vec.split_at(vec.len()/2). In which case the first part will be empty.
     result.push((
         F::ZERO,

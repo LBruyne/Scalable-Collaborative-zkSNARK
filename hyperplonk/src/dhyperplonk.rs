@@ -125,7 +125,7 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     let timer_all = start_timer!("Distributed HyperPlonk", net.is_leader());
 
     // Commit to 4+2+3=9 polynomials
-    let commit_timer = start_timer!("Distributed commit polynomials", net.is_leader());
+    let commit_timer = start_timer!("Commit", net.is_leader());
     let com_a = pk
         .commitment
         .d_commit(&vec![pk.a_evals.clone()], &pp, &net, sid)
@@ -175,6 +175,8 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
         .unwrap()[0];
     end_timer!(commit_timer);
 
+    let prover_timer = start_timer!("Distributed HyperPlonk Prover", net.is_leader());
+
     // Gate identity
     let gate_timer = start_timer!("Gate identity", net.is_leader());
     let mut gate_identity_proofs = Vec::new();
@@ -215,6 +217,7 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     let wire_timer = start_timer!("Wire identity", net.is_leader());
     // Compute f, g
     // f(x) = \prod (w_i(x) + \beta*sid_i(x) + \gamma)
+    let timer = start_timer!("Local: Something", net.is_leader());
     let num = (0..gate_count)
         .map(|i| {
             (pk.a_evals[i] + pk.beta * pk.sigma_a[i] + pk.gamma)
@@ -230,6 +233,7 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
         })
         .collect();
     let fs: Vec<Vec<E::ScalarField>> = vec![num, den];
+    end_timer!(timer);
 
     let mut wire_identity = Vec::new();
     for evaluations in &fs {
@@ -293,7 +297,7 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     end_timer!(wire_timer);
 
     // Open
-    let open_timer = start_timer!("Distributed open polynomials", net.is_leader());
+    let open_timer = start_timer!("Open", net.is_leader());
     gate_identity_commitments.push((
         com_a,
         pk.commitment
@@ -349,6 +353,8 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
             .await?,
     ));
     end_timer!(open_timer);
+
+    end_timer!(prover_timer);
 
     end_timer!(timer_all);
 
