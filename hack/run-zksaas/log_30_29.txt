@@ -1,1 +1,0 @@
-ssh: connect to host 47.96.97.58 port 22: Connection timed out
