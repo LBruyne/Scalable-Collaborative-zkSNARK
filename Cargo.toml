@@ -4,9 +4,8 @@ members = [
     "secret-sharing",
     "dist-primitive",
     "mpc-net",
-    "client",
     "gkr",
-    "hyperplonk",
+    "hyperplonk"
 ]
 
 [profile.bench]

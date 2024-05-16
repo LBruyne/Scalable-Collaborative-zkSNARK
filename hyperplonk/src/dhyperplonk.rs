@@ -13,6 +13,7 @@ use dist_primitive::{
 };
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
+
 #[derive(Clone, Debug)]
 pub struct PackedProvingParameters<E: Pairing> {
     pub a_evals: Vec<E::ScalarField>,
@@ -120,12 +121,11 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
 > {
     let gate_count = (1 << n) / pp.l;
 
-
     // Now run the protocol.
     let timer_all = start_timer!("Distributed HyperPlonk", net.is_leader());
 
     // Commit to 4+2+3=9 polynomials
-    let commit_timer = start_timer!("dCommit polynomials", net.is_leader());
+    let commit_timer = start_timer!("Distributed commit polynomials", net.is_leader());
     let com_a = pk
         .commitment
         .d_commit(&vec![pk.a_evals.clone()], &pp, &net, sid)
@@ -293,7 +293,7 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     end_timer!(wire_timer);
 
     // Open
-    let open_timer = start_timer!("dOpen polynomials", net.is_leader());
+    let open_timer = start_timer!("Distributed open polynomials", net.is_leader());
     gate_identity_commitments.push((
         com_a,
         pk.commitment

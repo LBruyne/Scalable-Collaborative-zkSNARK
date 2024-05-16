@@ -105,7 +105,7 @@ async fn sumcheck_bench(n: usize, l: usize) {
     let challenge = (0..n)
         .map(|_| Fr::rand(&mut ark_std::test_rng()))
         .collect::<Vec<_>>();
-    let sc = start_timer!("Sumcheck Leader");
+    let sc = start_timer!("Local Sumcheck");
     let proof = sumcheck(
         black_box(&delegator.x),
         black_box(&challenge),
@@ -139,7 +139,7 @@ async fn sumcheck_bench(n: usize, l: usize) {
     let challenge = (0..n)
     .map(|_| Fr::rand(&mut ark_std::test_rng()))
     .collect::<Vec<_>>();
-    let sc = start_timer!("Sumcheck");
+    let sc = start_timer!("Local Sumcheck");
     let proof = sumcheck(&delegator.x, &challenge);
     end_timer!(sc);
     black_box(proof);
@@ -186,7 +186,7 @@ async fn sumcheck_product_bench(n: usize, l: usize) {
     let challenge = (0..n)
         .map(|_| Fr::rand(&mut ark_std::test_rng()))
         .collect::<Vec<_>>();
-    let sc = start_timer!("SumcheckProduct Leader");
+    let sc = start_timer!("Local SumcheckProduct");
     let proof = sumcheck_product(
         black_box(&delegator.x),
         black_box(&delegator.y),
@@ -222,7 +222,7 @@ async fn sumcheck_product_bench(n: usize, l: usize) {
     let challenge = (0..n)
     .map(|_| Fr::rand(&mut ark_std::test_rng()))
     .collect::<Vec<_>>();    
-    let sc = start_timer!("SumcheckProduct");
+    let sc = start_timer!("Local SumcheckProduct");
     let proof = sumcheck_product(&delegator.x, &delegator.y, &challenge);
     end_timer!(sc);
     black_box(proof);

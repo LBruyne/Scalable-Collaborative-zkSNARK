@@ -61,7 +61,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<(Vec<F>, Vec<F>, Vec<F>), MPCNetError> {
-    let timer = start_timer!("Distributed product accumulation and sharing");
+    let timer = start_timer!("Distributed product accumulation and sharing", net.is_leader());
     let party_count = pp.l * 4;
     // Every party gets n/N of the shares.
     assert!(shares.len() > party_count);

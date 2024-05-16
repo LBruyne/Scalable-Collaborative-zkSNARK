@@ -6,12 +6,14 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
 default = []
+benchmark = ["comm", "report"]
 local = ["comm", "single_thread"] # local simulating with tokio in single-thread
-local-multithread = ["comm"] # local simulating with tokio in multi-thread
+local-multi-thread = ["comm"] # local simulating with tokio in multi-thread
 leader = ["single_thread"] # local ONLY leader running its own part without actual communication
 
 single_thread = [] # with tokio in single thread
 comm = [] # with actual communication
+report = [] # with each party reports benchmark statistics
 
 [dependencies]
 ark-std = {version = "0.4.0", default-features = false, features = [ "print-trace", "std" ]}

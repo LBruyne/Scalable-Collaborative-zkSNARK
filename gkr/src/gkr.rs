@@ -10,7 +10,6 @@ use dist_primitive::end_timer;
 use dist_primitive::mle::fix_variable;
 use dist_primitive::mle::DenseMultilinearExtension;
 use dist_primitive::start_timer;
-use dist_primitive::timed;
 
 use rand::random;
 use std::hint::black_box;
@@ -144,7 +143,9 @@ pub fn local_gkr<E: Pairing>(
     let timer_all = start_timer!("Local GKR");
 
     // Commit to V_d
-    let commit = timed!("Commit", commitment.commit(&poly_vs[0].evaluations));
+    let commit_timer = start_timer!("Commit");
+    let commit = commitment.commit(&poly_vs[0].evaluations);
+    end_timer!(commit_timer);
 
     // GKR prover
     let gkr_timer = start_timer!("GKR Prover");
@@ -171,7 +172,7 @@ pub fn local_gkr<E: Pairing>(
 
     // Open V_d at a random challenge point.
     let timer_open = start_timer!("Open");
-    let (value, com_proof) = commitment.open(&poly_vs[0].evaluations, &challenge_r);
+    let (value, com_proof) = commitment.open(&poly_vs[depth-1].evaluations, &challenge_r);
     end_timer!(timer_open);
 
     end_timer!(timer_all);
