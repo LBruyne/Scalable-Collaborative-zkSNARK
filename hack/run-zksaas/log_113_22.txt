@@ -1,0 +1,779 @@
+Cargo is installed. Skipping the script.
+[source.crates-io]
+replace-with = 'ustc'
+
+[source.ustc]
+registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+unzip is installed. Skipping the script.
+Archive:  /tmp/zksaas.zip
+  inflating: /tmp/zksaas/Cargo.toml  
+  inflating: /tmp/zksaas/plonk/Cargo.toml  
+  inflating: /tmp/zksaas/plonk/examples/dpoly_commit_test.rs  
+  inflating: /tmp/zksaas/plonk/examples/plonk_bench.rs  
+  inflating: /tmp/zksaas/plonk/examples/local_plonk_test.rs  
+  inflating: /tmp/zksaas/plonk/src/localplonk.rs  
+  inflating: /tmp/zksaas/plonk/src/dplonk.rs  
+  inflating: /tmp/zksaas/plonk/src/poly_commit.rs  
+  inflating: /tmp/zksaas/plonk/src/dpoly_commit.rs  
+  inflating: /tmp/zksaas/plonk/src/lib.rs  
+  inflating: /tmp/zksaas/plonk/README.md  
+  inflating: /tmp/zksaas/LICENSE     
+ extracting: /tmp/zksaas/.gitignore  
+  inflating: /tmp/zksaas/mpc-net/test.zsh  
+  inflating: /tmp/zksaas/mpc-net/Cargo.toml  
+  inflating: /tmp/zksaas/mpc-net/src/multi.rs  
+  inflating: /tmp/zksaas/mpc-net/src/two.rs  
+  inflating: /tmp/zksaas/mpc-net/src/lib.rs  
+  inflating: /tmp/zksaas/mpc-net/data/4  
+  inflating: /tmp/zksaas/mpc-net/README.md  
+  inflating: /tmp/zksaas/scripts/ext_wit_test.zsh  
+  inflating: /tmp/zksaas/scripts/dmsm_test.zsh  
+  inflating: /tmp/zksaas/scripts/dpp_test.zsh  
+  inflating: /tmp/zksaas/scripts/local_plonk_bench.sh  
+  inflating: /tmp/zksaas/scripts/dpoly_commit_test.zsh  
+  inflating: /tmp/zksaas/scripts/plonk_bench.zsh  
+  inflating: /tmp/zksaas/scripts/groth_bench.zsh  
+  inflating: /tmp/zksaas/scripts/dfft_test.zsh  
+  inflating: /tmp/zksaas/scripts/output.txt  
+  inflating: /tmp/zksaas/scripts/dmsm_bench.zsh  
+  inflating: /tmp/zksaas/dist-primitives/Cargo.toml  
+  inflating: /tmp/zksaas/dist-primitives/examples/dfft_test.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/local_dfft_test.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/dpp_test.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/dmsm_bench.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/dmsm_test.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/msm_bench.rs  
+ extracting: /tmp/zksaas/dist-primitives/src/dfft/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/dfft/dfft.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/utils/deg_red.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/utils/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/utils/pack.rs  
+ extracting: /tmp/zksaas/dist-primitives/src/channel/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/channel/channel.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/dmsm/dmsm.rs  
+ extracting: /tmp/zksaas/dist-primitives/src/dmsm/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/lib.rs  
+ extracting: /tmp/zksaas/dist-primitives/src/dpp/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/dpp/dpp.rs  
+  inflating: /tmp/zksaas/.git/description  
+ extracting: /tmp/zksaas/.git/objects/56/84896ca3763c30a40eb4aef48197d3e90d9c91  
+ extracting: /tmp/zksaas/.git/objects/50/5f8a1fe9dec459640cd943708b746f3925a68f  
+ extracting: /tmp/zksaas/.git/objects/60/37d6dd49c9592637e1c8a6be544af6f5f9957f  
+ extracting: /tmp/zksaas/.git/objects/9e/91acdf0e2c00ea82b22ad8f00eb00fa7fd8b8a  
+ extracting: /tmp/zksaas/.git/objects/1f/8ab9a7b22bb10bdd0583894d9bf2bc51435bf5  
+ extracting: /tmp/zksaas/.git/objects/7f/f696d83f2f92195e9c288e1e5c2c9a059db8f0  
+ extracting: /tmp/zksaas/.git/objects/18/b783a9f21d36a96164bde4df773dfa43fca885  
+ extracting: /tmp/zksaas/.git/objects/f7/24770dace5dcb541196f54dc421604af7fc109  
+ extracting: /tmp/zksaas/.git/objects/03/98d3ccb244d9b8d5bff368696fd106096c4eb4  
+ extracting: /tmp/zksaas/.git/objects/36/842720f20d6a013b80269868d3569564d14f16  
+ extracting: /tmp/zksaas/.git/objects/4e/cd7f1e1849b520ac2f0a3b9e62a5be17cae0ae  
+ extracting: /tmp/zksaas/.git/objects/80/9c0d45b6324a5f2db0f9a59d9e4a6060655aa1  
+ extracting: /tmp/zksaas/.git/objects/82/574b512c3722a2d8394094d59f619f8a032b5f  
+ extracting: /tmp/zksaas/.git/objects/f2/7885ec9adf82b003d1ee83afb63edc8f1ad932  
+ extracting: /tmp/zksaas/.git/objects/8b/1f1eed8609ea4ec632e939ed5cad5ae2678fbe  
+ extracting: /tmp/zksaas/.git/objects/45/f7276e05fcb0850dc67288ba762029d72cbbd7  
+ extracting: /tmp/zksaas/.git/objects/eb/39df6740146898cba4b5c0c2be9883504a8dff  
+ extracting: /tmp/zksaas/.git/objects/5b/667d05c3f639505671221f6c3ca1a8fa7b0b49  
+ extracting: /tmp/zksaas/.git/objects/fd/f23065a02f5f1aa8932f1bad4415efdcf02970  
+  inflating: /tmp/zksaas/.git/objects/pack/pack-258f890dc1c1dbbbd0a3688250c9d39845084fcd.idx  
+  inflating: /tmp/zksaas/.git/objects/pack/pack-258f890dc1c1dbbbd0a3688250c9d39845084fcd.pack  
+ extracting: /tmp/zksaas/.git/refs/remotes/origin/HEAD  
+ extracting: /tmp/zksaas/.git/refs/heads/main  
+ extracting: /tmp/zksaas/.git/HEAD   
+  inflating: /tmp/zksaas/.git/logs/refs/remotes/origin/HEAD  
+  inflating: /tmp/zksaas/.git/logs/refs/heads/main  
+  inflating: /tmp/zksaas/.git/logs/HEAD  
+  inflating: /tmp/zksaas/.git/config  
+  inflating: /tmp/zksaas/.git/packed-refs  
+  inflating: /tmp/zksaas/.git/hooks/fsmonitor-watchman.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-commit.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-merge-commit.sample  
+  inflating: /tmp/zksaas/.git/hooks/update.sample  
+  inflating: /tmp/zksaas/.git/hooks/push-to-checkout.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-rebase.sample  
+  inflating: /tmp/zksaas/.git/hooks/commit-msg.sample  
+  inflating: /tmp/zksaas/.git/hooks/applypatch-msg.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-applypatch.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-receive.sample  
+  inflating: /tmp/zksaas/.git/hooks/prepare-commit-msg.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-push.sample  
+  inflating: /tmp/zksaas/.git/hooks/post-update.sample  
+ extracting: /tmp/zksaas/.git/COMMIT_EDITMSG  
+  inflating: /tmp/zksaas/.git/FETCH_HEAD  
+  inflating: /tmp/zksaas/.git/info/exclude  
+  inflating: /tmp/zksaas/.git/index  
+  inflating: /tmp/zksaas/Cargo.lock  
+  inflating: /tmp/zksaas/README.md   
+  inflating: /tmp/zksaas/groth16/Cargo.toml  
+  inflating: /tmp/zksaas/groth16/examples/groth_bench.rs  
+  inflating: /tmp/zksaas/groth16/examples/ext_wit_bench.rs  
+  inflating: /tmp/zksaas/groth16/examples/local_groth_bench.rs  
+  inflating: /tmp/zksaas/groth16/src/lib.rs  
+  inflating: /tmp/zksaas/groth16/src/ext_wit.rs  
+  inflating: /tmp/zksaas/groth16/README.md  
+  inflating: /tmp/zksaas/network-address/16  
+  inflating: /tmp/zksaas/network-address/4  
+  inflating: /tmp/zksaas/network-address/8  
+  inflating: /tmp/zksaas/network-address/128  
+  inflating: /tmp/zksaas/network-address/32  
+  inflating: /tmp/zksaas/secret-sharing/Cargo.toml  
+  inflating: /tmp/zksaas/secret-sharing/src/pss.rs  
+ extracting: /tmp/zksaas/secret-sharing/src/lib.rs  
+warning: virtual workspace defaulting to `resolver = "1"` despite one or more workspace members being on edition 2021 which implies `resolver = "2"`
+note: to keep the current resolver, specify `workspace.resolver = "1"` in the workspace root's manifest
+note: to use the edition 2021 resolver, specify `workspace.resolver = "2"` in the workspace root's manifest
+note: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+    Finished release [optimized] target(s) in 0.03s
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -q, --queue <value>    integer value to be sent with the signal
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+Start:   Connecting
+[DEBUG mpc_net::multi] Awaiting 0
+[DEBUG mpc_net::multi] Awaited 0
+[DEBUG mpc_net::multi] Awaiting 1
+[DEBUG mpc_net::multi] Awaited 1
+[DEBUG mpc_net::multi] Awaiting 2
+[DEBUG mpc_net::multi] Awaited 2
+[DEBUG mpc_net::multi] Awaiting 3
+[DEBUG mpc_net::multi] Awaited 3
+[DEBUG mpc_net::multi] Awaiting 4
+[DEBUG mpc_net::multi] Awaited 4
+[DEBUG mpc_net::multi] Awaiting 5
+[DEBUG mpc_net::multi] Awaited 5
+[DEBUG mpc_net::multi] Awaiting 6
+[DEBUG mpc_net::multi] Awaited 6
+[DEBUG mpc_net::multi] Awaiting 7
+[DEBUG mpc_net::multi] Awaited 7
+[DEBUG mpc_net::multi] Awaiting 8
+[DEBUG mpc_net::multi] Awaited 8
+[DEBUG mpc_net::multi] Awaiting 9
+[DEBUG mpc_net::multi] Awaited 9
+[DEBUG mpc_net::multi] Awaiting 10
+[DEBUG mpc_net::multi] Awaited 10
+[DEBUG mpc_net::multi] Awaiting 11
+[DEBUG mpc_net::multi] Awaited 11
+[DEBUG mpc_net::multi] Awaiting 12
+[DEBUG mpc_net::multi] Awaited 12
+[DEBUG mpc_net::multi] Awaiting 13
+[DEBUG mpc_net::multi] Awaited 13
+[DEBUG mpc_net::multi] Awaiting 14
+[DEBUG mpc_net::multi] Awaited 14
+[DEBUG mpc_net::multi] Awaiting 15
+[DEBUG mpc_net::multi] Awaited 15
+[DEBUG mpc_net::multi] Awaiting 16
+[DEBUG mpc_net::multi] Awaited 16
+[DEBUG mpc_net::multi] Awaiting 17
+[DEBUG mpc_net::multi] Awaited 17
+[DEBUG mpc_net::multi] Awaiting 18
+[DEBUG mpc_net::multi] Awaited 18
+[DEBUG mpc_net::multi] Awaiting 19
+[DEBUG mpc_net::multi] Awaited 19
+[DEBUG mpc_net::multi] Awaiting 20
+[DEBUG mpc_net::multi] Awaited 20
+[DEBUG mpc_net::multi] Awaiting 21
+[DEBUG mpc_net::multi] Awaited 21
+[DEBUG mpc_net::multi] Awaiting 22
+[DEBUG mpc_net::multi] Awaited 22
+[DEBUG mpc_net::multi] Awaiting 23
+[DEBUG mpc_net::multi] Awaited 23
+[DEBUG mpc_net::multi] Awaiting 24
+[DEBUG mpc_net::multi] Awaited 24
+[DEBUG mpc_net::multi] Awaiting 25
+[DEBUG mpc_net::multi] Awaited 25
+[DEBUG mpc_net::multi] Awaiting 26
+[DEBUG mpc_net::multi] Awaited 26
+[DEBUG mpc_net::multi] Awaiting 27
+[DEBUG mpc_net::multi] Awaited 27
+[DEBUG mpc_net::multi] Awaiting 28
+[DEBUG mpc_net::multi] Awaited 28
+[DEBUG mpc_net::multi] Awaiting 29
+[DEBUG mpc_net::multi] Awaited 29
+[DEBUG mpc_net::multi] Awaiting 30
+[DEBUG mpc_net::multi] Awaited 30
+[DEBUG mpc_net::multi] Awaiting 31
+[DEBUG mpc_net::multi] Awaited 31
+[DEBUG mpc_net::multi] Awaiting 32
+[DEBUG mpc_net::multi] Awaited 32
+[DEBUG mpc_net::multi] Awaiting 33
+[DEBUG mpc_net::multi] Awaited 33
+[DEBUG mpc_net::multi] Awaiting 34
+[DEBUG mpc_net::multi] Awaited 34
+[DEBUG mpc_net::multi] Awaiting 35
+[DEBUG mpc_net::multi] Awaited 35
+[DEBUG mpc_net::multi] Awaiting 36
+[DEBUG mpc_net::multi] Awaited 36
+[DEBUG mpc_net::multi] Awaiting 37
+[DEBUG mpc_net::multi] Awaited 37
+[DEBUG mpc_net::multi] Awaiting 38
+[DEBUG mpc_net::multi] Awaited 38
+[DEBUG mpc_net::multi] Awaiting 39
+[DEBUG mpc_net::multi] Awaited 39
+[DEBUG mpc_net::multi] Awaiting 40
+[DEBUG mpc_net::multi] Awaited 40
+[DEBUG mpc_net::multi] Awaiting 41
+[DEBUG mpc_net::multi] Awaited 41
+[DEBUG mpc_net::multi] Awaiting 42
+[DEBUG mpc_net::multi] Awaited 42
+[DEBUG mpc_net::multi] Awaiting 43
+[DEBUG mpc_net::multi] Awaited 43
+[DEBUG mpc_net::multi] Awaiting 44
+[DEBUG mpc_net::multi] Awaited 44
+[DEBUG mpc_net::multi] Awaiting 45
+[DEBUG mpc_net::multi] Awaited 45
+[DEBUG mpc_net::multi] Awaiting 46
+[DEBUG mpc_net::multi] Awaited 46
+[DEBUG mpc_net::multi] Awaiting 47
+[DEBUG mpc_net::multi] Awaited 47
+[DEBUG mpc_net::multi] Awaiting 48
+[DEBUG mpc_net::multi] Awaited 48
+[DEBUG mpc_net::multi] Awaiting 49
+[DEBUG mpc_net::multi] Awaited 49
+[DEBUG mpc_net::multi] Awaiting 50
+[DEBUG mpc_net::multi] Awaited 50
+[DEBUG mpc_net::multi] Awaiting 51
+[DEBUG mpc_net::multi] Awaited 51
+[DEBUG mpc_net::multi] Awaiting 52
+[DEBUG mpc_net::multi] Awaited 52
+[DEBUG mpc_net::multi] Awaiting 53
+[DEBUG mpc_net::multi] Awaited 53
+[DEBUG mpc_net::multi] Awaiting 54
+[DEBUG mpc_net::multi] Awaited 54
+[DEBUG mpc_net::multi] Awaiting 55
+[DEBUG mpc_net::multi] Awaited 55
+[DEBUG mpc_net::multi] Awaiting 56
+[DEBUG mpc_net::multi] Awaited 56
+[DEBUG mpc_net::multi] Awaiting 57
+[DEBUG mpc_net::multi] Awaited 57
+[DEBUG mpc_net::multi] Awaiting 58
+[DEBUG mpc_net::multi] Awaited 58
+[DEBUG mpc_net::multi] Awaiting 59
+[DEBUG mpc_net::multi] Awaited 59
+[DEBUG mpc_net::multi] Awaiting 60
+[DEBUG mpc_net::multi] Awaited 60
+[DEBUG mpc_net::multi] Awaiting 61
+[DEBUG mpc_net::multi] Awaited 61
+[DEBUG mpc_net::multi] Awaiting 62
+[DEBUG mpc_net::multi] Awaited 62
+[DEBUG mpc_net::multi] Awaiting 63
+[DEBUG mpc_net::multi] Awaited 63
+[DEBUG mpc_net::multi] Awaiting 64
+[DEBUG mpc_net::multi] Awaited 64
+[DEBUG mpc_net::multi] Awaiting 65
+[DEBUG mpc_net::multi] Awaited 65
+[DEBUG mpc_net::multi] Awaiting 66
+[DEBUG mpc_net::multi] Awaited 66
+[DEBUG mpc_net::multi] Awaiting 67
+[DEBUG mpc_net::multi] Awaited 67
+[DEBUG mpc_net::multi] Awaiting 68
+[DEBUG mpc_net::multi] Awaited 68
+[DEBUG mpc_net::multi] Awaiting 69
+[DEBUG mpc_net::multi] Awaited 69
+[DEBUG mpc_net::multi] Awaiting 70
+[DEBUG mpc_net::multi] Awaited 70
+[DEBUG mpc_net::multi] Awaiting 71
+[DEBUG mpc_net::multi] Awaited 71
+[DEBUG mpc_net::multi] Awaiting 72
+[DEBUG mpc_net::multi] Awaited 72
+[DEBUG mpc_net::multi] Awaiting 73
+[DEBUG mpc_net::multi] Awaited 73
+[DEBUG mpc_net::multi] Awaiting 74
+[DEBUG mpc_net::multi] Awaited 74
+[DEBUG mpc_net::multi] Awaiting 75
+[DEBUG mpc_net::multi] Awaited 75
+[DEBUG mpc_net::multi] Awaiting 76
+[DEBUG mpc_net::multi] Awaited 76
+[DEBUG mpc_net::multi] Awaiting 77
+[DEBUG mpc_net::multi] Awaited 77
+[DEBUG mpc_net::multi] Awaiting 78
+[DEBUG mpc_net::multi] Awaited 78
+[DEBUG mpc_net::multi] Awaiting 79
+[DEBUG mpc_net::multi] Awaited 79
+[DEBUG mpc_net::multi] Awaiting 80
+[DEBUG mpc_net::multi] Awaited 80
+[DEBUG mpc_net::multi] Awaiting 81
+[DEBUG mpc_net::multi] Awaited 81
+[DEBUG mpc_net::multi] Awaiting 82
+[DEBUG mpc_net::multi] Awaited 82
+[DEBUG mpc_net::multi] Awaiting 83
+[DEBUG mpc_net::multi] Awaited 83
+[DEBUG mpc_net::multi] Awaiting 84
+[DEBUG mpc_net::multi] Awaited 84
+[DEBUG mpc_net::multi] Awaiting 85
+[DEBUG mpc_net::multi] Awaited 85
+[DEBUG mpc_net::multi] Awaiting 86
+[DEBUG mpc_net::multi] Awaited 86
+[DEBUG mpc_net::multi] Awaiting 87
+[DEBUG mpc_net::multi] Awaited 87
+[DEBUG mpc_net::multi] Awaiting 88
+[DEBUG mpc_net::multi] Awaited 88
+[DEBUG mpc_net::multi] Awaiting 89
+[DEBUG mpc_net::multi] Awaited 89
+[DEBUG mpc_net::multi] Awaiting 90
+[DEBUG mpc_net::multi] Awaited 90
+[DEBUG mpc_net::multi] Awaiting 91
+[DEBUG mpc_net::multi] Awaited 91
+[DEBUG mpc_net::multi] Awaiting 92
+[DEBUG mpc_net::multi] Awaited 92
+[DEBUG mpc_net::multi] Awaiting 93
+[DEBUG mpc_net::multi] Awaited 93
+[DEBUG mpc_net::multi] Awaiting 94
+[DEBUG mpc_net::multi] Awaited 94
+[DEBUG mpc_net::multi] Awaiting 95
+[DEBUG mpc_net::multi] Awaited 95
+[DEBUG mpc_net::multi] Awaiting 96
+[DEBUG mpc_net::multi] Awaited 96
+[DEBUG mpc_net::multi] Awaiting 97
+[DEBUG mpc_net::multi] Awaited 97
+[DEBUG mpc_net::multi] Awaiting 98
+[DEBUG mpc_net::multi] Awaited 98
+[DEBUG mpc_net::multi] Awaiting 99
+[DEBUG mpc_net::multi] Awaited 99
+[DEBUG mpc_net::multi] Awaiting 100
+[DEBUG mpc_net::multi] Awaited 100
+[DEBUG mpc_net::multi] Awaiting 101
+[DEBUG mpc_net::multi] Awaited 101
+[DEBUG mpc_net::multi] Awaiting 102
+[DEBUG mpc_net::multi] Awaited 102
+[DEBUG mpc_net::multi] Awaiting 103
+[DEBUG mpc_net::multi] Awaited 103
+[DEBUG mpc_net::multi] Awaiting 104
+[DEBUG mpc_net::multi] Awaited 104
+[DEBUG mpc_net::multi] Awaiting 105
+[DEBUG mpc_net::multi] Awaited 105
+[DEBUG mpc_net::multi] Awaiting 106
+[DEBUG mpc_net::multi] Awaited 106
+[DEBUG mpc_net::multi] Awaiting 107
+[DEBUG mpc_net::multi] Awaited 107
+[DEBUG mpc_net::multi] Awaiting 108
+[DEBUG mpc_net::multi] Awaited 108
+[DEBUG mpc_net::multi] Awaiting 109
+[DEBUG mpc_net::multi] Awaited 109
+[DEBUG mpc_net::multi] Awaiting 110
+[DEBUG mpc_net::multi] Awaited 110
+[DEBUG mpc_net::multi] Awaiting 111
+[DEBUG mpc_net::multi] Awaited 111
+[DEBUG mpc_net::multi] Awaiting 112
+[DEBUG mpc_net::multi] Awaited 112
+[DEBUG mpc_net::multi] Contacting 114
+[DEBUG mpc_net::multi] Contacted 114
+[DEBUG mpc_net::multi] Contacting 115
+[DEBUG mpc_net::multi] Contacted 115
+[DEBUG mpc_net::multi] Contacting 116
+[DEBUG mpc_net::multi] Contacted 116
+[DEBUG mpc_net::multi] Contacting 117
+[DEBUG mpc_net::multi] Contacted 117
+[DEBUG mpc_net::multi] Contacting 118
+[DEBUG mpc_net::multi] Contacted 118
+[DEBUG mpc_net::multi] Contacting 119
+[DEBUG mpc_net::multi] Contacted 119
+[DEBUG mpc_net::multi] Contacting 120
+[DEBUG mpc_net::multi] Contacted 120
+[DEBUG mpc_net::multi] Contacting 121
+[DEBUG mpc_net::multi] Contacted 121
+[DEBUG mpc_net::multi] Contacting 122
+[DEBUG mpc_net::multi] Contacted 122
+[DEBUG mpc_net::multi] Contacting 123
+[DEBUG mpc_net::multi] Contacted 123
+[DEBUG mpc_net::multi] Contacting 124
+[DEBUG mpc_net::multi] Contacted 124
+[DEBUG mpc_net::multi] Contacting 125
+[DEBUG mpc_net::multi] Contacted 125
+[DEBUG mpc_net::multi] Contacting 126
+[DEBUG mpc_net::multi] Contacted 126
+[DEBUG mpc_net::multi] Contacting 127
+[DEBUG mpc_net::multi] Contacted 127
+··Start:   To king 1
+··End:     To king 1 ...............................................................5.029µs
+End:     Connecting ................................................................1.417s
+Start:   Dummy CRS
+End:     Dummy CRS .................................................................372.978ms
+Start:   Prover
+Committing to a, b, c
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.693s
+··Start:   To king 48
+··End:     To king 48 ..............................................................34.247µs
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.684s
+··Start:   To king 48
+··End:     To king 48 ..............................................................25.283µs
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.677s
+··Start:   To king 48
+··End:     To king 48 ..............................................................24.875µs
+=======================
+Extending domain of a,b,c to 8n
+··Start:   FFT1
+··End:     FFT1 ....................................................................54.411ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................58.929ms
+··End:     ComToKing ...............................................................61.312ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................46.690s
+··Start:   FFT1
+··End:     FFT1 ....................................................................56.142ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................1.132s
+··End:     ComToKing ...............................................................1.135s
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................46.384s
+··Start:   FFT1
+··End:     FFT1 ....................................................................56.019ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................908.858ms
+··End:     ComToKing ...............................................................911.254ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................46.541s
+··Start:   FFT1
+··End:     FFT1 ....................................................................695.055ms
+mbyl: 1048576
+··Start:   ComToKing
+····Start:   To king 33554440
+····End:     To king 33554440 ......................................................1.454s
+··End:     ComToKing ...............................................................1.485s
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................99.453s
+··Start:   FFT1
+··End:     FFT1 ....................................................................736.543ms
+mbyl: 1048576
+··Start:   ComToKing
+····Start:   To king 33554440
+····End:     To king 33554440 ......................................................1.297s
+··End:     ComToKing ...............................................................1.328s
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................100.098s
+··Start:   FFT1
+··End:     FFT1 ....................................................................666.776ms
+mbyl: 1048576
+··Start:   ComToKing
+····Start:   To king 33554440
+····End:     To king 33554440 ......................................................1.257s
+··End:     ComToKing ...............................................................1.288s
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................99.329s
+=======================
+··Start:   Local DPP
+··End:     Local DPP ...............................................................40.686ms
+··Start:   DppRand
+··End:     DppRand .................................................................6.413ms
+··Start:   ComToKing
+····Start:   To king 8388616
+····End:     To king 8388616 .......................................................844.214ms
+··End:     ComToKing ...............................................................851.656ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................29.277s
+··Start:   DppRand
+··End:     DppRand .................................................................2.607ms
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................125.187ms
+··End:     ComToKing ...............................................................127.633ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................13.516s
+··Start:   FFT1
+··End:     FFT1 ....................................................................56.110ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................138.703ms
+··End:     ComToKing ...............................................................141.115ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................49.053s
+··Start:   FFT1
+··End:     FFT1 ....................................................................706.531ms
+mbyl: 1048576
+··Start:   ComToKing
+····Start:   To king 33554440
+····End:     To king 33554440 ......................................................503.655ms
+··End:     ComToKing ...............................................................534.715ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................99.821s
+··Start:   Compute t
+··End:     Compute t ...............................................................817.656ms
+··Start:   FFT1
+··End:     FFT1 ....................................................................739.529ms
+mbyl: 1048576
+··Start:   ComToKing
+····Start:   To king 33554440
+····End:     To king 33554440 ......................................................1.651s
+··End:     ComToKing ...............................................................1.682s
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................100.227s
+··Start:   FFT1
+··End:     FFT1 ....................................................................764.630ms
+mbyl: 1048576
+··Start:   ComToKing
+····Start:   To king 33554440
+····End:     To king 33554440 ......................................................1.488s
+··End:     ComToKing ...............................................................1.520s
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................99.575s
+··Start:   ComToKing
+····Start:   To king 33554440
+····End:     To king 33554440 ......................................................1.236s
+··End:     ComToKing ...............................................................1.267s
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................108.449s
+Committing to z, t
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.679s
+··Start:   To king 48
+··End:     To king 48 ..............................................................23.705µs
+bases: 1048576, scalars: 1048576
+··Start:   Base MSM
+··End:     Base MSM ................................................................11.713s
+··Start:   To king 48
+··End:     To king 48 ..............................................................25.238µs
+Opening a, b, c
+··Start:   FFT1
+··End:     FFT1 ....................................................................56.183ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................252.340ms
+··End:     ComToKing ...............................................................254.730ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................10.995s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................11.804µs
+··End:     ComToKing ...............................................................34.474µs
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................30.389ms
+··Start:   FFT1
+··End:     FFT1 ....................................................................54.381ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................63.496ms
+··End:     ComToKing ...............................................................65.946ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................12.105s
+··Start:   Division
+··End:     Division ................................................................2.792ms
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.682s
+··Start:   To king 48
+··End:     To king 48 ..............................................................25.139µs
+··Start:   FFT1
+··End:     FFT1 ....................................................................56.165ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................34.482ms
+··End:     ComToKing ...............................................................36.884ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................11.232s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................10.422µs
+··End:     ComToKing ...............................................................19.708µs
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................20.406ms
+··Start:   FFT1
+··End:     FFT1 ....................................................................54.602ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................260.995ms
+··End:     ComToKing ...............................................................263.463ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................11.967s
+··Start:   Division
+··End:     Division ................................................................2.751ms
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.683s
+··Start:   To king 48
+··End:     To king 48 ..............................................................26.258µs
+··Start:   FFT1
+··End:     FFT1 ....................................................................56.428ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................61.324ms
+··End:     ComToKing ...............................................................63.730ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................11.189s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................11.488µs
+··End:     ComToKing ...............................................................21.333µs
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................64.844ms
+··Start:   FFT1
+··End:     FFT1 ....................................................................54.505ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................99.943ms
+··End:     ComToKing ...............................................................102.429ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................12.120s
+··Start:   Division
+··End:     Division ................................................................2.756ms
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.684s
+··Start:   To king 48
+··End:     To king 48 ..............................................................25.126µs
+Opening s1, s2, s3
+··Start:   FFT1
+··End:     FFT1 ....................................................................54.571ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................234.766ms
+··End:     ComToKing ...............................................................237.164ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................11.007s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................12.540µs
+··End:     ComToKing ...............................................................33.579µs
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................82.527ms
+··Start:   FFT1
+··End:     FFT1 ....................................................................55.139ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................265.645ms
+··End:     ComToKing ...............................................................268.138ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................11.923s
+··Start:   Division
+··End:     Division ................................................................3.020ms
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.689s
+··Start:   To king 48
+··End:     To king 48 ..............................................................24.960µs
+··Start:   FFT1
+··End:     FFT1 ....................................................................54.318ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................113.213ms
+··End:     ComToKing ...............................................................115.620ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................11.141s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................10.777µs
+··End:     ComToKing ...............................................................19.524µs
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................20.730ms
+··Start:   FFT1
+··End:     FFT1 ....................................................................55.108ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................250.818ms
+··End:     ComToKing ...............................................................253.316ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................11.933s
+··Start:   Division
+··End:     Division ................................................................3.020ms
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.683s
+··Start:   To king 48
+··End:     To king 48 ..............................................................25.801µs
+··Start:   FFT1
+··End:     FFT1 ....................................................................54.483ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................232.804ms
+··End:     ComToKing ...............................................................235.186ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................11.050s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................11.457µs
+··End:     ComToKing ...............................................................20.116µs
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................26.386ms
+··Start:   FFT1
+··End:     FFT1 ....................................................................55.144ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................176.120ms
+··End:     ComToKing ...............................................................178.589ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................12.045s
+··Start:   Division
+··End:     Division ................................................................3.048ms
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.682s
+··Start:   To king 48
+··End:     To king 48 ..............................................................24.075µs
+Computing r
+··Start:   Compute r
+··End:     Compute r ...............................................................15.649ms
+Committing to r
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.679s
+··Start:   To king 48
+··End:     To king 48 ..............................................................24.765µs
+··Start:   FFT1
+··End:     FFT1 ....................................................................54.666ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................18.814ms
+··End:     ComToKing ...............................................................21.201ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................12.215s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................11.183µs
+··End:     ComToKing ...............................................................31.178µs
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................32.716ms
+··Start:   FFT1
+··End:     FFT1 ....................................................................54.971ms
+mbyl: 131072
+··Start:   ComToKing
+····Start:   To king 4194312
+····End:     To king 4194312 .......................................................258.176ms
+··End:     ComToKing ...............................................................260.665ms
+··Start:   ComFromKing
+··End:     ComFromKing .............................................................11.989s
+··Start:   Division
+··End:     Division ................................................................2.787ms
+bases: 131072, scalars: 131072
+··Start:   Base MSM
+··End:     Base MSM ................................................................1.683s
+··Start:   To king 48
+··End:     To king 48 ..............................................................24.785µs
+End:     Prover ....................................................................1164.981s
+[DEBUG plonk_bench] Done

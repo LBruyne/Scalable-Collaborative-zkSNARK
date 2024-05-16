@@ -1,0 +1,541 @@
+Cargo is installed. Skipping the script.
+[source.crates-io]
+replace-with = 'ustc'
+
+[source.ustc]
+registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+unzip is installed. Skipping the script.
+Archive:  /tmp/gkr.zip
+  inflating: /tmp/distributed-GKR/Cargo.toml  
+  inflating: /tmp/distributed-GKR/hack/run_clients.py  
+  inflating: /tmp/distributed-GKR/hack/bench_sumcheck.sh  
+  inflating: /tmp/distributed-GKR/hack/bench_poly_comm.sh  
+  inflating: /tmp/distributed-GKR/config/config.json  
+  inflating: /tmp/distributed-GKR/mpc-net/Cargo.toml  
+  inflating: /tmp/distributed-GKR/mpc-net/src/multi.rs  
+  inflating: /tmp/distributed-GKR/mpc-net/src/lib.rs  
+  inflating: /tmp/distributed-GKR/justfile  
+  inflating: /tmp/distributed-GKR/gkr/Cargo.toml  
+  inflating: /tmp/distributed-GKR/gkr/examples/gkr.rs  
+  inflating: /tmp/distributed-GKR/gkr/src/gkr.rs  
+ extracting: /tmp/distributed-GKR/gkr/src/lib.rs  
+  inflating: /tmp/distributed-GKR/Cargo.lock  
+  inflating: /tmp/distributed-GKR/README.md  
+  inflating: /tmp/distributed-GKR/dist-primitive/Cargo.toml  
+  inflating: /tmp/distributed-GKR/dist-primitive/examples/poly_comm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/examples/msm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/examples/sumcheck.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/examples/delegator.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/dmsm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/mle.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/unpack.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/dperm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/dpoly_comm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/dsumcheck.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/utils/mod.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/utils/serializing_net.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/utils/operator.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/utils/timer.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/degree_reduce.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/lib.rs  
+  inflating: /tmp/distributed-GKR/network-address/16  
+  inflating: /tmp/distributed-GKR/network-address/4  
+  inflating: /tmp/distributed-GKR/network-address/8  
+  inflating: /tmp/distributed-GKR/network-address/128  
+  inflating: /tmp/distributed-GKR/network-address/32  
+  inflating: /tmp/distributed-GKR/secret-sharing/Cargo.toml  
+  inflating: /tmp/distributed-GKR/secret-sharing/src/pss.rs  
+ extracting: /tmp/distributed-GKR/secret-sharing/src/lib.rs  
+  inflating: /tmp/distributed-GKR/client/Cargo.toml  
+  inflating: /tmp/distributed-GKR/client/src/main.rs  
+  inflating: /tmp/distributed-GKR/client/config.json.example  
+    Finished release [optimized + debuginfo] target(s) in 0.07s
+Start:   Begin dGKR (thread ThreadId(1))
+··Start:   dCommit (thread ThreadId(1))
+··End:     dCommit (thread ThreadId(1)) ............................................49.123s
+··Start:   dGKR rounds (thread ThreadId(1))
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.599s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.836s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.618s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.172ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.832s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.591s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.599s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................525.815ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.829s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.581s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.828s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.569s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................523.326ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.823s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.572s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.577s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.138ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.574s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.828s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.585s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.391ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.557s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.600s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.539ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.565s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.590s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................523.066ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.588s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.574s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.985ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.590s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.559s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................525.079ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.827s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.574s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.590s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.831ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.574s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.577s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................522.941ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.822s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.605s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.574s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.836ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.608s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.827s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.590s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.707ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.605s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.579s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.803ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.571s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.823s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.583s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................523.092ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.823s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.580s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.576s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.386ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.827s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.563s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.593s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................523.915ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.827s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.575s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.563s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................523.318ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.600s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.821s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.575s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................522.661ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.580s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.593s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.805ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.558s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.593s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.427ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.594s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.591s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................523.567ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.577s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.821s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.555s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.179ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.828s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.597s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.601s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.984ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.575s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.589s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.475ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.583s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.823s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.584s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................522.743ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.823s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.566s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.579s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.746ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.580s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.562s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.367ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.582s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.604s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.410ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.587s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.822s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.592s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................522.351ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.821s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.606s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.823s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.601s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.281ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.827s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.582s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.824s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.582s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.661ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.568s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.576s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.433ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.829s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.600s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.579s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................524.538ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.584s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.828s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.600s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.325ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.604s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.831s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.580s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.773ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.831s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.580s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.597s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.099ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.610s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.588s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................525.024ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.591s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.828s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.590s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................527.095ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.591s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.829s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.580s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.513ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.832s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.585s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.567s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................525.864ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.829s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.576s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.825s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.579s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................525.254ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.828s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.607s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.831s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.589s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.663ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.571s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.569s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.966ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.832s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.590s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.573s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.661ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.583s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.826s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.588s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................525.926ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.829s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.585s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.830s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.581s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................527.088ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.831s
+····Start:   dInitialize phase one (thread ThreadId(1))
+····End:     dInitialize phase one (thread ThreadId(1)) ............................3.596s
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.831s
+····Start:   dInitialize phase two (thread ThreadId(1))
+····End:     dInitialize phase two (thread ThreadId(1)) ............................3.602s
+····Start:   Calculate f3*f2(u) (thread ThreadId(1))
+····End:     Calculate f3*f2(u) (thread ThreadId(1)) ...............................526.963ms
+····Start:   dSumcheck product (thread ThreadId(1))
+····End:     dSumcheck product (thread ThreadId(1)) ................................1.833s
+··End:     dGKR rounds (thread ThreadId(1)) ........................................545.199s
+··Start:   dOpen (thread ThreadId(1))
+··End:     dOpen (thread ThreadId(1)) ..............................................52.248s
+End:     Begin dGKR (thread ThreadId(1)) ...........................................646.571s
+Comm: (25367728254, 25367728254)

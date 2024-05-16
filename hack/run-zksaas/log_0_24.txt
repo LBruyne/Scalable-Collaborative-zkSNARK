@@ -1,0 +1,1150 @@
+Cargo is installed. Skipping the script.
+[source.crates-io]
+replace-with = 'ustc'
+
+[source.ustc]
+registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+unzip is installed. Skipping the script.
+Archive:  /tmp/zksaas.zip
+  inflating: /tmp/zksaas/Cargo.toml  
+  inflating: /tmp/zksaas/plonk/Cargo.toml  
+  inflating: /tmp/zksaas/plonk/examples/dpoly_commit_test.rs  
+  inflating: /tmp/zksaas/plonk/examples/plonk_bench.rs  
+  inflating: /tmp/zksaas/plonk/examples/local_plonk_test.rs  
+  inflating: /tmp/zksaas/plonk/src/localplonk.rs  
+  inflating: /tmp/zksaas/plonk/src/dplonk.rs  
+  inflating: /tmp/zksaas/plonk/src/poly_commit.rs  
+  inflating: /tmp/zksaas/plonk/src/dpoly_commit.rs  
+  inflating: /tmp/zksaas/plonk/src/lib.rs  
+  inflating: /tmp/zksaas/plonk/README.md  
+  inflating: /tmp/zksaas/LICENSE     
+ extracting: /tmp/zksaas/.gitignore  
+  inflating: /tmp/zksaas/mpc-net/test.zsh  
+  inflating: /tmp/zksaas/mpc-net/Cargo.toml  
+  inflating: /tmp/zksaas/mpc-net/src/multi.rs  
+  inflating: /tmp/zksaas/mpc-net/src/two.rs  
+  inflating: /tmp/zksaas/mpc-net/src/lib.rs  
+  inflating: /tmp/zksaas/mpc-net/data/4  
+  inflating: /tmp/zksaas/mpc-net/README.md  
+  inflating: /tmp/zksaas/scripts/ext_wit_test.zsh  
+  inflating: /tmp/zksaas/scripts/dmsm_test.zsh  
+  inflating: /tmp/zksaas/scripts/dpp_test.zsh  
+  inflating: /tmp/zksaas/scripts/local_plonk_bench.sh  
+  inflating: /tmp/zksaas/scripts/dpoly_commit_test.zsh  
+  inflating: /tmp/zksaas/scripts/plonk_bench.zsh  
+  inflating: /tmp/zksaas/scripts/groth_bench.zsh  
+  inflating: /tmp/zksaas/scripts/dfft_test.zsh  
+  inflating: /tmp/zksaas/scripts/output.txt  
+  inflating: /tmp/zksaas/scripts/dmsm_bench.zsh  
+  inflating: /tmp/zksaas/dist-primitives/Cargo.toml  
+  inflating: /tmp/zksaas/dist-primitives/examples/dfft_test.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/local_dfft_test.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/dpp_test.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/dmsm_bench.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/dmsm_test.rs  
+  inflating: /tmp/zksaas/dist-primitives/examples/msm_bench.rs  
+ extracting: /tmp/zksaas/dist-primitives/src/dfft/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/dfft/dfft.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/utils/deg_red.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/utils/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/utils/pack.rs  
+ extracting: /tmp/zksaas/dist-primitives/src/channel/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/channel/channel.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/dmsm/dmsm.rs  
+ extracting: /tmp/zksaas/dist-primitives/src/dmsm/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/lib.rs  
+ extracting: /tmp/zksaas/dist-primitives/src/dpp/mod.rs  
+  inflating: /tmp/zksaas/dist-primitives/src/dpp/dpp.rs  
+  inflating: /tmp/zksaas/.git/description  
+ extracting: /tmp/zksaas/.git/objects/56/84896ca3763c30a40eb4aef48197d3e90d9c91  
+ extracting: /tmp/zksaas/.git/objects/50/5f8a1fe9dec459640cd943708b746f3925a68f  
+ extracting: /tmp/zksaas/.git/objects/60/37d6dd49c9592637e1c8a6be544af6f5f9957f  
+ extracting: /tmp/zksaas/.git/objects/9e/91acdf0e2c00ea82b22ad8f00eb00fa7fd8b8a  
+ extracting: /tmp/zksaas/.git/objects/1f/8ab9a7b22bb10bdd0583894d9bf2bc51435bf5  
+ extracting: /tmp/zksaas/.git/objects/7f/f696d83f2f92195e9c288e1e5c2c9a059db8f0  
+ extracting: /tmp/zksaas/.git/objects/18/b783a9f21d36a96164bde4df773dfa43fca885  
+ extracting: /tmp/zksaas/.git/objects/f7/24770dace5dcb541196f54dc421604af7fc109  
+ extracting: /tmp/zksaas/.git/objects/03/98d3ccb244d9b8d5bff368696fd106096c4eb4  
+ extracting: /tmp/zksaas/.git/objects/36/842720f20d6a013b80269868d3569564d14f16  
+ extracting: /tmp/zksaas/.git/objects/4e/cd7f1e1849b520ac2f0a3b9e62a5be17cae0ae  
+ extracting: /tmp/zksaas/.git/objects/80/9c0d45b6324a5f2db0f9a59d9e4a6060655aa1  
+ extracting: /tmp/zksaas/.git/objects/82/574b512c3722a2d8394094d59f619f8a032b5f  
+ extracting: /tmp/zksaas/.git/objects/f2/7885ec9adf82b003d1ee83afb63edc8f1ad932  
+ extracting: /tmp/zksaas/.git/objects/8b/1f1eed8609ea4ec632e939ed5cad5ae2678fbe  
+ extracting: /tmp/zksaas/.git/objects/45/f7276e05fcb0850dc67288ba762029d72cbbd7  
+ extracting: /tmp/zksaas/.git/objects/eb/39df6740146898cba4b5c0c2be9883504a8dff  
+ extracting: /tmp/zksaas/.git/objects/5b/667d05c3f639505671221f6c3ca1a8fa7b0b49  
+ extracting: /tmp/zksaas/.git/objects/fd/f23065a02f5f1aa8932f1bad4415efdcf02970  
+  inflating: /tmp/zksaas/.git/objects/pack/pack-258f890dc1c1dbbbd0a3688250c9d39845084fcd.idx  
+  inflating: /tmp/zksaas/.git/objects/pack/pack-258f890dc1c1dbbbd0a3688250c9d39845084fcd.pack  
+ extracting: /tmp/zksaas/.git/refs/remotes/origin/HEAD  
+ extracting: /tmp/zksaas/.git/refs/heads/main  
+ extracting: /tmp/zksaas/.git/HEAD   
+  inflating: /tmp/zksaas/.git/logs/refs/remotes/origin/HEAD  
+  inflating: /tmp/zksaas/.git/logs/refs/heads/main  
+  inflating: /tmp/zksaas/.git/logs/HEAD  
+  inflating: /tmp/zksaas/.git/config  
+  inflating: /tmp/zksaas/.git/packed-refs  
+  inflating: /tmp/zksaas/.git/hooks/fsmonitor-watchman.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-commit.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-merge-commit.sample  
+  inflating: /tmp/zksaas/.git/hooks/update.sample  
+  inflating: /tmp/zksaas/.git/hooks/push-to-checkout.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-rebase.sample  
+  inflating: /tmp/zksaas/.git/hooks/commit-msg.sample  
+  inflating: /tmp/zksaas/.git/hooks/applypatch-msg.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-applypatch.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-receive.sample  
+  inflating: /tmp/zksaas/.git/hooks/prepare-commit-msg.sample  
+  inflating: /tmp/zksaas/.git/hooks/pre-push.sample  
+  inflating: /tmp/zksaas/.git/hooks/post-update.sample  
+ extracting: /tmp/zksaas/.git/COMMIT_EDITMSG  
+  inflating: /tmp/zksaas/.git/FETCH_HEAD  
+  inflating: /tmp/zksaas/.git/info/exclude  
+  inflating: /tmp/zksaas/.git/index  
+  inflating: /tmp/zksaas/Cargo.lock  
+  inflating: /tmp/zksaas/README.md   
+  inflating: /tmp/zksaas/groth16/Cargo.toml  
+  inflating: /tmp/zksaas/groth16/examples/groth_bench.rs  
+  inflating: /tmp/zksaas/groth16/examples/ext_wit_bench.rs  
+  inflating: /tmp/zksaas/groth16/examples/local_groth_bench.rs  
+  inflating: /tmp/zksaas/groth16/src/lib.rs  
+  inflating: /tmp/zksaas/groth16/src/ext_wit.rs  
+  inflating: /tmp/zksaas/groth16/README.md  
+  inflating: /tmp/zksaas/network-address/16  
+  inflating: /tmp/zksaas/network-address/4  
+  inflating: /tmp/zksaas/network-address/8  
+  inflating: /tmp/zksaas/network-address/128  
+  inflating: /tmp/zksaas/network-address/32  
+  inflating: /tmp/zksaas/secret-sharing/Cargo.toml  
+  inflating: /tmp/zksaas/secret-sharing/src/pss.rs  
+ extracting: /tmp/zksaas/secret-sharing/src/lib.rs  
+warning: virtual workspace defaulting to `resolver = "1"` despite one or more workspace members being on edition 2021 which implies `resolver = "2"`
+note: to keep the current resolver, specify `workspace.resolver = "1"` in the workspace root's manifest
+note: to use the edition 2021 resolver, specify `workspace.resolver = "2"` in the workspace root's manifest
+note: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+    Finished release [optimized] target(s) in 0.03s
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -q, --queue <value>    integer value to be sent with the signal
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+Start:   Connecting
+[DEBUG mpc_net::multi] Contacting 1
+[DEBUG mpc_net::multi] Contacted 1
+[DEBUG mpc_net::multi] Contacting 2
+[DEBUG mpc_net::multi] Contacted 2
+[DEBUG mpc_net::multi] Contacting 3
+[DEBUG mpc_net::multi] Contacted 3
+[DEBUG mpc_net::multi] Contacting 4
+[DEBUG mpc_net::multi] Contacted 4
+[DEBUG mpc_net::multi] Contacting 5
+[DEBUG mpc_net::multi] Contacted 5
+[DEBUG mpc_net::multi] Contacting 6
+[DEBUG mpc_net::multi] Contacted 6
+[DEBUG mpc_net::multi] Contacting 7
+[DEBUG mpc_net::multi] Contacted 7
+[DEBUG mpc_net::multi] Contacting 8
+[DEBUG mpc_net::multi] Contacted 8
+[DEBUG mpc_net::multi] Contacting 9
+[DEBUG mpc_net::multi] Contacted 9
+[DEBUG mpc_net::multi] Contacting 10
+[DEBUG mpc_net::multi] Contacted 10
+[DEBUG mpc_net::multi] Contacting 11
+[DEBUG mpc_net::multi] Contacted 11
+[DEBUG mpc_net::multi] Contacting 12
+[DEBUG mpc_net::multi] Contacted 12
+[DEBUG mpc_net::multi] Contacting 13
+[DEBUG mpc_net::multi] Contacted 13
+[DEBUG mpc_net::multi] Contacting 14
+[DEBUG mpc_net::multi] Contacted 14
+[DEBUG mpc_net::multi] Contacting 15
+[DEBUG mpc_net::multi] Contacted 15
+[DEBUG mpc_net::multi] Contacting 16
+[DEBUG mpc_net::multi] Contacted 16
+[DEBUG mpc_net::multi] Contacting 17
+[DEBUG mpc_net::multi] Contacted 17
+[DEBUG mpc_net::multi] Contacting 18
+[DEBUG mpc_net::multi] Contacted 18
+[DEBUG mpc_net::multi] Contacting 19
+[DEBUG mpc_net::multi] Contacted 19
+[DEBUG mpc_net::multi] Contacting 20
+[DEBUG mpc_net::multi] Contacted 20
+[DEBUG mpc_net::multi] Contacting 21
+[DEBUG mpc_net::multi] Contacted 21
+[DEBUG mpc_net::multi] Contacting 22
+[DEBUG mpc_net::multi] Contacted 22
+[DEBUG mpc_net::multi] Contacting 23
+[DEBUG mpc_net::multi] Contacted 23
+[DEBUG mpc_net::multi] Contacting 24
+[DEBUG mpc_net::multi] Contacted 24
+[DEBUG mpc_net::multi] Contacting 25
+[DEBUG mpc_net::multi] Contacted 25
+[DEBUG mpc_net::multi] Contacting 26
+[DEBUG mpc_net::multi] Contacted 26
+[DEBUG mpc_net::multi] Contacting 27
+[DEBUG mpc_net::multi] Contacted 27
+[DEBUG mpc_net::multi] Contacting 28
+[DEBUG mpc_net::multi] Contacted 28
+[DEBUG mpc_net::multi] Contacting 29
+[DEBUG mpc_net::multi] Contacted 29
+[DEBUG mpc_net::multi] Contacting 30
+[DEBUG mpc_net::multi] Contacted 30
+[DEBUG mpc_net::multi] Contacting 31
+[DEBUG mpc_net::multi] Contacted 31
+[DEBUG mpc_net::multi] Contacting 32
+[DEBUG mpc_net::multi] Contacted 32
+[DEBUG mpc_net::multi] Contacting 33
+[DEBUG mpc_net::multi] Contacted 33
+[DEBUG mpc_net::multi] Contacting 34
+[DEBUG mpc_net::multi] Contacted 34
+[DEBUG mpc_net::multi] Contacting 35
+[DEBUG mpc_net::multi] Contacted 35
+[DEBUG mpc_net::multi] Contacting 36
+[DEBUG mpc_net::multi] Contacted 36
+[DEBUG mpc_net::multi] Contacting 37
+[DEBUG mpc_net::multi] Contacted 37
+[DEBUG mpc_net::multi] Contacting 38
+[DEBUG mpc_net::multi] Contacted 38
+[DEBUG mpc_net::multi] Contacting 39
+[DEBUG mpc_net::multi] Contacted 39
+[DEBUG mpc_net::multi] Contacting 40
+[DEBUG mpc_net::multi] Contacted 40
+[DEBUG mpc_net::multi] Contacting 41
+[DEBUG mpc_net::multi] Contacted 41
+[DEBUG mpc_net::multi] Contacting 42
+[DEBUG mpc_net::multi] Contacted 42
+[DEBUG mpc_net::multi] Contacting 43
+[DEBUG mpc_net::multi] Contacted 43
+[DEBUG mpc_net::multi] Contacting 44
+[DEBUG mpc_net::multi] Contacted 44
+[DEBUG mpc_net::multi] Contacting 45
+[DEBUG mpc_net::multi] Contacted 45
+[DEBUG mpc_net::multi] Contacting 46
+[DEBUG mpc_net::multi] Contacted 46
+[DEBUG mpc_net::multi] Contacting 47
+[DEBUG mpc_net::multi] Contacted 47
+[DEBUG mpc_net::multi] Contacting 48
+[DEBUG mpc_net::multi] Contacted 48
+[DEBUG mpc_net::multi] Contacting 49
+[DEBUG mpc_net::multi] Contacted 49
+[DEBUG mpc_net::multi] Contacting 50
+[DEBUG mpc_net::multi] Contacted 50
+[DEBUG mpc_net::multi] Contacting 51
+[DEBUG mpc_net::multi] Contacted 51
+[DEBUG mpc_net::multi] Contacting 52
+[DEBUG mpc_net::multi] Contacted 52
+[DEBUG mpc_net::multi] Contacting 53
+[DEBUG mpc_net::multi] Contacted 53
+[DEBUG mpc_net::multi] Contacting 54
+[DEBUG mpc_net::multi] Contacted 54
+[DEBUG mpc_net::multi] Contacting 55
+[DEBUG mpc_net::multi] Contacted 55
+[DEBUG mpc_net::multi] Contacting 56
+[DEBUG mpc_net::multi] Contacted 56
+[DEBUG mpc_net::multi] Contacting 57
+[DEBUG mpc_net::multi] Contacted 57
+[DEBUG mpc_net::multi] Contacting 58
+[DEBUG mpc_net::multi] Contacted 58
+[DEBUG mpc_net::multi] Contacting 59
+[DEBUG mpc_net::multi] Contacted 59
+[DEBUG mpc_net::multi] Contacting 60
+[DEBUG mpc_net::multi] Contacted 60
+[DEBUG mpc_net::multi] Contacting 61
+[DEBUG mpc_net::multi] Contacted 61
+[DEBUG mpc_net::multi] Contacting 62
+[DEBUG mpc_net::multi] Contacted 62
+[DEBUG mpc_net::multi] Contacting 63
+[DEBUG mpc_net::multi] Contacted 63
+[DEBUG mpc_net::multi] Contacting 64
+[DEBUG mpc_net::multi] Contacted 64
+[DEBUG mpc_net::multi] Contacting 65
+[DEBUG mpc_net::multi] Contacted 65
+[DEBUG mpc_net::multi] Contacting 66
+[DEBUG mpc_net::multi] Contacted 66
+[DEBUG mpc_net::multi] Contacting 67
+[DEBUG mpc_net::multi] Contacted 67
+[DEBUG mpc_net::multi] Contacting 68
+[DEBUG mpc_net::multi] Contacted 68
+[DEBUG mpc_net::multi] Contacting 69
+[DEBUG mpc_net::multi] Contacted 69
+[DEBUG mpc_net::multi] Contacting 70
+[DEBUG mpc_net::multi] Contacted 70
+[DEBUG mpc_net::multi] Contacting 71
+[DEBUG mpc_net::multi] Contacted 71
+[DEBUG mpc_net::multi] Contacting 72
+[DEBUG mpc_net::multi] Contacted 72
+[DEBUG mpc_net::multi] Contacting 73
+[DEBUG mpc_net::multi] Contacted 73
+[DEBUG mpc_net::multi] Contacting 74
+[DEBUG mpc_net::multi] Contacted 74
+[DEBUG mpc_net::multi] Contacting 75
+[DEBUG mpc_net::multi] Contacted 75
+[DEBUG mpc_net::multi] Contacting 76
+[DEBUG mpc_net::multi] Contacted 76
+[DEBUG mpc_net::multi] Contacting 77
+[DEBUG mpc_net::multi] Contacted 77
+[DEBUG mpc_net::multi] Contacting 78
+[DEBUG mpc_net::multi] Contacted 78
+[DEBUG mpc_net::multi] Contacting 79
+[DEBUG mpc_net::multi] Contacted 79
+[DEBUG mpc_net::multi] Contacting 80
+[DEBUG mpc_net::multi] Contacted 80
+[DEBUG mpc_net::multi] Contacting 81
+[DEBUG mpc_net::multi] Contacted 81
+[DEBUG mpc_net::multi] Contacting 82
+[DEBUG mpc_net::multi] Contacted 82
+[DEBUG mpc_net::multi] Contacting 83
+[DEBUG mpc_net::multi] Contacted 83
+[DEBUG mpc_net::multi] Contacting 84
+[DEBUG mpc_net::multi] Contacted 84
+[DEBUG mpc_net::multi] Contacting 85
+[DEBUG mpc_net::multi] Contacted 85
+[DEBUG mpc_net::multi] Contacting 86
+[DEBUG mpc_net::multi] Contacted 86
+[DEBUG mpc_net::multi] Contacting 87
+[DEBUG mpc_net::multi] Contacted 87
+[DEBUG mpc_net::multi] Contacting 88
+[DEBUG mpc_net::multi] Contacted 88
+[DEBUG mpc_net::multi] Contacting 89
+[DEBUG mpc_net::multi] Contacted 89
+[DEBUG mpc_net::multi] Contacting 90
+[DEBUG mpc_net::multi] Contacted 90
+[DEBUG mpc_net::multi] Contacting 91
+[DEBUG mpc_net::multi] Contacted 91
+[DEBUG mpc_net::multi] Contacting 92
+[DEBUG mpc_net::multi] Contacted 92
+[DEBUG mpc_net::multi] Contacting 93
+[DEBUG mpc_net::multi] Contacted 93
+[DEBUG mpc_net::multi] Contacting 94
+[DEBUG mpc_net::multi] Contacted 94
+[DEBUG mpc_net::multi] Contacting 95
+[DEBUG mpc_net::multi] Contacted 95
+[DEBUG mpc_net::multi] Contacting 96
+[DEBUG mpc_net::multi] Contacted 96
+[DEBUG mpc_net::multi] Contacting 97
+[DEBUG mpc_net::multi] Contacted 97
+[DEBUG mpc_net::multi] Contacting 98
+[DEBUG mpc_net::multi] Contacted 98
+[DEBUG mpc_net::multi] Contacting 99
+[DEBUG mpc_net::multi] Contacted 99
+[DEBUG mpc_net::multi] Contacting 100
+[DEBUG mpc_net::multi] Contacted 100
+[DEBUG mpc_net::multi] Contacting 101
+[DEBUG mpc_net::multi] Contacted 101
+[DEBUG mpc_net::multi] Contacting 102
+[DEBUG mpc_net::multi] Contacted 102
+[DEBUG mpc_net::multi] Contacting 103
+[DEBUG mpc_net::multi] Contacted 103
+[DEBUG mpc_net::multi] Contacting 104
+[DEBUG mpc_net::multi] Contacted 104
+[DEBUG mpc_net::multi] Contacting 105
+[DEBUG mpc_net::multi] Contacted 105
+[DEBUG mpc_net::multi] Contacting 106
+[DEBUG mpc_net::multi] Contacted 106
+[DEBUG mpc_net::multi] Contacting 107
+[DEBUG mpc_net::multi] Contacted 107
+[DEBUG mpc_net::multi] Contacting 108
+[DEBUG mpc_net::multi] Contacted 108
+[DEBUG mpc_net::multi] Contacting 109
+[DEBUG mpc_net::multi] Contacted 109
+[DEBUG mpc_net::multi] Contacting 110
+[DEBUG mpc_net::multi] Contacted 110
+[DEBUG mpc_net::multi] Contacting 111
+[DEBUG mpc_net::multi] Contacted 111
+[DEBUG mpc_net::multi] Contacting 112
+[DEBUG mpc_net::multi] Contacted 112
+[DEBUG mpc_net::multi] Contacting 113
+[DEBUG mpc_net::multi] Contacted 113
+[DEBUG mpc_net::multi] Contacting 114
+[DEBUG mpc_net::multi] Contacted 114
+[DEBUG mpc_net::multi] Contacting 115
+[DEBUG mpc_net::multi] Contacted 115
+[DEBUG mpc_net::multi] Contacting 116
+[DEBUG mpc_net::multi] Contacted 116
+[DEBUG mpc_net::multi] Contacting 117
+[DEBUG mpc_net::multi] Contacted 117
+[DEBUG mpc_net::multi] Contacting 118
+[DEBUG mpc_net::multi] Contacted 118
+[DEBUG mpc_net::multi] Contacting 119
+[DEBUG mpc_net::multi] Contacted 119
+[DEBUG mpc_net::multi] Contacting 120
+[DEBUG mpc_net::multi] Contacted 120
+[DEBUG mpc_net::multi] Contacting 121
+[DEBUG mpc_net::multi] Contacted 121
+[DEBUG mpc_net::multi] Contacting 122
+[DEBUG mpc_net::multi] Contacted 122
+[DEBUG mpc_net::multi] Contacting 123
+[DEBUG mpc_net::multi] Contacted 123
+[DEBUG mpc_net::multi] Contacting 124
+[DEBUG mpc_net::multi] Contacted 124
+[DEBUG mpc_net::multi] Contacting 125
+[DEBUG mpc_net::multi] Contacted 125
+[DEBUG mpc_net::multi] Contacting 126
+[DEBUG mpc_net::multi] Contacted 126
+[DEBUG mpc_net::multi] Contacting 127
+[DEBUG mpc_net::multi] Contacted 127
+··Start:   To king 1
+··End:     To king 1 ...............................................................1.200s
+··Start:   From king 1
+··End:     From king 1 .............................................................111.758µs
+End:     Connecting ................................................................1.398s
+mbyl: 524288
+Generating CRS===============================
+Start:   Dummy CRS
+End:     Dummy CRS .................................................................1.486s
+Round 1===============================
+Start:   Prover
+Committing to a, b, c
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.895s
+··Start:   To king 48
+··End:     To king 48 ..............................................................24.714s
+··Start:   From king 48
+··End:     From king 48 ............................................................130.494µs
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.922s
+··Start:   To king 48
+··End:     To king 48 ..............................................................168.192ms
+··Start:   From king 48
+··End:     From king 48 ............................................................233.943µs
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.915s
+··Start:   To king 48
+··End:     To king 48 ..............................................................166.368ms
+··Start:   From king 48
+··End:     From king 48 ............................................................225.569µs
+=======================
+Extending domain of a,b,c to 8n
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................265.125ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................792.790ms
+··End:     ComToKing ...............................................................4.334s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................16.020s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.228s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................129.829s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.178s
+··End:     ComFromKing .............................................................22.306s
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................256.848ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................568.657ms
+··End:     ComToKing ...............................................................4.280s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................16.250s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.222s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................130.147s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.197s
+··End:     ComFromKing .............................................................21.243s
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................259.587ms
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+mbyl: 524288
+··Start:   ComToKing
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................659.490ms
+··End:     ComToKing ...............................................................4.412s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................16.091s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.222s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................130.068s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.182s
+··End:     ComFromKing .............................................................22.802s
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................3.759s
+mbyl: 4194304
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 134217736
+····End:     To king 134217736 .....................................................5.288s
+··End:     ComToKing ...............................................................37.368s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................157.221s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................20.783s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................144.648s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.178s
+··End:     ComFromKing .............................................................23.171s
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................4.157s
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+mbyl: 4194304
+··Start:   ComToKing
+····Start:   To king 134217736
+····End:     To king 134217736 .....................................................5.293s
+··End:     ComToKing ...............................................................37.124s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................157.691s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................20.708s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................145.008s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.183s
+··End:     ComFromKing .............................................................21.408s
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................3.976s
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+mbyl: 4194304
+··Start:   ComToKing
+····Start:   To king 134217736
+····End:     To king 134217736 .....................................................5.306s
+··End:     ComToKing ...............................................................37.277s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................157.740s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................20.740s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................145.070s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.182s
+··End:     ComFromKing .............................................................23.266s
+=======================
+Round 2===============================
+··Start:   Local DPP
+··End:     Local DPP ...............................................................162.300ms
+··Start:   DppRand
+··End:     DppRand .................................................................32.559ms
+··Start:   ComToKing
+····Start:   To king 33554440
+····End:     To king 33554440 ......................................................1.247s
+··End:     ComToKing ...............................................................8.926s
+··Start:   DPP
+····Start:   Packing shares
+····End:     Packing shares ........................................................18.349s
+··End:     DPP .....................................................................110.104s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................617.986ms
+··End:     ComFromKing .............................................................2.070s
+··Start:   DppRand
+··End:     DppRand .................................................................10.342ms
+··Start:   ComToKing
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................679.584ms
+··End:     ComToKing ...............................................................4.537s
+··Start:   Unpack Pack shares
+··End:     Unpack Pack shares ......................................................46.201s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................618.905ms
+··End:     ComFromKing .............................................................2.423s
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................273.339ms
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+mbyl: 524288
+··Start:   ComToKing
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................749.575ms
+··End:     ComToKing ...............................................................4.515s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................19.580s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.491s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................129.983s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.178s
+··End:     ComFromKing .............................................................23.079s
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................4.004s
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+mbyl: 4194304
+··Start:   ComToKing
+····Start:   To king 134217736
+····End:     To king 134217736 .....................................................5.285s
+··End:     ComToKing ...............................................................37.019s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................157.700s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................20.752s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................145.370s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.184s
+··End:     ComFromKing .............................................................23.392s
+Round 3===============================
+··Start:   Compute t
+··End:     Compute t ...............................................................3.198s
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................4.204s
+mbyl: 4194304
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 134217736
+····End:     To king 134217736 .....................................................5.413s
+··End:     ComToKing ...............................................................36.678s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................158.503s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................20.752s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................146.409s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.177s
+··End:     ComFromKing .............................................................23.185s
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................3.976s
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+mbyl: 4194304
+··Start:   ComToKing
+····Start:   To king 134217736
+····End:     To king 134217736 .....................................................5.302s
+··End:     ComToKing ...............................................................37.059s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................157.683s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................20.758s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................145.336s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.185s
+··End:     ComFromKing .............................................................23.323s
+··Start:   ComToKing
+····Start:   To king 134217736
+····End:     To king 134217736 .....................................................5.313s
+··End:     ComToKing ...............................................................37.390s
+··Start:   Unpack Pack shares
+··End:     Unpack Pack shares ......................................................365.092s
+··Start:   ComFromKing
+····Start:   From king 134217736
+····End:     From king 134217736 ...................................................5.179s
+··End:     ComFromKing .............................................................23.386s
+Round 4===============================
+Committing to z, t
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.894s
+··Start:   To king 48
+··End:     To king 48 ..............................................................164.718µs
+··Start:   From king 48
+··End:     From king 48 ............................................................223.840µs
+bases: 4194304, scalars: 4194304
+··Start:   Base MSM
+··End:     Base MSM ................................................................41.860s
+··Start:   To king 48
+··End:     To king 48 ..............................................................4.898s
+··Start:   From king 48
+··End:     From king 48 ............................................................242.390µs
+Opening a, b, c
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................258.757ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................679.325ms
+··End:     ComToKing ...............................................................4.489s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................16.129s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.222s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.804s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................618.938ms
+··End:     ComFromKing .............................................................2.040s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................110.071µs
+··End:     ComToKing ...............................................................141.489µs
+··Start:   Unpack Pack shares
+··End:     Unpack Pack shares ......................................................102.389µs
+··Start:   ComFromKing
+····Start:   From king 40
+····End:     From king 40 ..........................................................195.493µs
+··End:     ComFromKing .............................................................224.290µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................258.529ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................692.334ms
+··End:     ComToKing ...............................................................4.536s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................19.446s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.480s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.787s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................617.336ms
+··End:     ComFromKing .............................................................2.028s
+··Start:   Division
+··End:     Division ................................................................10.999ms
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.891s
+··Start:   To king 48
+··End:     To king 48 ..............................................................102.719ms
+··Start:   From king 48
+··End:     From king 48 ............................................................207.717µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................254.268ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................708.915ms
+··End:     ComToKing ...............................................................4.509s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................16.096s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.221s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.809s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................614.090ms
+··End:     ComFromKing .............................................................2.027s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................76.230µs
+··End:     ComToKing ...............................................................123.128µs
+··Start:   Unpack Pack shares
+··End:     Unpack Pack shares ......................................................104.887µs
+··Start:   ComFromKing
+····Start:   From king 40
+····End:     From king 40 ..........................................................180.879µs
+··End:     ComFromKing .............................................................211.431µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................265.948ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................718.482ms
+··End:     ComToKing ...............................................................4.566s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................19.573s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.477s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................17.804s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................618.808ms
+··End:     ComFromKing .............................................................2.032s
+··Start:   Division
+··End:     Division ................................................................11.006ms
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.874s
+··Start:   To king 48
+··End:     To king 48 ..............................................................61.922ms
+··Start:   From king 48
+··End:     From king 48 ............................................................179.379µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................254.375ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................742.233ms
+··End:     ComToKing ...............................................................4.550s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................16.099s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.211s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.808s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................614.506ms
+··End:     ComFromKing .............................................................2.024s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................83.349µs
+··End:     ComToKing ...............................................................126.639µs
+··Start:   Unpack Pack shares
+··End:     Unpack Pack shares ......................................................105.084µs
+··Start:   ComFromKing
+····Start:   From king 40
+····End:     From king 40 ..........................................................99.553µs
+··End:     ComFromKing .............................................................198.415µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................266.405ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................799.515ms
+··End:     ComToKing ...............................................................4.654s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................19.581s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.470s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.797s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................617.569ms
+··End:     ComFromKing .............................................................2.027s
+··Start:   Division
+··End:     Division ................................................................10.986ms
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.897s
+··Start:   To king 48
+··End:     To king 48 ..............................................................88.117ms
+··Start:   From king 48
+··End:     From king 48 ............................................................255.299µs
+Opening s1, s2, s3
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................264.085ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................923.561ms
+··End:     ComToKing ...............................................................4.730s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................15.966s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.222s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.810s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................613.269ms
+··End:     ComFromKing .............................................................2.028s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................76.044µs
+··End:     ComToKing ...............................................................149.807µs
+··Start:   Unpack Pack shares
+··End:     Unpack Pack shares ......................................................106.276µs
+··Start:   ComFromKing
+····Start:   From king 40
+····End:     From king 40 ..........................................................201.545µs
+··End:     ComFromKing .............................................................230.869µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................258.604ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................794.371ms
+··End:     ComToKing ...............................................................4.651s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................19.427s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.477s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.785s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................618.272ms
+··End:     ComFromKing .............................................................2.030s
+··Start:   Division
+··End:     Division ................................................................10.988ms
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.928s
+··Start:   To king 48
+··End:     To king 48 ..............................................................100.689µs
+··Start:   From king 48
+··End:     From king 48 ............................................................191.979µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................267.937ms
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+mbyl: 524288
+··Start:   ComToKing
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................1.073s
+··End:     ComToKing ...............................................................4.881s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................15.970s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.220s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.818s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................613.608ms
+··End:     ComFromKing .............................................................2.022s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................81.269µs
+··End:     ComToKing ...............................................................132.617µs
+··Start:   Unpack Pack shares
+··End:     Unpack Pack shares ......................................................105.496µs
+··Start:   ComFromKing
+····Start:   From king 40
+····End:     From king 40 ..........................................................214.181µs
+··End:     ComFromKing .............................................................249.516µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................278.477ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................936.940ms
+··End:     ComToKing ...............................................................4.786s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................19.534s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.478s
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··Start:   Packing shares
+··End:     Packing shares ..........................................................17.772s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................616.564ms
+··End:     ComFromKing .............................................................2.027s
+··Start:   Division
+··End:     Division ................................................................10.961ms
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.884s
+··Start:   To king 48
+··End:     To king 48 ..............................................................96.813µs
+··Start:   From king 48
+··End:     From king 48 ............................................................216.317µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................258.335ms
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+mbyl: 524288
+··Start:   ComToKing
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................770.305ms
+··End:     ComToKing ...............................................................4.581s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................16.078s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.218s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.788s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................614.289ms
+··End:     ComFromKing .............................................................2.027s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................102.163µs
+··End:     ComToKing ...............................................................135.962µs
+··Start:   Unpack Pack shares
+··End:     Unpack Pack shares ......................................................101.035µs
+··Start:   ComFromKing
+····Start:   From king 40
+····End:     From king 40 ..........................................................198.503µs
+··End:     ComFromKing .............................................................226.394µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................258.591ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................641.883ms
+··End:     ComToKing ...............................................................4.513s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................19.425s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.478s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.786s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................617.455ms
+··End:     ComFromKing .............................................................2.036s
+··Start:   Division
+··End:     Division ................................................................10.986ms
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.919s
+··Start:   To king 48
+··End:     To king 48 ..............................................................90.122µs
+··Start:   From king 48
+··End:     From king 48 ............................................................200.831µs
+Computing r
+··Start:   Compute r
+··End:     Compute r ...............................................................61.803ms
+Committing to r
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.913s
+··Start:   To king 48
+··End:     To king 48 ..............................................................181.183ms
+··Start:   From king 48
+··End:     From king 48 ............................................................226.532µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................265.653ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................857.087ms
+··End:     ComToKing ...............................................................4.687s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................19.759s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.487s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.817s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................618.776ms
+··End:     ComFromKing .............................................................2.057s
+··Start:   ComToKing
+····Start:   To king 40
+····End:     To king 40 ............................................................88.756µs
+··End:     ComToKing ...............................................................150.406µs
+··Start:   Unpack Pack shares
+··End:     Unpack Pack shares ......................................................107.790µs
+··Start:   ComFromKing
+····Start:   From king 40
+····End:     From king 40 ..........................................................205.828µs
+··End:     ComFromKing .............................................................259.634µs
+··Start:   FFT1
+[DEBUG dist_primitives::dfft::dfft] Applying fft1
+··End:     FFT1 ....................................................................266.683ms
+mbyl: 524288
+··Start:   ComToKing
+[DEBUG dist_primitives::dfft::dfft] Finished fft1
+····Start:   To king 16777224
+····End:     To king 16777224 ......................................................854.288ms
+··End:     ComToKing ...............................................................4.720s
+··Start:   Opening shares
+··End:     Opening shares ..........................................................19.429s
+··Start:   FFT2
+[DEBUG dist_primitives::dfft::dfft] Applying fft2
+··End:     FFT2 ....................................................................2.485s
+··Start:   Packing shares
+[DEBUG dist_primitives::dfft::dfft] Finished fft2
+··End:     Packing shares ..........................................................17.799s
+··Start:   ComFromKing
+····Start:   From king 16777224
+····End:     From king 16777224 ....................................................618.067ms
+··End:     ComFromKing .............................................................2.028s
+··Start:   Division
+··End:     Division ................................................................10.983ms
+bases: 524288, scalars: 524288
+··Start:   Base MSM
+··End:     Base MSM ................................................................5.904s
+··Start:   To king 48
+··End:     To king 48 ..............................................................248.848ms
+··Start:   From king 48
+··End:     From king 48 ............................................................258.049µs
+End:     Prover ....................................................................4679.406s
+Stats: Stats {
+    bytes_sent: 221593660063,
+    bytes_recv: 164064537631,
+    broadcasts: 0,
+    to_king: 48,
+    from_king: 48,
+}
+[DEBUG plonk_bench] Done

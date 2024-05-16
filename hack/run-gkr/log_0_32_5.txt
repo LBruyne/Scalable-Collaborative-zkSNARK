@@ -1,0 +1,52 @@
+Cargo is installed. Skipping the script.
+[source.crates-io]
+replace-with = 'ustc'
+
+[source.ustc]
+registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+unzip is installed. Skipping the script.
+Archive:  /tmp/gkr.zip
+  inflating: /tmp/distributed-GKR/Cargo.toml  
+  inflating: /tmp/distributed-GKR/hack/run_clients.py  
+  inflating: /tmp/distributed-GKR/hack/bench_sumcheck.sh  
+  inflating: /tmp/distributed-GKR/hack/bench_poly_comm.sh  
+  inflating: /tmp/distributed-GKR/config/config.json  
+  inflating: /tmp/distributed-GKR/mpc-net/Cargo.toml  
+  inflating: /tmp/distributed-GKR/mpc-net/src/multi.rs  
+  inflating: /tmp/distributed-GKR/mpc-net/src/lib.rs  
+  inflating: /tmp/distributed-GKR/justfile  
+  inflating: /tmp/distributed-GKR/gkr/Cargo.toml  
+  inflating: /tmp/distributed-GKR/gkr/examples/gkr.rs  
+  inflating: /tmp/distributed-GKR/gkr/src/gkr.rs  
+ extracting: /tmp/distributed-GKR/gkr/src/lib.rs  
+  inflating: /tmp/distributed-GKR/Cargo.lock  
+  inflating: /tmp/distributed-GKR/README.md  
+  inflating: /tmp/distributed-GKR/dist-primitive/Cargo.toml  
+  inflating: /tmp/distributed-GKR/dist-primitive/examples/poly_comm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/examples/msm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/examples/sumcheck.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/examples/delegator.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/dmsm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/mle.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/unpack.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/dperm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/dpoly_comm.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/dsumcheck.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/utils/mod.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/utils/serializing_net.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/utils/operator.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/utils/timer.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/degree_reduce.rs  
+  inflating: /tmp/distributed-GKR/dist-primitive/src/lib.rs  
+  inflating: /tmp/distributed-GKR/network-address/16  
+  inflating: /tmp/distributed-GKR/network-address/4  
+  inflating: /tmp/distributed-GKR/network-address/8  
+  inflating: /tmp/distributed-GKR/network-address/128  
+  inflating: /tmp/distributed-GKR/network-address/32  
+  inflating: /tmp/distributed-GKR/secret-sharing/Cargo.toml  
+  inflating: /tmp/distributed-GKR/secret-sharing/src/pss.rs  
+ extracting: /tmp/distributed-GKR/secret-sharing/src/lib.rs  
+  inflating: /tmp/distributed-GKR/client/Cargo.toml  
+  inflating: /tmp/distributed-GKR/client/src/main.rs  
+  inflating: /tmp/distributed-GKR/client/config.json.example  
+    Finished release [optimized + debuginfo] target(s) in 0.53s

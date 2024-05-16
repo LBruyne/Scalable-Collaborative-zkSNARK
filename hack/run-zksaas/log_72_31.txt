@@ -1,0 +1,17 @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ED25519 key sent by the remote host is
+SHA256:gWiGpdIkksaSGPuLzoScS3GEMbbN3iDqaMOqrlboGNk.
+Please contact your system administrator.
+Add correct host key in /home/asternight/.ssh/known_hosts to get rid of this message.
+Offending ECDSA key in /home/asternight/.ssh/known_hosts:225
+  remove with:
+  ssh-keygen -f "/home/asternight/.ssh/known_hosts" -R "112.124.29.36"
+Password authentication is disabled to avoid man-in-the-middle attacks.
+Keyboard-interactive authentication is disabled to avoid man-in-the-middle attacks.
+UpdateHostkeys is disabled because the host key is not trusted.
+root@112.124.29.36: Permission denied (publickey,gssapi-keyex,gssapi-with-mic).
