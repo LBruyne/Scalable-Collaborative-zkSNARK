@@ -2,7 +2,7 @@ use ark_ff::FftField;
 use futures::future::join_all;
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
-use crate::utils::operator::transpose;
+
 use crate::utils::serializing_net::MPCSerializeNet;
 use mpc_net::{end_timer, start_timer, timed};
 
@@ -53,23 +53,6 @@ pub async fn d_unpack2<F: FftField, Net: MPCSerializeNet>(
     }
 }
 
-pub async fn d_unpack2_many<F: FftField, Net: MPCSerializeNet>(
-    share: Vec<F>,
-    receiver: u32,
-    pp: &PackedSharingParams<F>,
-    net: &Net,
-    sid: MultiplexedStreamID,
-) -> Result<Vec<F>, MPCNetError> {
-    let shares = net
-        .dynamic_worker_send_or_leader_receive_element(&share, receiver, sid)
-        .await?;
-    if let Some(shares) = shares {
-        Ok(shares.into_iter().flat_map(|share| pp.unpack2(share)).collect())
-    } else {
-        Ok(Vec::new())
-    }
-}
-
 pub async fn pss2ss<F: FftField, Net: MPCSerializeNet>(
     share: F,
     pp: &PackedSharingParams<F>,
@@ -84,13 +67,17 @@ pub async fn pss2ss<F: FftField, Net: MPCSerializeNet>(
                 .worker_send_or_leader_receive_element(&share, sid)
                 .await?;
             if let Some(shares) = shares {
-                let out = transpose(pp.unpack(shares).into_iter().map(|v| {
-                    pp.pack_single(v)
-                }).collect::<Vec<_>>());
-                net.worker_receive_or_leader_send_element(Some(out), sid).await
+                join_all(pp.unpack(shares).into_iter().map(|v| {
+                    net.worker_receive_or_leader_send_element(Some(pp.pack_single(v)), sid)
+                }))
+                .await
+                .into_iter()
+                .collect::<Result<Vec<_>, _>>()
             } else {
-                net.worker_receive_or_leader_send_element(None, sid)
+                join_all((0..pp.l).map(|_| net.worker_receive_or_leader_send_element(None, sid)))
                     .await
+                    .into_iter()
+                    .collect::<Result<Vec<_>, _>>()
             }
         },
         net.is_leader()
