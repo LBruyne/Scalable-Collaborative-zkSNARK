@@ -72,8 +72,10 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     let block_size = shares.len() / party_count;
 
     // Compute masked x
-    let mask_timer = start_timer!("Comm: Leader distribute masked elements", net.is_leader());
+    let mask_timer = start_timer!("Leader distributes masked elements", net.is_leader());
+    let _timer = start_timer!("Local: Compute masked x", net.is_leader());
     let masked_shares = shares.iter().zip(masks.iter()).map(|(x, mask)| *x * *mask).collect::<Vec<_>>();
+    end_timer!(_timer);
     let masked_x = join_all(masked_shares.chunks_exact(block_size).enumerate().map(|(i, masked_shares)| async move {
         unpack::d_unpack2_many(masked_shares.to_vec(), i as u32, pp, net, sid)
             .await
@@ -83,9 +85,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     .into_iter()
     .flatten()
     .collect::<Vec<F>>();
-    
     end_timer!(mask_timer);
-    // TODO: We assume the client prepare masked input for each server directly.
 
     // Each party locally computes a sub-tree and leader computes the remaining layer.
     let tree = d_acc_product(&masked_x, pp, net, sid).await?;
@@ -125,7 +125,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
         .collect::<Vec<_>>());
     end_timer!(compute_subtree_share_timer);
 
-    let share_subtree_timer = start_timer!("Comm: Share subtree", net.is_leader());
+    let share_subtree_timer = start_timer!("Share subtree", net.is_leader());
     let mut results0 = Vec::with_capacity(party_count);
     let mut results1 = Vec::with_capacity(party_count);
     let mut results2 = Vec::with_capacity(party_count);
@@ -220,7 +220,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     });
     end_timer!(compute_leader_tree_share_timer);
 
-    let share_leader_tree_timer = start_timer!("Comm: Share leader tree", net.is_leader());
+    let share_leader_tree_timer = start_timer!("Share leader tree", net.is_leader());
     let leader_out0 = net
         .worker_receive_or_leader_send_element(leader_tree_vx0_share, sid)
         .await?;
@@ -278,7 +278,7 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
     // where the extra elements can guarantee the later sharing can be done smoothly.
     // So that the remaining computation and sharing can be done locally by each party.
     let num_to_send = min(party_count, subtree.len());
-    let ld_receive_timer = start_timer!("Comm: Send elements to leader", net.is_leader());
+    let ld_receive_timer = start_timer!("Send elements to leader", net.is_leader());
     let leader_receiving = net
         .worker_send_or_leader_receive_element(
             &subtree[subtree.len() - num_to_send..].to_vec(),
