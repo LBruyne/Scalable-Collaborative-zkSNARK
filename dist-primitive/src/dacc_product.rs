@@ -1,5 +1,5 @@
 use std::cmp::min;
-
+use itertools::Itertools;
 #[cfg(not(feature = "comm"))]
 use std::hint::black_box;
 
@@ -73,8 +73,8 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
 
     // Compute masked x
     let mask_timer = start_timer!("Comm: Leader distribute masked elements", net.is_leader());
-    let masked_x = join_all(shares.iter().enumerate().map(|(i, x)| async move {
-        unpack::d_unpack2(*x * masks[i], (i / block_size) as u32, pp, net, sid)
+    let masked_x = join_all(shares.iter().zip(masks.iter()).map(|(x, mask)| *x * *mask).collect::<Vec<_>>().chunks_exact(block_size).enumerate().map(|(i, masked_shares)| async move {
+        unpack::d_unpack2_many(masked_shares.to_vec(), i as u32, pp, net, sid)
             .await
             .unwrap()
     }))
@@ -82,6 +82,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     .into_iter()
     .flatten()
     .collect::<Vec<F>>();
+    
     end_timer!(mask_timer);
     // TODO: We assume the client prepare masked input for each server directly.
 
