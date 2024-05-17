@@ -24,7 +24,7 @@ pub async fn d_msm<G: CurveGroup, Net: MPCSerializeNet>(
     }).collect::<Vec<_>>();
     end_timer!(msm_timer);
 
-    let leader_timer = start_timer!("Comm: Send to leader for MSM", net.is_leader());
+    let leader_timer = start_timer!("Send to leader for MSM", net.is_leader());
     // Should be masked by randoms. Omitted for simplicity.
     let result = net.leader_compute_element(&c_shares, sid, |shares|{
         let shares = transpose(shares);
