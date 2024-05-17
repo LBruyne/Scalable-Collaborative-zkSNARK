@@ -73,7 +73,8 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
 
     // Compute masked x
     let mask_timer = start_timer!("Comm: Leader distribute masked elements", net.is_leader());
-    let masked_x = join_all(shares.iter().zip(masks.iter()).map(|(x, mask)| *x * *mask).collect::<Vec<_>>().chunks_exact(block_size).enumerate().map(|(i, masked_shares)| async move {
+    let masked_shares = shares.iter().zip(masks.iter()).map(|(x, mask)| *x * *mask).collect::<Vec<_>>();
+    let masked_x = join_all(masked_shares.chunks_exact(block_size).enumerate().map(|(i, masked_shares)| async move {
         unpack::d_unpack2_many(masked_shares.to_vec(), i as u32, pp, net, sid)
             .await
             .unwrap()
@@ -322,7 +323,7 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
 
 fn merge<F: FftField>(results: &Vec<Vec<F>>) -> Vec<F> {
     let mut merged = Vec::new();
-    let mut num_to_retrieve = results[0].len().next_power_of_two() >> 1;
+    let mut num_to_retrieve = (results[0].len()+1).next_power_of_two() >> 1;
     let mut start_index = 0;
     while start_index + num_to_retrieve <= results[0].len() {
         for j in 0..results.len() {
