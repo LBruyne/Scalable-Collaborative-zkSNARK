@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
 default = []
-benchmark = ["comm", "mpc-net/report"]
+benchmark = ["comm", "mpc-net/report"] # benchmark on multiple machines
 local = ["comm", "single_thread"] # local simulating with tokio in single-thread
 local-multi-thread = ["comm"] # local simulating with tokio in multi-thread
 leader = ["single_thread"] # local ONLY leader running its own part without actual communication

@@ -2,6 +2,7 @@
 // The indent still don't quite work for multithread environment. In fact I'm not sure how such thing can be illustrated linearly in multithread environment.
 pub use colored::Colorize;
 
+use std::cmp::min;
 // print-trace requires std, so these imports are well-defined
 pub use std::{
     format, println,
@@ -42,7 +43,7 @@ macro_rules! start_timer {
             }
         } else {
             let start_info = "Start:".yellow().bold();
-            let indent_amount = 2 * NUM_INDENT.fetch_add(1, Ordering::Relaxed);
+            let indent_amount = NUM_INDENT.fetch_add(1, Ordering::Relaxed);
             let indent = compute_indent(indent_amount);
 
             let msg = format!("{} (thread {:?})", &msg, thread::current().id());
@@ -52,7 +53,7 @@ macro_rules! start_timer {
                 msg: msg.to_string(),
                 time: Instant::now(),
                 print: $print,
-                indent: indent_amount,
+                indent: indent_amount
             }
         }
     }};
@@ -71,7 +72,7 @@ macro_rules! start_timer {
 
         let msg = $msg;
         let start_info = "Start:".yellow().bold();
-        let indent_amount = 2 * NUM_INDENT.fetch_add(1, Ordering::Relaxed);
+        let indent_amount = NUM_INDENT.fetch_add(1, Ordering::Relaxed);
         let indent = compute_indent(indent_amount);
 
         let msg = format!("{} (thread {:?})", &msg, thread::current().id());
@@ -128,7 +129,7 @@ macro_rules! end_timer {
                 end_info,
                 message,
                 final_time_str,
-                pad = 75 - indent_amount
+                pad = 5
             );
         }
         final_time
@@ -176,7 +177,7 @@ macro_rules! end_timer {
             end_info,
             message,
             final_time_str,
-            pad = 75 - indent_amount
+            pad = 5
         );
         final_time
     }};
@@ -204,6 +205,7 @@ pub fn compute_indent_whitespace(indent_amount: usize) -> String {
 }
 
 pub fn compute_indent(indent_amount: usize) -> String {
+    let indent_amount = min(6, indent_amount);
     let mut indent = String::new();
     for _ in 0..indent_amount {
         indent.push_str(&PAD_CHAR.white());

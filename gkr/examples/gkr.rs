@@ -20,10 +20,10 @@ struct Cli {
     l: usize,
     /// The depth of the circuit.
     #[arg(long)]
-    depth: usize,
+    d: usize,
     /// log2 of the width of the circuit.
     #[arg(long)]
-    width: usize,
+    w: usize,
 }
 
 #[cfg_attr(feature = "single_thread", tokio::main(flavor = "current_thread"))]
@@ -32,10 +32,10 @@ async fn main() {
     let args = Cli::parse();
 
     // Local
-    gkr_local_bench(args.width, args.depth);
+    gkr_local_bench(args.w, args.d);
 
     // Distributed
-    gkr_distributed_bench(args.width, args.depth, args.l).await;
+    gkr_distributed_bench(args.w, args.d, args.l).await;
 }
 
 #[cfg(feature = "leader")]

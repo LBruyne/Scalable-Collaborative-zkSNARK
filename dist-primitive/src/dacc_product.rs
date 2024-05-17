@@ -1,5 +1,4 @@
 use std::cmp::min;
-use itertools::Itertools;
 #[cfg(not(feature = "comm"))]
 use std::hint::black_box;
 
@@ -67,7 +66,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
 ) -> Result<(Vec<F>, Vec<F>, Vec<F>), MPCNetError> {
     let timer = start_timer!("Distributed product accumulation and sharing", net.is_leader());
     let party_count = pp.l * 4;
-    // Every party gets n/N of the shares.
+    // Every party gets n/N of the shares. Assert failed if not enough shares.
     assert!(shares.len() > party_count);
     let block_size = shares.len() / party_count;
 
