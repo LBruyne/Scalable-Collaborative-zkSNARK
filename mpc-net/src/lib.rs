@@ -1,5 +1,5 @@
 pub mod multi;
-// pub mod prod;
+pub mod utils;
 
 use async_trait::async_trait;
 use auto_impl::auto_impl;
@@ -68,6 +68,7 @@ pub trait MPCNet: Send + Sync {
     ) -> Result<Option<Vec<Bytes>>, MPCNetError> {
         let bytes_out = Bytes::copy_from_slice(bytes);
         let own_id = self.party_id();
+        let timer = start_timer!(format!("Comm: from {} to leader, {}B", own_id, bytes_out.len()), self.is_leader());
 
         let r = if self.is_leader() {
             let mut r = FuturesOrdered::new();
@@ -99,10 +100,11 @@ pub trait MPCNet: Send + Sync {
             self.send_to(0, bytes_out, sid).await?;
             Ok(None)
         };
+        end_timer!(timer);
         r
     }
 
-    /// All parties send bytes to the leader. The leader receives all the bytes
+    /// All parties send bytes to someone. The someone receives all the bytes
     async fn dynamic_worker_send_or_leader_receive(
         &self,
         bytes: &[u8],
@@ -111,6 +113,7 @@ pub trait MPCNet: Send + Sync {
     ) -> Result<Option<Vec<Bytes>>, MPCNetError> {
         let bytes_out = Bytes::copy_from_slice(bytes);
         let own_id = self.party_id();
+        let timer = start_timer!(format!("Comm: from {} to {}, {}B", own_id, receiver, bytes_out.len()), self.is_leader());
 
         let r = if receiver == self.party_id() {
             let mut r = FuturesOrdered::new();
@@ -142,6 +145,7 @@ pub trait MPCNet: Send + Sync {
             self.send_to(receiver, bytes_out, sid).await?;
             Ok(None)
         };
+        end_timer!(timer);
         r
     }
 
@@ -155,6 +159,8 @@ pub trait MPCNet: Send + Sync {
         let own_id = self.party_id();
 
         if let Some(bytes_out) = bytes_out {
+            let timer = start_timer!(format!("Comm: from leader to all, {}B", bytes_out.len()), self.is_leader());
+
             if !self.is_leader() {
                 return Err(MPCNetError::BadInput {
                     err: "recv_from_leader called with bytes_out when not leader",
@@ -174,6 +180,8 @@ pub trait MPCNet: Send + Sync {
                 self.send_to(id as u32, bytes_out[id].clone(), sid).await?;
             }
 
+            end_timer!(timer);
+
             Ok(bytes_out[own_id as usize].clone())
         } else {
             if self.is_leader() {
@@ -186,8 +194,8 @@ pub trait MPCNet: Send + Sync {
         }
     }
 
-    /// All parties recv bytes from the leader.
-    /// Provide bytes iff you're the leader!
+    /// All parties recv bytes from someone.
+    /// Provide bytes iff you're the someone!
     async fn dynamic_worker_receive_or_leader_send(
         &self,
         bytes_out: Option<Vec<Bytes>>,
@@ -197,6 +205,9 @@ pub trait MPCNet: Send + Sync {
         let own_id = self.party_id();
 
         if let Some(bytes_out) = bytes_out {
+
+            let timer = start_timer!(format!("Comm: from {} to all, {}B", own_id, bytes_out.len()), self.is_leader());
+
             if !own_id == sender {
                 return Err(MPCNetError::BadInput {
                     err: "recv_from_leader called with bytes_out when not leader",
@@ -215,6 +226,8 @@ pub trait MPCNet: Send + Sync {
 
                 self.send_to(id as u32, bytes_out[id].clone(), sid).await?;
             }
+
+            end_timer!(timer);
 
             Ok(bytes_out[own_id as usize].clone())
         } else {

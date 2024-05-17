@@ -6,10 +6,8 @@ use ark_std::UniformRand;
 
 use clap::Parser;
 use dist_primitive::dpoly_comm::PolynomialCommitmentCub;
-use dist_primitive::end_timer;
-use dist_primitive::start_timer;
-
 use dist_primitive::utils::operator::transpose;
+use mpc_net::{end_timer, start_timer};
 use mpc_net::LocalTestNet;
 use mpc_net::MPCNet;
 use mpc_net::MultiplexedStreamID;

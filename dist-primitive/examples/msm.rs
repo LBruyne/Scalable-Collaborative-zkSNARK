@@ -4,7 +4,8 @@ use rayon::prelude::*;
 use ark_ec::{bls12::Bls12, pairing::Pairing, CurveGroup, VariableBaseMSM};
 use ark_poly::{EvaluationDomain, Radix2EvaluationDomain};
 use ark_std::UniformRand;
-use dist_primitive::{dmsm::d_msm, end_timer, start_timer, utils::operator::transpose};
+use dist_primitive::{dmsm::d_msm, utils::operator::transpose};
+use mpc_net::{end_timer, start_timer};
 use mpc_net::{LocalTestNet as Net, MPCNet, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 

@@ -4,12 +4,13 @@ use std::cmp::min;
 use std::hint::black_box;
 
 use crate::{
-    end_timer, start_timer, unpack, utils::{operator::transpose, serializing_net::MPCSerializeNet}
+    unpack, utils::{operator::transpose, serializing_net::MPCSerializeNet}
 };
 use ark_ff::FftField;
 use ark_std::iterable::Iterable;
 use futures::future::join_all;
 use mpc_net::{MPCNetError, MultiplexedStreamID};
+use mpc_net::{end_timer, start_timer};
 use secret_sharing::pss::PackedSharingParams;
 
 /// Given i as a number in its binary representation, i.e. i = (1,x), return (x,0) and (x,1)

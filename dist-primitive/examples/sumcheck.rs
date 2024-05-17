@@ -10,8 +10,9 @@ use dist_primitive::dsumcheck::d_sumcheck_product;
 use dist_primitive::dsumcheck::d_sumcheck;
 use dist_primitive::dsumcheck::sumcheck_product;
 use dist_primitive::dsumcheck::sumcheck;
-use dist_primitive::{end_timer, start_timer, utils::operator::transpose};
+use dist_primitive::utils::operator::transpose;
 use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
+use mpc_net::{end_timer, start_timer};
 use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
 

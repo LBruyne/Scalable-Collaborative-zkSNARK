@@ -10,12 +10,11 @@ use dist_primitive::{
     degree_reduce::degree_reduce_many,
     dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub},
     dsumcheck::d_sumcheck_product,
-    end_timer,
     mle::PackedDenseMultilinearExtension,
-    start_timer,
     utils::serializing_net::MPCSerializeNet,
 };
 use mpc_net::{MPCNetError, MultiplexedStreamID};
+use mpc_net::{end_timer, start_timer};
 use secret_sharing::pss::PackedSharingParams;
 
 use crate::gkr::SparseMultilinearExtension;
@@ -211,7 +210,7 @@ pub async fn d_gkr<E: Pairing, Net: MPCSerializeNet>(
     let _ = width;
     let mut proof = Vec::new();
 
-    let timer_all: dist_primitive::utils::timer::TimerInfo =
+    let timer_all =
         start_timer!("Distributed GKR", net.is_leader());
 
     // Commit

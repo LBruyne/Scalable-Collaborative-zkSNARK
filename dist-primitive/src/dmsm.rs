@@ -1,6 +1,7 @@
-use crate::{end_timer, start_timer, utils::{operator::transpose, serializing_net::MPCSerializeNet}};
+use crate::utils::{operator::transpose, serializing_net::MPCSerializeNet};
 use ark_ec::CurveGroup;
 
+use mpc_net::{end_timer, start_timer};
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 

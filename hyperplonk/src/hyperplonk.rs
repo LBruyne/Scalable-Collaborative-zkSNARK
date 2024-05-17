@@ -2,9 +2,10 @@ use ark_ec::pairing::Pairing;
 use ark_ff::fields::Field;
 use ark_std::UniformRand;
 use dist_primitive::{
-    dacc_product::acc_product, dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub}, dsumcheck::sumcheck_product, end_timer, mle::fix_variable, start_timer
+    dacc_product::acc_product, dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub}, dsumcheck::sumcheck_product, mle::fix_variable
 };
 
+use mpc_net::{end_timer, start_timer};
 use dist_primitive::random_evaluations;
 
 /// This is a simplified version without any optimization to simulate the complexity.

@@ -8,7 +8,7 @@ use ark_std::UniformRand;
 use clap::Parser;
 use dist_primitive::dacc_product::acc_product;
 use dist_primitive::dacc_product::d_acc_product_and_share;
-use dist_primitive::{end_timer, start_timer};
+use mpc_net::{end_timer, start_timer};
 use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
 use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;

@@ -5,7 +5,13 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+report = []
+
 [dependencies]
+colored = "2.0.4"
+ark-std = {version = "0.4.0", default-features = false, features = [ "print-trace", "std" ]}
 log = {version = "0.4"}
 futures = "0.3.29"
 async-trait = "0.1.74"

@@ -6,12 +6,11 @@ use dist_primitive::{
     dacc_product::d_acc_product_and_share,
     dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub},
     dsumcheck::d_sumcheck_product,
-    end_timer,
     mle::fix_variable,
-    start_timer,
     utils::serializing_net::MPCSerializeNet,
 };
 use mpc_net::{MPCNetError, MultiplexedStreamID};
+use mpc_net::{end_timer, start_timer};
 use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Clone, Debug)]

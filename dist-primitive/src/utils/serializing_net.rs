@@ -2,8 +2,7 @@ use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use async_trait::async_trait;
 
 use mpc_net::{MPCNet, MPCNetError, MultiplexedStreamID};
-
-use crate::{end_timer, start_timer};
+use mpc_net::{end_timer, start_timer};
 
 /// The MPC net can serialize and deserialize elements. Should be useful for arkworks computation.
 #[cfg(feature = "comm")]

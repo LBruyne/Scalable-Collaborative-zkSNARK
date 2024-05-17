@@ -6,11 +6,8 @@ use ark_std::One;
 
 use dist_primitive::dpoly_comm::PolynomialCommitmentCub;
 use dist_primitive::dsumcheck::sumcheck_product;
-use dist_primitive::end_timer;
-use dist_primitive::mle::fix_variable;
 use dist_primitive::mle::DenseMultilinearExtension;
-use dist_primitive::start_timer;
-
+use mpc_net::{end_timer, start_timer};
 use rand::random;
 use std::hint::black_box;
 
@@ -35,8 +32,9 @@ pub fn local_gkr_function<F: FftField>(
     let mut proof1 = sumcheck_product(&hg.evaluations, &f2.evaluations, challenge_u);
     // Initialize phase two.
     let f1 = initialize_phase_two(f1, challenge_g, challenge_v);
-    // Compute polynomial
-    let f2_u = fix_variable(&f2.evaluations, challenge_u)[0];
+    // Compute polynomial. Omitted for simplicity.
+    // let f2_u = fix_variable(&f2.evaluations, challenge_u)[0];
+    let f2_u = F::one();
     let f3_f2u = f3.mul(&f2_u);
     // Sumcheck product 2.
     let proof2 = sumcheck_product(&f1.evaluations, &f3_f2u.evaluations, challenge_v);

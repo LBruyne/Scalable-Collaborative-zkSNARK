@@ -3,14 +3,13 @@ use std::hint::black_box;
 use ark_ec::{bls12::Bls12, pairing::Pairing};
 
 use clap::Parser;
-use dist_primitive::end_timer;
-use dist_primitive::start_timer;
 
 use hyperplonk::dhyperplonk::dhyperplonk;
 use hyperplonk::dhyperplonk::PackedProvingParameters;
 use hyperplonk::hyperplonk::local_hyperplonk;
 use mpc_net::LocalTestNet;
 use mpc_net::MPCNet; 
+use mpc_net::{end_timer, start_timer};
 use mpc_net::MultiplexedStreamID;
 use secret_sharing::pss::PackedSharingParams;
 

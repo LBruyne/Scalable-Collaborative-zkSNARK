@@ -1,8 +1,8 @@
 use crate::{
-    end_timer, start_timer, unpack::pss2ss, utils::serializing_net::MPCSerializeNet
+    unpack::pss2ss, utils::serializing_net::MPCSerializeNet
 };
 use ark_ff::FftField;
-use mpc_net::{MPCNetError, MultiplexedStreamID};
+use mpc_net::{end_timer, start_timer, MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
 pub fn sumcheck<F: FftField>(evaluation: &Vec<F>, challenge: &Vec<F>) -> Vec<(F, F)> {

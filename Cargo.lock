@@ -435,7 +435,6 @@ dependencies = [
  "ark-std",
  "async-trait",
  "clap",
- "colored",
  "digest",
  "env_logger",
  "futures",
@@ -747,9 +746,11 @@ dependencies = [
 name = "mpc-net"
 version = "0.1.0"
 dependencies = [
+ "ark-std",
  "async-trait",
  "async_smux",
  "auto_impl",
+ "colored",
  "env_logger",
  "futures",
  "log",

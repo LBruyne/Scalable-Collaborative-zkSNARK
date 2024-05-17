@@ -1,16 +1,15 @@
 use std::hint::black_box;
-
 use crate::dmsm::d_msm;
 use crate::unpack::pss2ss;
 use crate::utils::operator::transpose;
 use crate::utils::serializing_net::MPCSerializeNet;
-use crate::{end_timer, start_timer};
 use ark_ec::pairing::Pairing;
 use ark_ec::pairing::PairingOutput;
 use ark_ec::AffineRepr;
 use ark_ec::VariableBaseMSM;
 use ark_ff::UniformRand;
 use ark_ff::{One, Zero};
+use mpc_net::{end_timer, start_timer};
 use mpc_net::MPCNetError;
 use mpc_net::MultiplexedStreamID;
 use rayon::prelude::*;
