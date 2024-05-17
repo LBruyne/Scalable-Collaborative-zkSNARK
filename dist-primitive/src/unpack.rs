@@ -64,7 +64,7 @@ pub async fn d_unpack2_many<F: FftField, Net: MPCSerializeNet>(
         .dynamic_worker_send_or_leader_receive_element(&share, receiver, sid)
         .await?;
     if let Some(shares) = shares {
-        Ok(shares.into_iter().flat_map(|share| pp.unpack2(share)).collect())
+        Ok(transpose(shares).into_iter().flat_map(|share| pp.unpack2(share)).collect())
     } else {
         Ok(Vec::new())
     }
