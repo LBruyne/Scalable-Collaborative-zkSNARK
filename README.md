@@ -1,4 +1,4 @@
-# Collaborative-GKR
+# Scalable-Collaborative-ZKP
 
 Rust implementation of the paper "Scalable Collaborative zk-SNARK: Fully Distributed Proof Generation and Malicious Security". 
 
@@ -6,7 +6,13 @@ The project is built upon [arkworks ecosystem](https://github.com/arkworks-rs).
 
 ## Illustration
 
-This is a Proof-of-Concept (PoC) implementation. In the paper, we assume a peer-to-peer network for smooth operation of the MPC protocol. In experimental practice, we implemented a single peer that can be executed on a low-specification instance. We estimated the overall efficiency by calculating the computational, memory, and communication costs incurred by a node during a single proof generation process. Although we did not implement actual communication (an industrial-grade implementation could address this), we ensured that each instance accurately executed its assigned tasks, and we properly tracked for the communication overhead.
+This is a Proof-of-Concept (PoC) implementation. In this work, we assume a peer-to-peer network for smooth operation of the MPC protocol. Each peer can be a low-specification instance (e.g., 2 vCPU and 4 GB memory is enough), where peers will be connected through LAN/WAN. The parties can collaboratively generate a ZK proof for large-scale circuits while preserving witness privacy.
+
+We provide three kinds of modes, which are classified as follows and can be switched by adjusting Rust features:
+
+- `leader`: A single peer that simulates its own part of the job according to the protocol. It is ensured that this instance accurately executes its assigned tasks, and we properly track the computation time and communication overhead.
+- `local` and `local-multi-thread`: The local mode will simulate the distributed protocol locally, where every task is executed by a single thread. `local-multi-thread` enables multiple threads to simulate different parties locally (so your machine's number of threads should not exceed the number of parties).
+- `collaborative`: This mode actually runs a distributed cluster, where different parties are deployed on different machines and collaborate together to generate a proof. We provide some scripts to deploy such a cluster.
 
 ## Version
 
@@ -21,42 +27,49 @@ rustup default nightly-2024-02-04
 
 ## How to run
 
-We offer "Rust examples" for distributed primitives and the PoC implementation of distributed GKR. For a "Rust example", if you have [`just`](https://github.com/casey/just) installed, you can run: 
+### Distributed primitives
+
+We offer "Rust examples" for distributed primitives under the `dist-primitive` folder. If you have [`just`](https://github.com/casey/just) installed, you can run:
 
 ```bash
-just run --release --example <example name>
+just run --release --example <example name> <args>
 ```
 
 If you don't have just, execute the examples using the raw cargo commands:
 
 ```bash
-RUSTFLAGS="-Ctarget-cpu=native -Awarnings" cargo +nightly run --release --example <example name>
+RUSTFLAGS="-Ctarget-cpu=native -Awarnings" cargo +nightly run --release --example <example name> <args>
 ```
 
-### Distributed primitives
+For example, to run a collaborative sumcheck protocol in `leader` mode, run:
 
-For benchmarks of the distributed primitives, please check `hack/bench_poly_comm.sh` and `hack/bench_sumcheck.sh`.
+```bash
+just run --release --example sumcheck -F leader -l 32 -n 20
+# WARNING: If you encounter a `Too many open files` error, please adjust your environment setting with `ulimit -HSn 65536` 
+```
 
-### Distributed GKR
+This simulate a leader's task in a cluster where 128 parties engage in and the variable number of sumcheck is $2^{20}$. To further benchmark the distributed primitives described in the paper, please check `hack/bench_poly_comm.sh` and `hack/bench_sumcheck.sh`. We only provide commands for leader mode. To switch modes, try different features. You can change to collaborative mode if you have enough well-connected hardware resources.
 
-Run the example inside the folder `gkr/examples`.
+### Distributed ZKPs
 
-To run the comparison between PoC dGKR and GKR:
+We offer implementation and examples for collaborative Libra (in the `gkr` crate) and collaborative HyperPlonk (in the `hyperplonk` crate). For example, to run the comparison between local Libra and collaborative Libra:
+
 ```bash
 # At the root directory
-just run --release --example gkr -- --l 32 --depth 16 --width 19
+just run --release --example gkr -F leader -- --l 32 --d 16 --w 16
 ```
 
-This command runs proof generation in both local and distributed settings, and you can freely modify `gkr/examples/gkr.rs` as needed. If you encounter a `Too many open files` error, adjust your environment setting with `ulimit -HSn 65536`.
+In this command, $l$ represents the packing factor, and the circuit size is calculated as $|C| = d \times 2^{w}$.
 
-In this command, $l$ represents the packing factor (we use $t := \frac{N}{4}$ in the paper), and the circuit size is calculated as $|C| = depth \times 2^{width}$.  In a consumer machine, the example provided typically completes in about 5 minutes.
+The program outputs the time taken for the leader running the protocol and the actual communication cost (both incoming and outgoing data) during the proof generation. This output can be redirected to a file for further analysis.
 
-The program outputs the time taken for each sub-protocol and the actual communication cost (both incoming and outgoing data) during proof generation. This output can be redirected to a file for further analysis.
+### Benchmark
 
 ## Project layout
 
-- `dist-primitive`: The distributed primitives, including dMSM, dPolyCommit and dSumcheck.
+- `dist-primitive`: The distributed primitives.
 - `gkr`: The GKR protocol. 
+- `gkr`: The Hyperplonk protocol. 
 - `hack`: Scripts for running the experiments.
 - `mpc-net`: The network layer for the MPC.
 - `secret-sharing`: The packed secret sharing scheme.
