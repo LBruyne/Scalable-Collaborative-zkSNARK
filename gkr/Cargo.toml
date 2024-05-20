@@ -35,6 +35,7 @@ ark-bls12-381 = "0.4.0"
 rayon = "1.8.0"
 futures = "0.3.29"
 peak_alloc = "0.2.0"
+env_logger = "0.11.3"
 
 [dev-dependencies]
 clap = {version = "4.4.11", features = ["derive"] }

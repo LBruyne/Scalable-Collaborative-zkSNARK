@@ -65,6 +65,19 @@ The program outputs the time taken for the leader running the protocol and the a
 
 ### Benchmark
 
+To run a benchmark with packing factor $l$ you need $l\times 4$ servers. There are two scripts located in the `hack/run-hyperplonk` and  `hack/run-gkr` folder, to run the benchmark for HyperPlonk and GKR, respectively. In order to set up the benchmarks, you have to:
+
+1. Filling the addresses in `hack/run-hyperplonk/ip_addresses.txt` and `hack/run-gkr/ip_addresses.txt` with IP address publicly accessible from where you run the scripts. Make sure the files end with a new line.
+2. Filling the addresses in `network-address` with IP address accessible from the servers (private IP address). Make sure you have a proper amount of addresses in each file. Make sure the files end with a new line.
+3. `cd` to `hack/run-hyperplonk` or  `hack/run-gkr`, and run following commands:
+    ```bash
+    mkdir output
+    ./handle_server.sh ./ip_addresses.txt
+    ```
+4. You shall see results in `output` folder.
+
+To run the local benchmarks, simply run examples `gkr` and `hyperplonk`.
+
 ## Project layout
 
 - `dist-primitive`: The distributed primitives.

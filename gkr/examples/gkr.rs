@@ -35,7 +35,7 @@ async fn main() {
     gkr_local_bench(args.w, args.d);
 
     // Distributed
-    gkr_distributed_bench(args.w, args.d, args.l).await;
+    // gkr_distributed_bench(args.w, args.d, args.l).await;
 }
 
 #[cfg(feature = "leader")]

@@ -1,11 +1,14 @@
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
+use std::fs::File;
 use std::future::Future;
+use std::io::{BufRead, BufReader};
 use std::net::SocketAddr;
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, self};
+use tokio::io::{self, AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 
 use crate::{MPCNetError, MultiplexedStreamID};
@@ -102,6 +105,39 @@ pub struct MPCNetConnection<IO: AsyncRead + AsyncWrite + Unpin> {
 }
 
 impl MPCNetConnection<TcpStream> {
+    pub fn init_from_path(path: &PathBuf, id: u32) -> Self {
+        let mut this = MPCNetConnection {
+            id: 0 as u32,
+            listener: None,
+            peers: Default::default(),
+            n_parties: 0,
+            upload: AtomicUsize::new(0),
+            download: AtomicUsize::new(0),
+        };
+        let f = BufReader::new(File::open(path).expect("host configuration path"));
+        let mut peer_id = 0;
+        for line in f.lines() {
+            let line = line.unwrap();
+            let trimmed = line.trim();
+            if trimmed.len() > 0 {
+                let addr: SocketAddr = trimmed
+                    .parse()
+                    .unwrap_or_else(|e| panic!("bad socket address: {}:\n{}", trimmed, e));
+                let peer = Peer {
+                    id: peer_id,
+                    listen_addr: addr,
+                    streams: None,
+                };
+                this.peers.insert(peer_id, peer);
+                peer_id += 1;
+            }
+        }
+        assert!(id < this.peers.len() as u32);
+        this.id = id;
+        this.n_parties = this.peers.len();
+        this
+    }
+
     pub async fn connect_to_all(&mut self) -> Result<(), MPCNetError> {
         let n_minus_1 = self.n_parties() - 1;
         let my_id = self.id;
@@ -111,7 +147,14 @@ impl MPCNetConnection<TcpStream> {
             .iter()
             .map(|p| (*p.0, p.1.listen_addr))
             .collect::<HashMap<_, _>>();
-
+        trace!("Connecting to all peers");
+        let listen_addr = self.peers.get(&self.id).unwrap().listen_addr;
+        trace!("Listening on {listen_addr}");
+        self.listener = Some(
+            TcpListener::bind(listen_addr)
+                .await
+                .unwrap(),
+        );
         let listener = self.listener.take().expect("TcpListener is None");
         let new_peers = Arc::new(Mutex::new(self.peers.clone()));
         let new_peers_server = new_peers.clone();
@@ -153,10 +196,11 @@ impl MPCNetConnection<TcpStream> {
                 let next_peer_to_connect_to = my_id + conns_made as u32 + 1;
                 let peer_listen_addr = peer_addrs.get(&next_peer_to_connect_to).unwrap();
                 let mut stream = {
-                    let mut res=Err(io::Error::new(io::ErrorKind::Other, "Initial error"));
-                    for _ in 0..100 {
+                    let mut res = Err(io::Error::new(io::ErrorKind::Other, "Initial error"));
+                    for _ in 0..30 {
                         res = TcpStream::connect(peer_listen_addr).await;
                         if res.is_ok() {
+                            // trace!("Connected to peer {next_peer_to_connect_to}");
                             break;
                         }
                         tokio::time::sleep(Duration::from_secs(1)).await;
