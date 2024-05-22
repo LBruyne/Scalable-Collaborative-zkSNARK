@@ -27,14 +27,27 @@ pub async fn d_msm<G: CurveGroup, Net: MPCSerializeNet>(
     let leader_timer = start_timer!("Send to leader for MSM", net.is_leader());
     // Should be masked by randoms. Omitted for simplicity.
     let result = net.leader_compute_element(&c_shares, sid, |shares|{
+        let timer = start_timer!("Transpose", net.is_leader());
         let shares = transpose(shares);
+        end_timer!(timer);
+        let timer = start_timer!("Leader sum", net.is_leader());
         let results = shares.iter().map(|s| {
-            let output = pp.unpack2(s.clone()).iter().sum();
+            // This operation is costing for single-threaded execution. In the benchmark statistic, we assume this `iter` opertion can be replaced by a `par_iter` for parallelism. This is reasonable as in practice leader can use rayon to parallelize the computation.
+            let timer = start_timer!("Unpack", net.is_leader());
+            let binding = pp.unpack2(s.clone());
+            end_timer!(timer);
+            let timer = start_timer!("Sum", net.is_leader());
+            let output = binding.iter().sum();
+            end_timer!(timer);
             let pack = vec![output;pp.l];
-            pp.pack_from_public(pack)
+            let timer = start_timer!("Pack", net.is_leader());
+            let res = pp.pack_from_public(pack);
+            end_timer!(timer);
+            res
         }).collect();
+        end_timer!(timer);
         transpose(results)
-    }).await;
+    }, "MSM Leader").await;
     end_timer!(leader_timer);
     return result;
 }

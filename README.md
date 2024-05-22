@@ -44,11 +44,11 @@ RUSTFLAGS="-Ctarget-cpu=native -Awarnings" cargo +nightly run --release --exampl
 For example, to run a collaborative sumcheck protocol in `leader` mode, run:
 
 ```bash
-just run --release --example sumcheck -F leader -l 32 -n 20
+just run --release --example sumcheck -F leader -- --l 32 --n 20
 # WARNING: If you encounter a `Too many open files` error, please adjust your environment setting with `ulimit -HSn 65536` 
 ```
 
-This simulate a leader's task in a cluster where 128 parties engage in and the variable number of sumcheck is $2^{20}$. To further benchmark the distributed primitives described in the paper, please check `hack/bench_poly_comm.sh` and `hack/bench_sumcheck.sh`. We only provide commands for leader mode. To switch modes, try different features. You can change to collaborative mode if you have enough well-connected hardware resources.
+This simulate a leader's task in a cluster where 128 parties engage in and the variable number of sumcheck is $2^{20}$. To further benchmark the distributed primitives described in the paper, please check the scripts under `hack` folder (e.g., `hack/bench_sumcheck.sh`). We only provide commands for leader mode. To switch modes, try different Rust features. You can change to `collaborative` mode if you have enough well-connected hardware resources.
 
 ### Distributed ZKPs
 

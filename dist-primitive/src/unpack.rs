@@ -14,7 +14,7 @@ pub async fn d_unpack_0<F: FftField, Net: MPCSerializeNet>(
     net.leader_compute_element(&share, sid, |shares| {
         let values = pp.unpack(shares);
         vec![values[0]; net.n_parties()]
-    })
+    }, "Unpack 0")
     .await
 }
 

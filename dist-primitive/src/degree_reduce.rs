@@ -21,7 +21,7 @@ pub async fn degree_reduce_many<F: FftField, Net: MPCSerializeNet>(
             pp.pack_from_public_in_place(shares);
         });
         transpose(shares_from_many)
-    })
+    }, "Degree Reduce Many")
     .await
 }
 
@@ -36,6 +36,6 @@ pub async fn degree_reduce<F: FftField, Net: MPCSerializeNet>(
     net.leader_compute_element(&shares, sid, |shares| {
         let secrets = pp.unpack2(shares);
         pp.pack_from_public(secrets)
-    })
+    }, "Degree Reduce")
     .await
 }
