@@ -6,7 +6,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-bash pack.sh
+# bash pack.sh
 
 # IP address file parameter
 ip_address_file="$1"
