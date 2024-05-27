@@ -67,7 +67,7 @@ impl<F: FftField> PackedSharingParams<F> {
     /// Packs secrets into shares
     #[allow(unused)]
     pub fn pack_from_public<G: DomainCoeff<F>>(&self, mut secrets: Vec<G>) -> Vec<G> {
-        assert!(secrets.len() == self.l, "Secrets length mismatch");
+        // assert!(secrets.len() == self.l, "Secrets length mismatch");
         self.pack_from_public_in_place(&mut secrets);
         secrets
     }

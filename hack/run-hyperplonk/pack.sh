@@ -1,6 +1,6 @@
 rm tmp.zip
 rm -rf tmp
-cargo build --release -F benchmark --example bench_hyperplonk
+just build --release -F benchmark --example bench_hyperplonk
 mkdir tmp
 cp ../../target/release/examples/bench_hyperplonk ./tmp/bench_hyperplonk
 cp -r ../../network-address ./tmp

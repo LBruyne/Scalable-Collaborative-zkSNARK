@@ -1,8 +1,8 @@
 RUSTFLAGS:= "\"-Ctarget-cpu=native -Awarnings\""
 
 CARGO:= "RUSTFLAGS="+RUSTFLAGS+" cargo +nightly"
-build:
-    {{CARGO}} build
+build *params:
+    {{CARGO}} build {{params}}
 
 run *params:
     {{CARGO}} run {{params}}

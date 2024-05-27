@@ -30,7 +30,7 @@ async fn main() {
 
     hyperplonk_local_bench(args.n);
 
-    // hyperplonk_distributed_bench(args.n, args.l).await;
+    hyperplonk_distributed_bench(args.n, args.l).await;
 }
 
 /// This benchmark just runs the leader's part of the protocol without any networking involved.

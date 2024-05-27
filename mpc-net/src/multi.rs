@@ -138,6 +138,17 @@ impl MPCNetConnection<TcpStream> {
         this
     }
 
+    pub async fn listen(&mut self) -> Result<(), MPCNetError> {
+        let listen_addr = self.peers.get(&self.id).unwrap().listen_addr;
+        trace!("Listening on {listen_addr}");
+        self.listener = Some(
+            TcpListener::bind(listen_addr)
+                .await
+                .unwrap(),
+        );
+        Ok(())
+    }
+
     pub async fn connect_to_all(&mut self) -> Result<(), MPCNetError> {
         let n_minus_1 = self.n_parties() - 1;
         let my_id = self.id;
@@ -147,14 +158,7 @@ impl MPCNetConnection<TcpStream> {
             .iter()
             .map(|p| (*p.0, p.1.listen_addr))
             .collect::<HashMap<_, _>>();
-        trace!("Connecting to all peers");
-        let listen_addr = self.peers.get(&self.id).unwrap().listen_addr;
-        trace!("Listening on {listen_addr}");
-        self.listener = Some(
-            TcpListener::bind(listen_addr)
-                .await
-                .unwrap(),
-        );
+
         let listener = self.listener.take().expect("TcpListener is None");
         let new_peers = Arc::new(Mutex::new(self.peers.clone()));
         let new_peers_server = new_peers.clone();

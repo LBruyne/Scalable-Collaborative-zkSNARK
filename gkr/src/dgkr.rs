@@ -173,7 +173,7 @@ pub async fn d_phase_initilization<F: FftField, Net: MPCSerializeNet>(
     // Note that each party only suffers from 1/N cost.
     let shares = evaluations[..shares_f1.0.len() / net.n_parties()].to_vec();
     end_timer!(timer);
-    let shares = degree_reduce_many(shares, pp, net, sid)
+    let shares = degree_reduce_many(&shares, pp, net, sid)
         .await?
         .iter()
         .cycle()

@@ -38,6 +38,7 @@ async fn main() {
     env_logger::builder().format_timestamp(None).filter_level(log::LevelFilter::Trace).init();
     let args = Cli::parse();
     let mut net = MPCNetConnection::init_from_path(&args.file, args.id);
+    net.listen().await.unwrap();
     net.connect_to_all().await.unwrap();
 
     gkr_distributed_bench(&net, args.w, args.d, args.l).await;

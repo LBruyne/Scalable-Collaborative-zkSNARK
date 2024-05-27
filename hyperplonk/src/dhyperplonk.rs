@@ -1,6 +1,7 @@
 use ark_ec::pairing::Pairing;
 use ark_ff::fields::Field;
 use ark_std::UniformRand;
+use dist_primitive::degree_reduce::degree_reduce_many;
 use dist_primitive::random_evaluations;
 use dist_primitive::{
     dacc_product::d_acc_product_and_share,
@@ -9,8 +10,8 @@ use dist_primitive::{
     mle::fix_variable,
     utils::serializing_net::MPCSerializeNet,
 };
-use mpc_net::{MPCNetError, MultiplexedStreamID};
 use mpc_net::{end_timer, start_timer};
+use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Clone, Debug)]
@@ -36,6 +37,8 @@ pub struct PackedProvingParameters<E: Pairing> {
     pub unmask0: Vec<E::ScalarField>,
     pub unmask1: Vec<E::ScalarField>,
     pub unmask2: Vec<E::ScalarField>,
+    // Dummies
+    pub reduce_target: Vec<E::ScalarField>,
 }
 
 impl<E: Pairing> PackedProvingParameters<E> {
@@ -62,9 +65,9 @@ impl<E: Pairing> PackedProvingParameters<E> {
 
         // Shares of eq polynomial. For benchmarking purposes, we generate it in advance and use it repeatedly in the protocol.
         let eq = random_evaluations(gate_count);
-        // Distributed polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice. 
+        // Distributed polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice.
         let commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_single(n, pp);
-        // Challenge for polynomial commitment opening. 
+        // Challenge for polynomial commitment opening.
         let challenge = random_evaluations(n);
         // Other challenges.
         let beta = E::ScalarField::rand(rng);
@@ -74,6 +77,8 @@ impl<E: Pairing> PackedProvingParameters<E> {
         let unmask0 = random_evaluations(gate_count);
         let unmask1 = random_evaluations(gate_count);
         let unmask2 = random_evaluations(gate_count);
+        // Dummies
+        let reduce_target = random_evaluations(gate_count / l);
 
         PackedProvingParameters {
             a_evals,
@@ -95,6 +100,7 @@ impl<E: Pairing> PackedProvingParameters<E> {
             unmask0,
             unmask1,
             unmask2,
+            reduce_target,
         }
     }
 }
@@ -119,7 +125,7 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     MPCNetError,
 > {
     let gate_count = (1 << n) / pp.l;
-
+    
     // Now run the protocol.
     let timer_all = start_timer!("Distributed HyperPlonk", net.is_leader());
 
@@ -266,13 +272,13 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
         commits.push((
             com_v0x,
             pk.commitment
-                .d_open(&vx0, &pk.challenge, pp, net, sid)
+                .d_open(&evaluations, &pk.challenge, pp, net, sid)
                 .await?,
         ));
         commits.push((
             com_v1x,
             pk.commitment
-                .d_open(&vx0, &pk.challenge, pp, net, sid)
+                .d_open(&v1x, &pk.challenge, pp, net, sid)
                 .await?,
         ));
         // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
@@ -353,6 +359,9 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     ));
     end_timer!(open_timer);
 
+    let degree_reduce_timer = start_timer!("Degree reduce", net.is_leader());
+    degree_reduce_many(&pk.reduce_target, pp, net, sid).await?;
+    end_timer!(degree_reduce_timer);
     end_timer!(prover_timer);
 
     end_timer!(timer_all);
