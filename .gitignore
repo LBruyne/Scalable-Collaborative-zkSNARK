@@ -29,4 +29,6 @@ hack/run-gkr/tmp
 hack/run-gkr/tmp.zip
 hack/run-hyperplonk/tmp
 hack/run-hyperplonk/tmp.zip
+hack/run-zksaas/tmp
+hack/run-zksaas/tmp.zip
 *.zip
