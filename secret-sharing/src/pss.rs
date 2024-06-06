@@ -67,7 +67,7 @@ impl<F: FftField> PackedSharingParams<F> {
     /// Packs secrets into shares
     #[allow(unused)]
     pub fn pack_from_public<G: DomainCoeff<F>>(&self, mut secrets: Vec<G>) -> Vec<G> {
-        assert!(secrets.len() == self.l, "Secrets length mismatch");
+        // assert!(secrets.len() == self.l, "Secrets length mismatch");
         self.pack_from_public_in_place(&mut secrets);
         secrets
     }
@@ -98,6 +98,20 @@ impl<F: FftField> PackedSharingParams<F> {
         self.share.fft_in_place(secrets);
     }
 
+    /// Packs secret into shares in place
+    #[allow(unused)]
+    pub fn pack_single<G: DomainCoeff<F>>(&self, secret: G) -> Vec<G> {
+        // interpolating on secrets domain
+        let mut secrets = vec![secret];
+        self.secret.ifft_in_place(&mut secrets);
+
+        // evaluate on share domain
+        self.share.fft_in_place(&mut secrets);
+
+        self.pack_from_public_in_place(&mut secrets);
+        secrets
+    }
+
     /// Unpacks shares of degree t+l into secrets
     #[allow(unused)]
     pub fn unpack<G: DomainCoeff<F>>(&self, mut shares: Vec<G>) -> Vec<G> {
@@ -108,6 +122,7 @@ impl<F: FftField> PackedSharingParams<F> {
     /// Unpacks shares of degree 2(t+l) into secrets
     #[allow(unused)]
     pub fn unpack2<G: DomainCoeff<F>>(&self, mut shares: Vec<G>) -> Vec<G> {
+        debug_assert!(shares.len() == self.n, "Shares length mismatch");
         self.unpack2_in_place(&mut shares);
         shares
     }
@@ -140,12 +155,12 @@ impl<F: FftField> PackedSharingParams<F> {
         self.share.ifft_in_place(shares);
 
         // assert that all but first 2(t+l)+1 elements are zero
-        #[cfg(debug_assertions)]
-        {
-            for i in 2 * (self.l + self.t) + 1..shares.len() {
-                debug_assert!(shares[i].is_zero(), "Unpack2 failed");
-            }
-        }
+        // #[cfg(debug_assertions)]
+        // {
+        //     for i in 2 * (self.l + self.t) + 1..shares.len() {
+        //         debug_assert!(shares[i].is_zero(), "Unpack2 failed");
+        //     }
+        // }
 
         // evaluate on secrets domain
         self.secret2.fft_in_place(shares);

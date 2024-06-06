@@ -1,24 +1,45 @@
-use crate::utils::serializing_net::MPCSerializeNet;
+use crate::utils::{operator::transpose, serializing_net::MPCSerializeNet};
 use ark_ec::CurveGroup;
 
+use mpc_net::{end_timer, start_timer};
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
+/// This protocol implement dMSM in a batched way. 
 pub async fn d_msm<G: CurveGroup, Net: MPCSerializeNet>(
-    bases: &[G::Affine],
-    scalars: &[G::ScalarField],
+    bases: &Vec<Vec<G::Affine>>,
+    scalars: &Vec<Vec<G::ScalarField>>,
     pp: &PackedSharingParams<G::ScalarField>,
     net: &Net,
     sid: MultiplexedStreamID,
-) -> Result<G, MPCNetError> {
+) -> Result<Vec<G>, MPCNetError> {
     assert_eq!(bases.len(), scalars.len());
-    let c_share = G::msm(bases, scalars).unwrap();
-    log::warn!("Distributed MSM protocol should be masked by random sharing. Omitted for simplicity.");
-    net.leader_compute_element(&c_share, sid, |shares|{
-        let output: G = pp.unpack2(shares).iter().sum();
-        let pack = vec![output;pp.l];
-        pp.pack_from_public(pack)
-    }).await
+    // Obtain the result of each dMSM.
+    let msm_timer = start_timer!("Local: MSM", net.is_leader());
+    let c_shares = bases.iter().zip(scalars.iter()).map(|(b, s)| {
+        // if net.is_leader() {
+        //     eprintln!("MSM len: {}, {}", s.len(), b.len());
+        // }
+        G::msm(b, s).unwrap()
+    }).collect::<Vec<_>>();
+    end_timer!(msm_timer);
+
+    let leader_timer = start_timer!("Send to leader for MSM", net.is_leader());
+    // Should be masked by randoms. Omitted for simplicity.
+    let result = net.leader_compute_element(&c_shares, sid, |shares|{
+        let shares = transpose(shares);
+        let results = shares.iter().map(|s| {
+            // This operation is costing for single-threaded execution. In the benchmark statistic, we assume this `iter` opertion can be replaced by a `par_iter` for parallelism. This is reasonable as in practice leader can use rayon to parallelize the computation.
+            let binding = pp.unpack2(s.clone());
+            let output = binding.iter().sum();
+            let pack = vec![output;pp.l];
+            let res = pp.pack_from_public(pack);
+            res
+        }).collect();
+        transpose(results)
+    }, "MSM Leader").await;
+    end_timer!(leader_timer);
+    return result;
 }
 
 #[cfg(test)]

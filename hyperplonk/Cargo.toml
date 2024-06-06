@@ -1,9 +1,17 @@
 [package]
-name = "client"
+name = "hyperplonk"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+default = []
+benchmark = ["comm", "mpc-net/report"] # benchmark on multiple machines
+local = ["comm", "single_thread"] # local simulating with tokio in single-thread
+local-multi-thread = ["comm"] # local simulating with tokio in multi-thread
+leader = ["single_thread"] # local ONLY leader running its own part without actual communication
+
+single_thread = [] # with tokio in single thread
+comm = [] # with actual communication
 
 [dependencies]
 ark-std = {version = "0.4.0", default-features = false, features = [ "print-trace", "std" ]}
@@ -11,21 +19,20 @@ ark-ff = {version = "0.4.2", default-features = false}
 ark-poly = {version = "0.4.2", default-features = false}
 ark-ec = {version = "0.4.2", default-features = false}
 ark-serialize = { version = "0.4.2", default-features = false, features = [ "derive" ] }
-ark-bls12-377 = {version = "0.4.0", default-features = false, features = ["curve"] }
 secret-sharing = { version = "0.1.0", path = "../secret-sharing" }
-dist-primitive = { version = "0.1.0", path = "../dist-primitive" }
 mpc-net ={ version = "0.1.0", path = "../mpc-net" }
-gkr ={ version = "0.1.0", path = "../gkr" }
+dist-primitive ={ version = "0.1.0", path = "../dist-primitive" }
 log = {version = "0.4"}
 rand = { version = "0.8", default-features = false, features = ["std"] }
 digest = { version = "0.10" }
-sha2 = "0.10"
-structopt = "0.3"
-env_logger = "0.10"
 async-trait = "0.1.74"
 tokio = { version = "1.34.0", features = ["macros", "rt", "rt-multi-thread", "tracing"] }
 colored = "2.0.4"
 clap = {version = "4.4.11", features = ["derive"] }
-serde = "1.0.193"
-serde_json = "1.0.108"
-
+ark-bls12-381 = "0.4.0"
+rayon = "1.8.0"
+futures = "0.3.29"
+peak_alloc = "0.2.0"
+env_logger = "0.11.3"
+[dev-dependencies]
+clap = {version = "4.4.11", features = ["derive"] }

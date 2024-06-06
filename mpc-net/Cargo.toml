@@ -5,7 +5,13 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+report = []
+
 [dependencies]
+colored = "2.0.4"
+ark-std = {version = "0.4.0", default-features = false, features = [ "print-trace", "std" ]}
 log = {version = "0.4"}
 futures = "0.3.29"
 async-trait = "0.1.74"
@@ -15,6 +21,5 @@ parking_lot = "0.12.1"
 tokio-util = { version = "0.7.10", features = ["codec"] }
 async_smux = "0.3.0"
 serde = { version = "1.0.193", features = ["derive"] }
+env_logger = "0.11.3"
 
-[dev-dependencies]
-env_logger = "0.10"
