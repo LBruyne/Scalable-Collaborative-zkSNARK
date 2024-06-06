@@ -10,7 +10,7 @@ This is a Proof-of-Concept (PoC) implementation. In this work, we assume a peer-
 
 We provide three kinds of modes, which are classified as follows and can be switched by adjusting Rust features:
 
-- `collaborative`: This mode actually runs a *distributed* cluster, where different parties are deployed on different machines and collaborate together to generate a proof. We provide some scripts to deploy such a cluster, and benchmark is based on this mode.
+- `benchmark`: This mode actually runs a *distributed* cluster, where different parties are deployed on different machines and collaborate together to generate a proof. We provide some scripts to deploy such a cluster, and our benchmark is based on this mode.
 - `leader`: A single peer *locally* simulates its own part of the proof generation according to the protocol. It is ensured that this instance accurately executes its assigned tasks, and we properly track the computation time and communication overhead. Since every peer undertakes the same workload in our work, it is a promising way to evaluate the complexities in one server.
 - `local` and `local-multi-thread`: The `local` mode will simulate the distributed cluster *locally*, where every task is executed by a single thread in a sequence. `local-multi-thread` enables multiple threads to simulate different parties locally and these threads will run at the same time to simulate different parites (so your machine's number of threads should not less than the parties count).
 
@@ -29,7 +29,7 @@ cargo 1.80.0-nightly (05364cb2f 2024-05-03)
 
 ### Benchmark
 
-The benchmarks are based on `collaborative` mode. To run a benchmark with packing factor $l$ you need $l\times 4$ servers. If you have an additional jump server for your cluster, things are easier. There is a script located at `hack/prepare-server.sh` for preparing the jump server for the benchmarks. For servers communication, you will need a ip address file filled with server ip like this:
+The benchmarks are based on the aformentioned `benchmark` mode. To run a benchmark with packing factor $l$ you need $l\times 4$ servers. If you have an additional jump server for your cluster, things are easier. There is a script located at `hack/prepare-server.sh` for preparing the jump server for the benchmarks. For servers communication, you will need a ip address file filled with server ip like this:
 ```
 192.168.1.2
 192.168.1.3
@@ -78,7 +78,7 @@ just run --release --example sumcheck -F leader -- --l 32 --n 20
 
 This command will locally simulate one server's task in a cluster where $128=l*4$ parties engage in and the input number of sumcheck is $2^{20}$. 
 
-To further benchmark the distributed primitives described in the paper, please check the scripts under `hack` folder (e.g., `hack/bench_sumcheck.sh`). We only provide commands for leader mode. To switch modes, try different Rust features. You can change to `collaborative` mode if you have enough hardware resources.
+To further benchmark the distributed primitives described in the paper, please check the scripts under `hack` folder (e.g., `hack/bench_sumcheck.sh`). We only provide commands for leader mode. To switch modes, try different Rust features. You can change to `benchmark` mode if you have enough hardware resources.
 
 ### Distributed ZKPs
 
@@ -91,7 +91,7 @@ just run --release --example gkr -F leader -- --l 32 --d 16 --w 16
 
 In this command, $l$ represents the packing factor, and the circuit size is calculated as $n = d \times 2^{w}$.
 
-The program outputs the time taken for the a server running the protocol and its actual communication cost (both incoming and outgoing data) during the proof generation. This output can be redirected to a file for further analysis. To switch modes, try different Rust features. You can change to `collaborative` mode if you have enough hardware resources.
+The program outputs the time taken for the a server running the protocol and its actual communication cost (both incoming and outgoing data) during the proof generation. This output can be redirected to a file for further analysis. To switch modes, try different Rust features. You can change to `benchmark` mode if you have enough hardware resources.
 
 ## Project layout
 
