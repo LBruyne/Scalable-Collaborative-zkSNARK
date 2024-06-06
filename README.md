@@ -29,18 +29,33 @@ cargo 1.80.0-nightly (05364cb2f 2024-05-03)
 
 ### Benchmark
 
-To run a benchmark with packing factor $l$ you need $l\times 4$ servers. There are two scripts located in the `hack/run-hyperplonk` and  `hack/run-gkr` folder, to run the benchmark for HyperPlonk and GKR, respectively. In order to set up the benchmarks, you have to:
+To run a benchmark with packing factor $l$ you need $l\times 4$ servers. If you have a jump server for you cluster things are easy. There's a script located at `hack/prepare-server.sh` for preparing the jump server for the benchmarks. You will need a ip address file filled with server ip like this
+```
+192.168.1.2
+192.168.1.3
+192.168.1.4
+192.168.1.5
 
-1. Filling the addresses in `hack/run-hyperplonk/ip_addresses.txt` and `hack/run-gkr/ip_addresses.txt` with IP address publicly accessible from where you run the scripts. Make sure the files end with a new line.
-2. Filling the addresses in `network-address` with IP address accessible from the servers (private IP address). Make sure you have a proper amount of addresses in each file. Make sure the files end with a new line.
-3. `cd` to `hack/run-hyperplonk` or  `hack/run-gkr`, and run following commands:
+```
+Make sure it ends with a new line, and the ip of jump server as the input to the script. Notably there are a few things to tweak:
+
+1. You need to change the username and identity file in the script.
+2. Be sure to check the `pack.sh` scripts and see if any path is not correct for your system. 
+3. Remove the zkSaaS-related lines if they are not available
+4. Change the directories if you don't like them
+5. Change the ports if they are not available
+
+We strongly advise you run the script or you may have to read through the script yourself to understand how the scripts work and how to manually set up the addresses. To run the benchmark for HyperPlonk and GKR, respectively, you have to:
+
+1. Go to the jump server
+2. `cd` to `hyperplonk` or  `gkr`
+3. Change the benchmark scales in `handle_server.sh`, and run following commands:
     ```bash
-    mkdir output
     ./handle_server.sh ./ip_addresses.txt
     ```
 4. You shall see results in `output` folder. We also provide a `read_data.ipynb` script for reading these output into .csv files.
 
-To run the local benchmarks, simply run examples `gkr` and `hyperplonk`.
+To run the local benchmarks, simply run examples `gkr` and `hyperplonk`. If you wish to run local cluster, see `hack/local.sh` for an example.
 
 ### Distributed primitives
 
