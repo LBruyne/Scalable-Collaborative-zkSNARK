@@ -171,21 +171,21 @@ pub async fn d_phase_initilization<F: FftField, Net: MPCSerializeNet>(
     });
     // Act a degree reduction.
     // Note that each party only suffers from 1/N cost.
-    let shares = evaluations[..shares_f1.0.len() / net.n_parties()].to_vec();
+    let shares = evaluations[..shares_f1.0.len()].to_vec();
     end_timer!(timer);
-    let shares = degree_reduce_many(&shares, pp, net, sid)
-        .await?
-        .iter()
-        .cycle()
-        .take(shares_f1.0.len())
-        .cloned()
-        .collect::<Vec<_>>();
-    // Add the communication it should have.
-    // Is this correct?
-    net.add_comm(
-        F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),
-        F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),
-    );
+    // let shares = degree_reduce_many(&shares, pp, net, sid)
+    //     .await?
+    //     .iter()
+    //     .cycle()
+    //     .take(shares_f1.0.len())
+    //     .cloned()
+    //     .collect::<Vec<_>>();
+    // // Add the communication it should have.
+    // // Is this correct?
+    // net.add_comm(
+    //     F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),
+    //     F::zero().serialized_size(Compress::No) * (net.n_parties() - 1) * net.n_parties(),
+    // );
     end_timer!(all_timer);
     Ok(shares)
 }

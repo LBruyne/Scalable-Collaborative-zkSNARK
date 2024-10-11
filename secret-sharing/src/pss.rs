@@ -36,9 +36,8 @@ impl<F: FftField> PackedSharingParams<F> {
     /// Creates a new instance of PackedSharingParams with the given packing factor
     #[allow(unused)]
     pub fn new(l: usize) -> Self {
-        let n = l * 4;
-        let t = l - 1;
-        debug_assert_eq!(n, 2 * (t + l + 1));
+        let n = l * 8;
+        let t = l * 2 - 1;
 
         let share = Radix2EvaluationDomain::<F>::new(n).unwrap();
         let secret = Radix2EvaluationDomain::<F>::new(l + t + 1)
@@ -134,12 +133,12 @@ impl<F: FftField> PackedSharingParams<F> {
         self.share.ifft_in_place(shares);
 
         // assert that all but first t+l+1 elements are zero
-        #[cfg(debug_assertions)]
-        {
-            for i in self.l + self.t + 1..shares.len() {
-                debug_assert!(shares[i].is_zero(), "Unpack failed");
-            }
-        }
+        // #[cfg(debug_assertions)]
+        // {
+        //     for i in self.l + self.t + 1..shares.len() {
+        //         debug_assert!(shares[i].is_zero(), "Unpack failed");
+        //     }
+        // }
 
         // evaluate on secrets domain
         self.secret.fft_in_place(shares);

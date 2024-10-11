@@ -42,7 +42,7 @@ async fn main() {
 async fn gkr_distributed_bench(width: usize, depth: usize, l: usize) {
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     let params: PackedProvingParameters<E> = PackedProvingParameters::new(depth, width, l, &pp);
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     let res = d_gkr(
         depth,
         width,
@@ -60,7 +60,7 @@ async fn gkr_distributed_bench(width: usize, depth: usize, l: usize) {
 async fn gkr_distributed_bench(width: usize, depth: usize, l: usize) {
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     let params: PackedProvingParameters<E> = PackedProvingParameters::new(depth, width, l, &pp);
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
 
     let proof = net
         .simulate_network_round(params, 
