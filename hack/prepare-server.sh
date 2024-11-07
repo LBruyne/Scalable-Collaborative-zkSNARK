@@ -37,7 +37,7 @@ while IFS= read -r ip_address; do
     echo "${ip_address}:10086"
 done < "ip_addresses.txt" > "ip_addresses_port.txt"
 
-for ((i=3;i<8;i++)); do
+for ((i=3;i<9;i++)); do
     head -n $((2**$i)) "ip_addresses_port.txt" > ./network-address/$((2**$i))
 done
 

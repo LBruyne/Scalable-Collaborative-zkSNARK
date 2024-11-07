@@ -26,8 +26,8 @@ wait
 
 # Create a temporary directory for log files
 log_dir="./output"
-for m in {21..21}; do
-    for log_l in {3..5}; do
+for m in {17..25}; do
+    for log_l in {1..5}; do
     l=$((2**$log_l))
     echo "Running m = $m and l = $l"
     index=0

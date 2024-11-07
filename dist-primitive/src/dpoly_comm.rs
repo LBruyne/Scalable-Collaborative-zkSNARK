@@ -124,7 +124,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
                 powers_of_g: vec![Vec::new(); self.powers_of_g.len()],
                 powers_of_g2: self.powers_of_g2.clone(),
             };
-            l * 4
+            l * 8
         ];
         for i in 0..self.powers_of_g.len() {
             let v = &self.powers_of_g[i];
@@ -139,7 +139,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
                     .map(|chunk| pp.pack_from_public(chunk.to_vec()))
                     .collect()
             });
-            for j in (0..l * 4).rev() {
+            for j in (0..l * 8).rev() {
                 result[j].powers_of_g[i] = powers_of_g.remove(j);
             }
         }
@@ -346,12 +346,12 @@ mod test {
         let rng = &mut ark_std::test_rng();
         let mut s = Vec::new();
         let mut u = Vec::new();
-        for _ in 0..4 {
+        for _ in 0..8 {
             s.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
             u.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
         }
         let mut peval = Vec::new();
-        for _ in 0..2_usize.pow(4) {
+        for _ in 0..2_usize.pow(8) {
             peval.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
         }
         let g1 = <Bls12<ark_bls12_381::Config> as Pairing>::G1::rand(rng);
@@ -368,15 +368,15 @@ mod test {
     //     let rng = &mut ark_std::test_rng();
     //     let mut s = Vec::new();
     //     let mut u = Vec::new();
-    //     for _ in 0..4 {
+    //     for _ in 0..8 {
     //         s.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
     //         u.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
     //     }
     //     let mut peval = Vec::new();
-    //     for _ in 0..2_usize.pow(4) {
+    //     for _ in 0..2_usize.pow(8) {
     //         peval.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
     //     }
-    //     let mut shares = vec![Vec::new(); l * 4];
+    //     let mut shares = vec![Vec::new(); l * 8];
     //     let pp =
     //         PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     //     peval.chunks(l).for_each(|chunk| {
@@ -391,7 +391,7 @@ mod test {
     //     let cub = PolynomialCommitmentCub::<Bls12_381>::new(g1, g2, s);
     //     let adult = cub.to_packed(&pp);
     //     let verification = cub.mature();
-    //     let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    //     let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     //     let result = net
     //         .simulate_network_round(
     //             (u.clone(), adult, shares),

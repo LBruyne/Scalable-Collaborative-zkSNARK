@@ -19,7 +19,7 @@ fi
 server_id=$1
 n=$2
 l=$3
-server_count=$((4*$l))
+server_count=$((8*$l))
 
 if ! which unzip &> /dev/null; then
     echo "unzip is not installed. Running the script..."

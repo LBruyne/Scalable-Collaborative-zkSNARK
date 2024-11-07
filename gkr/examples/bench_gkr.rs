@@ -17,7 +17,7 @@ type E = Bls12<ark_bls12_381::Config>;
 
 #[derive(Parser)]
 struct Cli {
-    /// The packing size, should be 1/4 of the party size as well as a power of 2.
+    /// The packing size, should be 1/8 of the party size as well as a power of 2.
     #[arg(long)]
     l: usize,
     /// The depth of the circuit.

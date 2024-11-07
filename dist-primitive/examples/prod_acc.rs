@@ -16,7 +16,7 @@ use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Parser)]
 struct Cli {
-    /// The packing size, should be 1/4 of the party size as well as a power of 2.
+    /// The packing size, should be 1/8 of the party size as well as a power of 2.
     #[arg(long)]
     l: usize,
     /// log2 of the total number of variables.
@@ -66,7 +66,7 @@ async fn product_accumulator_bench(n: usize, l: usize) {
         .map(|_| Fr::rand(&mut ark_std::test_rng()))
         .collect();
 
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     let distributed = start_timer!("Distributed product accumulatiton");
     let _ = black_box(
         d_acc_product_and_share(
@@ -119,7 +119,7 @@ async fn product_accumulator_bench(n: usize, l: usize) {
         .map(|_| Fr::rand(&mut ark_std::test_rng()))
         .collect();
 
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     let distributed = start_timer!("Simulate distributed product accumulatiton");
 
     let _ = net.simulate_network_round((x_share, mask_share, unmask0_share, unmask1_share, unmask2_share), move |net, (x, mask, unmask0, unmask1, unmask2)| async move {

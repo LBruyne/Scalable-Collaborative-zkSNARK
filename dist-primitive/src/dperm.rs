@@ -85,8 +85,8 @@ mod tests {
     use crate::dperm::d_perm;
     use crate::dperm::d_perm_many;
 
-    const L: usize = 4;
-    const N: usize = L * 4;
+    const L: usize = 8;
+    const N: usize = L * 8;
 
     #[tokio::test]
     async fn perm_test() {

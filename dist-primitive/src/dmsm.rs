@@ -65,14 +65,14 @@ mod tests {
     use crate::utils::operator::transpose;
 
     const L: usize = 2;
-    const N: usize = L * 4;
+    const N: usize = L * 8;
     // const T:usize = N/2 - L - 1;
     const M: usize = 1 << 8;
 
     #[tokio::test]
     async fn pack_unpack_test() {
         println!("pack_unpack_test");
-        let net = LocalTestNet::new_local_testnet(4).await.unwrap();
+        let net = LocalTestNet::new_local_testnet(8).await.unwrap();
 
         println!("net init done");
 
@@ -91,7 +91,7 @@ mod tests {
 
     #[tokio::test]
     async fn pack_unpack2_test() {
-        let net = LocalTestNet::new_local_testnet(4).await.unwrap();
+        let net = LocalTestNet::new_local_testnet(8).await.unwrap();
 
         net.simulate_network_round((), |_, _| async move {
             let pp = PackedSharingParams::<F>::new(L);

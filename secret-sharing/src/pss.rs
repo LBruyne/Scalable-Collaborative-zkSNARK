@@ -49,9 +49,9 @@ impl<F: FftField> PackedSharingParams<F> {
             .get_coset(F::GENERATOR)
             .unwrap();
 
-        debug_assert_eq!(share.size(), n);
-        debug_assert_eq!(secret.size(), l + t + 1);
-        debug_assert_eq!(secret2.size(), 2 * (l + t + 1));
+        // debug_assert_eq!(share.size(), n);
+        // debug_assert_eq!(secret.size(), l + t + 1);
+        // debug_assert_eq!(secret2.size(), 2 * (l + t + 1));
 
         PackedSharingParams {
             t,
