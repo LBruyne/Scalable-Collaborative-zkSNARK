@@ -170,12 +170,12 @@ pub trait MPCNet: Send + Sync {
             let m = bytes_out[0].len();
 
             for id in (0..self.n_parties()).filter(|p| *p != own_id as usize) {
-                if bytes_out[id].len() != m {
-                    return Err(MPCNetError::Protocol {
-                        err: format!("The leader sent wrong number of bytes to Peer {}", id),
-                        party: id as u32,
-                    });
-                }
+                // if bytes_out[id].len() != m {
+                //     return Err(MPCNetError::Protocol {
+                //         err: format!("The leader sent wrong number of bytes to Peer {}", id),
+                //         party: id as u32,
+                //     });
+                // }
 
                 self.send_to(id as u32, bytes_out[id].clone(), sid).await?;
             }

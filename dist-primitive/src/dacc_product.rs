@@ -54,7 +54,7 @@ pub fn acc_product<F: FftField>(x: &Vec<F>) -> (Vec<F>, Vec<F>, Vec<F>) {
 /// unmask 0 unmask v(x,0)
 /// unmask 1 unmask v(x,1)
 /// unmask 2 unmask v(1,x)
-pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
+pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     shares: &Vec<F>,
     masks: &Vec<F>,
     unmask0: &Vec<F>,
@@ -87,7 +87,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     end_timer!(mask_timer);
 
     // Each party locally computes a sub-tree and leader computes the remaining layer.
-    let tree = d_acc_product(&masked_x, pp, net, sid).await?;
+    let tree = c_acc_product(&masked_x, pp, net, sid).await?;
     // Each party obtains a subtree. Leader additionally obtains a leader tree.
     let (subtree, leader_tree) = tree;
 
@@ -251,7 +251,7 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
 
 /// Given pss of evaluations of f,
 /// Returns the tree-shaped product of the masked results. 
-pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
+pub async fn c_acc_product<F: FftField, Net: MPCSerializeNet>(
     inputs: &Vec<F>,
     pp: &PackedSharingParams<F>,
     net: &Net,
@@ -305,6 +305,61 @@ pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
             start_index += layer_len;
             layer_len >>= 1;
         }
+        // Now leader has the bottem of the leader tree.
+        // Leader uses N elements (each is a root of a subtree) to calculate remaining layers.
+        // NOTE: We do not guarantee correctness here.
+        for i in (leader_tree_len - party_count)..(leader_tree_len - 1) {
+            let (x0, x1) = sub_index(i);
+            leader_tree.push(leader_tree[x0] * leader_tree[x1]);
+        }
+        leader_tree.push(F::ZERO);
+        end_timer!(ld_compute_timer);
+        return Ok((subtree, Some(leader_tree)));
+    }
+    
+    Ok((subtree, None))
+}
+
+pub async fn d_acc_product<F: FftField, Net: MPCSerializeNet>(
+    inputs: &Vec<F>,
+    net: &Net,
+    sid: MultiplexedStreamID,
+) -> Result<(Vec<F>, Option<Vec<F>>), MPCNetError> {
+    let party_count = net.n_parties();
+
+    // Each party calculates a sub-tree
+    let subtree_timer = start_timer!("Local: Computes subtree", net.is_leader());
+    let mut subtree = Vec::with_capacity(inputs.len() * 2);
+    subtree.extend_from_slice(&inputs);
+    subtree.extend_from_slice(&inputs);
+    for i in inputs.len()..subtree.len() - 1 {
+        let (x0, x1) = sub_index(i);
+        subtree[i] = subtree[x0] * subtree[x1];
+    }
+    *subtree.last_mut().unwrap() = F::ZERO;
+    end_timer!(subtree_timer);
+
+    // Now every party has a subtree.
+    // vec![subtree; party_count]; 
+    // Each party sends the last one element to the leader, 
+    let num_to_send = 1;
+    let ld_receive_timer = start_timer!("Send elements to leader", net.is_leader());
+    let leader_receiving = net
+        .worker_send_or_leader_receive_element(
+            &subtree[subtree.len() - num_to_send],
+            sid,
+        )
+        .await.unwrap();
+    end_timer!(ld_receive_timer);
+
+    // Leader receives N elements and calculates the remaining layers.
+    if net.is_leader() {
+        let leader_receiving = leader_receiving.unwrap();
+        let ld_compute_timer = start_timer!("Leader: Compute leader tree", net.is_leader());
+        // Leader first merge the N^2 elements to the bottem of the leader tree.
+        // This is done in a level-order traveral manner.
+        let leader_tree_len = num_to_send * party_count;
+        let mut leader_tree = leader_receiving;
         // Now leader has the bottem of the leader tree.
         // Leader uses N elements (each is a root of a subtree) to calculate remaining layers.
         // NOTE: We do not guarantee correctness here.

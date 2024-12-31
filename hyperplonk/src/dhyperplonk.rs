@@ -1,12 +1,15 @@
 use ark_ec::pairing::Pairing;
 use ark_ff::fields::Field;
 use ark_std::UniformRand;
+use dist_primitive::dacc_product::{c_acc_product, d_acc_product};
 use dist_primitive::degree_reduce::degree_reduce_many;
+use dist_primitive::dsumcheck::{d_sumcheck, d_sumcheck_product};
+use dist_primitive::mle::d_fix_variable;
 use dist_primitive::random_evaluations;
 use dist_primitive::{
-    dacc_product::d_acc_product_and_share,
+    dacc_product::c_acc_product_and_share,
     dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub},
-    dsumcheck::d_sumcheck_product,
+    dsumcheck::c_sumcheck_product,
     mle::fix_variable,
     utils::serializing_net::MPCSerializeNet,
 };
@@ -16,19 +19,26 @@ use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Clone, Debug)]
 pub struct PackedProvingParameters<E: Pairing> {
+    pub V: Vec<E::ScalarField>,
     pub a_evals: Vec<E::ScalarField>,
     pub b_evals: Vec<E::ScalarField>,
     pub c_evals: Vec<E::ScalarField>,
-    pub input: Vec<E::ScalarField>,
-    pub q1: Vec<E::ScalarField>,
-    pub q2: Vec<E::ScalarField>,
-    pub sigma_a: Vec<E::ScalarField>,
-    pub sigma_b: Vec<E::ScalarField>,
-    pub sigma_c: Vec<E::ScalarField>,
+    pub I: Vec<E::ScalarField>,
+    pub S1: Vec<E::ScalarField>,
+    pub S2: Vec<E::ScalarField>,
+    pub ssigma: Vec<E::ScalarField>,
+    pub ssigma_a: Vec<E::ScalarField>,
+    pub ssigma_b: Vec<E::ScalarField>,
+    pub ssigma_c: Vec<E::ScalarField>,
     pub sid: Vec<E::ScalarField>,
     // Challenges
     pub eq: Vec<E::ScalarField>,
+    pub eq_r1: Vec<E::ScalarField>,
+    pub eq_r2: Vec<E::ScalarField>,
     pub challenge: Vec<E::ScalarField>,
+    pub challenge_r1: Vec<E::ScalarField>,
+    pub challenge_r2: Vec<E::ScalarField>,
+    pub alpha: E::ScalarField,
     pub beta: E::ScalarField,
     pub gamma: E::ScalarField,
     pub commitment: PolynomialCommitment<E>,
@@ -47,29 +57,34 @@ impl<E: Pairing> PackedProvingParameters<E> {
         let rng = &mut StdRng::from_entropy();
         let gate_count = (1 << n) / l;
         // Shares of witness polynomial M
-        let m = random_evaluations(gate_count * 4);
-        let a_evals = fix_variable(&m, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
-        let b_evals = fix_variable(&m, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
-        let c_evals = fix_variable(&m, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
+        let V = random_evaluations(gate_count * 4);
+        let a_evals = fix_variable(&V, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
+        let b_evals = fix_variable(&V, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
+        let c_evals = fix_variable(&V, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
         // Shares of input polynomial I
-        let input = random_evaluations(gate_count);
+        let I = random_evaluations(gate_count);
         // Shares of selector polynomial Q_1, Q_2
-        let q1 = random_evaluations(gate_count);
-        let q2 = random_evaluations(gate_count);
+        let S1 = random_evaluations(gate_count);
+        let S2 = random_evaluations(gate_count);
         // Shares of permutation polynomial S_\sigma and identity polynomial S_id
         let ssigma: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4);
-        let sigma_a = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
-        let sigma_b = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
-        let sigma_c = fix_variable(&ssigma, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
-        let sid: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count);
+        let ssigma_a = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
+        let ssigma_b = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
+        let ssigma_c = fix_variable(&ssigma, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
+        let sid: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4);
 
         // Shares of eq polynomial. For benchmarking purposes, we generate it in advance and use it repeatedly in the protocol.
         let eq = random_evaluations(gate_count);
-        // Distributed polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice.
-        let commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_single(n, pp);
+        let eq_r1 = random_evaluations(gate_count * 4);
+        let eq_r2 = random_evaluations(gate_count * 4);
+        // Collaborative polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice.
+        let commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_single(n + 2, pp);
         // Challenge for polynomial commitment opening.
         let challenge = random_evaluations(n);
+        let challenge_r1 = random_evaluations(n + 2);
+        let challenge_r2 = random_evaluations(n + 2);
         // Other challenges.
+        let alpha = E::ScalarField::rand(rng);
         let beta = E::ScalarField::rand(rng);
         let gamma = E::ScalarField::rand(rng);
         // Masks.
@@ -81,18 +96,25 @@ impl<E: Pairing> PackedProvingParameters<E> {
         let reduce_target = random_evaluations(gate_count / l);
 
         PackedProvingParameters {
+            V,
             a_evals,
             b_evals,
             c_evals,
-            input,
-            q1,
-            q2,
-            sigma_a,
-            sigma_b,
-            sigma_c,
+            I,
+            S1,
+            S2,
+            ssigma,
+            ssigma_a,
+            ssigma_b,
+            ssigma_c,
             sid,
             eq,
+            eq_r1,
+            eq_r2,
             challenge,
+            challenge_r1,
+            challenge_r2,
+            alpha,
             beta,
             gamma,
             commitment,
@@ -125,64 +147,38 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     MPCNetError,
 > {
     let gate_count = (1 << n) / pp.l;
-    
+
     // Now run the protocol.
     let timer_all = start_timer!("Distributed HyperPlonk", net.is_leader());
 
-    // Commit to 4+2+3=9 polynomials
+    // step 1 in figure 11
     let commit_timer = start_timer!("Commit", net.is_leader());
     let com_a = pk
         .commitment
-        .d_commit(&vec![pk.a_evals.clone()], &pp, &net, sid)
+        .c_commit(&vec![pk.a_evals.clone()], &pp, &net, sid)
         .await
         .unwrap()[0];
     let com_b = pk
         .commitment
-        .d_commit(&vec![pk.b_evals.clone()], &pp, &net, sid)
+        .c_commit(&vec![pk.b_evals.clone()], &pp, &net, sid)
         .await
         .unwrap()[0];
     let com_c = pk
         .commitment
-        .d_commit(&vec![pk.c_evals.clone()], &pp, &net, sid)
+        .c_commit(&vec![pk.c_evals.clone()], &pp, &net, sid)
         .await
         .unwrap()[0];
-    let com_in = pk
-        .commitment
-        .d_commit(&vec![pk.input.clone()], &pp, &net, sid)
-        .await
-        .unwrap()[0];
+    let com_I = pk.commitment.d_commit(&pk.I, &net, sid).await.unwrap();
 
-    let com_q1 = pk
-        .commitment
-        .d_commit(&vec![pk.q1.clone()], &pp, &net, sid)
-        .await
-        .unwrap()[0];
-    let com_q2 = pk
-        .commitment
-        .d_commit(&vec![pk.q2.clone()], &pp, &net, sid)
-        .await
-        .unwrap()[0];
+    let com_S1 = pk.commitment.d_commit(&pk.S1, &net, sid).await.unwrap();
+    let com_S2 = pk.commitment.d_commit(&pk.S2, &net, sid).await.unwrap();
 
-    let com_ssigma_a = pk
-        .commitment
-        .d_commit(&vec![pk.sigma_a.clone()], &pp, &net, sid)
-        .await
-        .unwrap()[0];
-    let com_ssigma_b = pk
-        .commitment
-        .d_commit(&vec![pk.sigma_b.clone()], &pp, &net, sid)
-        .await
-        .unwrap()[0];
-    let com_ssigma_c = pk
-        .commitment
-        .d_commit(&vec![pk.sigma_c.clone()], &pp, &net, sid)
-        .await
-        .unwrap()[0];
     end_timer!(commit_timer);
+    // End of step 1
 
     let prover_timer = start_timer!("Distributed HyperPlonk Prover", net.is_leader());
 
-    // Gate identity
+    // Gate identity, step 3 in figure 11
     let gate_timer = start_timer!("Gate identity", net.is_leader());
     let mut gate_identity_proofs = Vec::new();
     let mut gate_identity_commitments = Vec::new();
@@ -191,7 +187,7 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     // We use different sumcheck product to simulate it for implementation simplicity. The computation complexity is the same.
     // Part 1
     gate_identity_proofs
-        .push(d_sumcheck_product(&pk.eq, &pk.q1, &pk.challenge, pp, net, sid).await?);
+        .push(c_sumcheck_product(&pk.eq, &pk.S1, &pk.challenge, pp, net, sid).await?);
     let sum_ab = pk
         .a_evals
         .iter()
@@ -199,162 +195,167 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
         .map(|(a, b)| *a + *b)
         .collect();
     gate_identity_proofs
-        .push(d_sumcheck_product(&pk.q1, &sum_ab, &pk.challenge, pp, net, sid).await?);
+        .push(c_sumcheck_product(&pk.S1, &sum_ab, &pk.challenge, pp, net, sid).await?);
     // Part 2
     gate_identity_proofs
-        .push(d_sumcheck_product(&pk.eq, &pk.q2, &pk.challenge, pp, net, sid).await?);
+        .push(c_sumcheck_product(&pk.eq, &pk.S2, &pk.challenge, pp, net, sid).await?);
     gate_identity_proofs
-        .push(d_sumcheck_product(&pk.a_evals, &pk.b_evals, &pk.challenge, pp, net, sid).await?);
+        .push(c_sumcheck_product(&pk.a_evals, &pk.b_evals, &pk.challenge, pp, net, sid).await?);
     gate_identity_proofs
-        .push(d_sumcheck_product(&pk.q2, &pk.a_evals, &pk.challenge, pp, net, sid).await?);
+        .push(c_sumcheck_product(&pk.S2, &pk.a_evals, &pk.challenge, pp, net, sid).await?);
     // Part 3
     let sum_ci = pk
         .c_evals
         .iter()
-        .zip(pk.input.iter())
+        .zip(pk.I.iter())
         .map(|(a, b)| -*a + b)
         .collect();
     gate_identity_proofs
-        .push(d_sumcheck_product(&pk.eq, &sum_ci, &pk.challenge, pp, net, sid).await?);
+        .push(c_sumcheck_product(&pk.eq, &sum_ci, &pk.challenge, pp, net, sid).await?);
     end_timer!(gate_timer);
+    // End of step 3
 
-    // Wire identity
+    // Wiring identity, step 2 in figure 11
+    let mut wiring_proofs = Vec::new();
+    let mut wiring_commits = Vec::new();
+    let mut wiring_opens = Vec::new();
     let wire_timer = start_timer!("Wire identity", net.is_leader());
-    // Compute f, g
-    // f(x) = \prod (w_i(x) + \beta*sid_i(x) + \gamma)
+    // 2.a compute A_s
+    // A_s is the PSS of a vector with length n. Just get some random value here as local value.
+    // Do note that in the paper n is gate_count*4
+    let local_s = random_evaluations(gate_count * 4 / net.n_parties() / pp.l);
+    let mut s = Vec::with_capacity(gate_count * 4 / pp.l);
+    for i in 0..net.n_parties() {
+        // If I am the current party, send shares to others.
+        let send = if i == net.party_id() as usize {
+            Some(vec![local_s.clone(); net.n_parties()])
+        } else {
+            None
+        };
+        // Send to all other parties.
+        let recv = net
+            .dynamic_worker_receive_or_worker_send_element(send, i as u32, sid)
+            .await
+            .unwrap();
+        #[cfg(feature = "comm")]
+        {
+            s.extend_from_slice(&recv);
+        }
+
+        // If no actual communication, just use the input as a placeholder.
+        #[cfg(not(feature = "comm"))]
+        {
+            black_box(recv);
+            s.extend_from_slice(&local_s);
+        }
+    }
+    // 2.b compute com_s
+    wiring_commits.push(
+        pk.commitment
+            .c_commit(&vec![s.clone()], &pp, &net, sid)
+            .await
+            .unwrap()[0],
+    );
+    // 2.c sumcheck product on V(r1), between s and V
+    wiring_proofs.push(c_sumcheck_product(&s, &pk.S1, &pk.challenge_r1, pp, net, sid).await?);
+    // 2.d co-open V at r1 and r2, di-open s at r2
+    wiring_opens.push(
+        pk.commitment
+            .c_open(&pk.V, &pk.challenge_r1, pp, net, sid)
+            .await?,
+    );
+    wiring_opens.push(
+        pk.commitment
+            .c_open(&pk.V, &pk.challenge_r2, pp, net, sid)
+            .await?,
+    );
+    wiring_opens.push(pk.commitment.d_open(&s, &pk.challenge_r2, net, sid).await?);
+    // 2.e distributed permcheck on s and eq(r1,x)
+    // d_commit s, eq(r1,x), ssigma, sid
+    // s has been committed before in 2.b, omit it here
+    wiring_commits.push(pk.commitment.d_commit(&pk.eq_r1, &net, sid).await.unwrap());
+    wiring_commits.push(pk.commitment.d_commit(&pk.ssigma, &net, sid).await.unwrap());
+    wiring_commits.push(pk.commitment.d_commit(&pk.sid, &net, sid).await.unwrap());
+    // prodcheck
+    // Compute h
+    let h_length = gate_count * 4 / net.n_parties();
+    let offset = h_length * net.party_id() as usize;
     let timer = start_timer!("Local: Something", net.is_leader());
-    let num = (0..gate_count)
+    let num = (0..h_length)
         .map(|i| {
-            (pk.a_evals[i] + pk.beta * pk.sigma_a[i] + pk.gamma)
-                * (pk.b_evals[i] + pk.beta * pk.sigma_b[i] + pk.gamma)
-                * (pk.c_evals[i] + pk.beta * pk.sigma_c[i] + pk.gamma)
+            let index = offset + i;
+            s[index] + pk.alpha * pk.sid[index] + pk.beta
         })
         .collect();
-    let den = (0..gate_count)
+    let den = (0..h_length)
         .map(|i| {
-            (pk.a_evals[i] + pk.beta * pk.sid[i] + pk.gamma)
-                * (pk.b_evals[i] + pk.beta * pk.sid[i] + pk.gamma)
-                * (pk.c_evals[i] + pk.beta * pk.sid[i] + pk.gamma)
+            let index = offset + i;
+            pk.eq_r1[index] + pk.alpha * pk.ssigma[index] + pk.beta
         })
         .collect();
     let fs: Vec<Vec<E::ScalarField>> = vec![num, den];
     end_timer!(timer);
+    // Compute h = num/den, in fact we should leave the form in upcoming steps, this is simplification
+    let h = num.iter().zip(den.iter()).map(|(a, b)| *a / *b).collect();
 
-    let mut wire_identity = Vec::new();
-    for evaluations in &fs {
-        let mut proofs = Vec::new();
-        let mut commits = Vec::new();
-        // Compute V
-        let (vx0, vx1, v1x) = d_acc_product_and_share(
-            evaluations,
-            &pk.mask,
-            &pk.unmask0,
-            &pk.unmask1,
-            &pk.unmask2,
-            pp,
-            net,
-            sid,
-        )
-        .await
-        .unwrap();
-        // Commit
-        let com_v0x = pk
-            .commitment
-            .d_commit(&vec![evaluations.clone()], &pp, &net, sid)
-            .await
-            .unwrap()[0];
-        let com_v1x = pk
-            .commitment
-            .d_commit(&vec![v1x.clone()], &pp, &net, sid)
-            .await
-            .unwrap()[0];
-        // Open
-        commits.push((
-            com_v0x,
-            pk.commitment
-                .d_open(&evaluations, &pk.challenge, pp, net, sid)
-                .await?,
-        ));
-        commits.push((
-            com_v1x,
-            pk.commitment
-                .d_open(&v1x, &pk.challenge, pp, net, sid)
-                .await?,
-        ));
-        // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
-        proofs.push(
-            d_sumcheck_product(&pk.eq, &v1x, &pk.challenge, pp, net, sid)
-                .await
-                .unwrap(),
-        );
-        proofs.push(
-            d_sumcheck_product(&pk.eq, &vx0, &pk.challenge, pp, net, sid)
-                .await
-                .unwrap(),
-        );
-        proofs.push(
-            d_sumcheck_product(&vx0, &vx1, &pk.challenge, pp, net, sid)
-                .await
-                .unwrap(),
-        );
-        wire_identity.push((proofs, commits));
-    }
+    // Compute subtree of v
+    let (subtree, top) = d_acc_product(&h, net, sid).await.unwrap();
+    // 2.e.1 zerocheck on p(x) = h(x) - v(0,x)
+    // Commit v0x
+    wiring_commits.push(pk.commitment.d_commit(&h, &net, sid).await.unwrap());
+
+    // sumcheck product for p and eq
+    wiring_proofs.push(d_sumcheck_product(&h, &pk.eq_r2, &pk.challenge_r2, net, sid).await?);
+    // Open p
+    wiring_opens.push(pk.commitment.d_open(&h, &pk.challenge_r2, net, sid).await?);
+    wiring_opens.push(pk.commitment.d_open(&pk.eq_r2, &pk.challenge_r2, net, sid).await?);
+
+    // 2.e.2 zerocheck on q(x) = v(1,x) - v(x,0) * v(x,1)
+    // We are literally running l sumchecks, let's get these three v first
+    let v1x = subtree.iter().skip(subtree.len()/2).map(<E as Pairing>::ScalarField::clone).collect();
+    let vx0 = subtree.iter().step_by(2).map(<E as Pairing>::ScalarField::clone).collect();
+    let vx1 = subtree.iter().skip(1).step_by(2).map(<E as Pairing>::ScalarField::clone).collect();
+    // and commit them
+    wiring_commits.push(pk.commitment.d_commit(&v1x, &net, sid).await.unwrap());
+
     end_timer!(wire_timer);
-
+    // end of step 2
     // Open
     let open_timer = start_timer!("Open", net.is_leader());
     gate_identity_commitments.push((
         com_a,
         pk.commitment
-            .d_open(&pk.a_evals, &pk.challenge, pp, net, sid)
+            .c_open(&pk.a_evals, &pk.challenge, pp, net, sid)
             .await?,
     ));
     gate_identity_commitments.push((
         com_b,
         pk.commitment
-            .d_open(&pk.b_evals, &pk.challenge, pp, net, sid)
+            .c_open(&pk.b_evals, &pk.challenge, pp, net, sid)
             .await?,
     ));
     gate_identity_commitments.push((
         com_c,
         pk.commitment
-            .d_open(&pk.c_evals, &pk.challenge, pp, net, sid)
+            .c_open(&pk.c_evals, &pk.challenge, pp, net, sid)
             .await?,
     ));
     gate_identity_commitments.push((
-        com_in,
+        com_I,
         pk.commitment
-            .d_open(&pk.input, &pk.challenge, pp, net, sid)
+            .c_open(&pk.I, &pk.challenge, pp, net, sid)
             .await?,
     ));
     gate_identity_commitments.push((
-        com_q1,
+        com_S1,
         pk.commitment
-            .d_open(&pk.q1, &pk.challenge, pp, net, sid)
+            .c_open(&pk.S1, &pk.challenge, pp, net, sid)
             .await?,
     ));
     gate_identity_commitments.push((
-        com_q2,
+        com_S2,
         pk.commitment
-            .d_open(&pk.q2, &pk.challenge, pp, net, sid)
-            .await?,
-    ));
-    gate_identity_commitments.push((
-        com_ssigma_a,
-        pk.commitment
-            .d_open(&pk.sigma_a, &pk.challenge, pp, net, sid)
-            .await?,
-    ));
-    gate_identity_commitments.push((
-        com_ssigma_b,
-        pk.commitment
-            .d_open(&pk.sigma_b, &pk.challenge, pp, net, sid)
-            .await?,
-    ));
-    gate_identity_commitments.push((
-        com_ssigma_c,
-        pk.commitment
-            .d_open(&pk.sigma_c, &pk.challenge, pp, net, sid)
+            .c_open(&pk.S2, &pk.challenge, pp, net, sid)
             .await?,
     ));
     end_timer!(open_timer);

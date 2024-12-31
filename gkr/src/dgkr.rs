@@ -9,7 +9,7 @@ use ark_serialize::Compress;
 use dist_primitive::{
     degree_reduce::degree_reduce_many,
     dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub},
-    dsumcheck::d_sumcheck_product,
+    dsumcheck::c_sumcheck_product,
     mle::PackedDenseMultilinearExtension,
     utils::serializing_net::MPCSerializeNet,
 };
@@ -106,7 +106,7 @@ pub async fn d_gkr_function<F: FftField, Net: MPCSerializeNet>(
     let hg = d_initialize_phase_one(shares_f1, shares_f3, challenge_g, pp, net, sid).await?;
     // Sumcheck product 1
     let mut proof1 =
-        d_sumcheck_product(&hg.shares, &shares_f2.shares, challenge_u, pp, net, sid).await?;
+        c_sumcheck_product(&hg.shares, &shares_f2.shares, challenge_u, pp, net, sid).await?;
     // Init Phase 2
     let f1 = d_initialize_phase_two(shares_f1, challenge_g, challenge_v, pp, net, sid).await?;
     // Calculate f3*f2(u). Omitted for simplicity.
@@ -116,7 +116,7 @@ pub async fn d_gkr_function<F: FftField, Net: MPCSerializeNet>(
     let shares_f3_f2u = shares_f3.mul(&f2_u);
     // Sumcheck product 2
     let proof2 =
-        d_sumcheck_product(&f1.shares, &shares_f3_f2u.shares, challenge_v, pp, net, sid).await?;
+        c_sumcheck_product(&f1.shares, &shares_f3_f2u.shares, challenge_v, pp, net, sid).await?;
     proof1.extend(proof2);
     Ok(proof1)
 }
@@ -216,7 +216,7 @@ pub async fn d_gkr<E: Pairing, Net: MPCSerializeNet>(
     // Commit
     let commit_timer = start_timer!("Commit", net.is_leader());
     let commit = pk.commitment
-        .d_commit(&vec![pk.poly_vs[0].shares.clone()], pp, net, sid)
+        .c_commit(&vec![pk.poly_vs[0].shares.clone()], pp, net, sid)
         .await?;
     end_timer!(commit_timer);
 
@@ -253,7 +253,7 @@ pub async fn d_gkr<E: Pairing, Net: MPCSerializeNet>(
     // Open
     let open_timer = start_timer!("Open", net.is_leader());
     let open = pk.commitment
-        .d_open(&pk.poly_vs[depth-1].shares, &pk.challenge_r, pp, net, sid)
+        .c_open(&pk.poly_vs[depth-1].shares, &pk.challenge_r, pp, net, sid)
         .await?;
     end_timer!(open_timer);
 
