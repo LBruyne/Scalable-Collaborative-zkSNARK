@@ -65,6 +65,53 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
             powers_of_g2,
         }
     }
+
+    pub fn new_ugly(g: E::G1, g2: E::G2, s: Vec<E::ScalarField>, party_count:usize) -> Self {
+        let n = s.len();
+        let log_party = party_count.trailing_zeros() as usize;
+        let mut powers_of_g: Vec<Vec<<E as Pairing>::G1>> = vec![Vec::new(); n + 1];
+        let mut powers_of_g2: Vec<<E as Pairing>::G2> = Vec::new();
+        {
+            // Last vec, only g
+            powers_of_g[0].push(g);
+        }
+        // s_0 is in the outermost layer, i.e. in the final vec the first half is s_0, and the second half is 1-s_0
+        for i in 0..log_party {
+            powers_of_g[i + 1] = powers_of_g[i]
+                .clone()
+                .into_par_iter()
+                .map(|e| e * (E::ScalarField::one() - s[log_party - i - 1]))
+                .chain(
+                    powers_of_g[i]
+                        .clone()
+                        .into_par_iter()
+                        .map(|e| e * s[log_party - i - 1]),
+                )
+                .collect();
+        }
+        for i in log_party..n {
+            powers_of_g[i + 1] = powers_of_g[i]
+                .clone()
+                .into_par_iter()
+                .map(|e| e * (E::ScalarField::one() - s[n - i - 1]))
+                .chain(
+                    powers_of_g[i]
+                        .clone()
+                        .into_par_iter()
+                        .map(|e| e * s[n - i - 1]),
+                )
+                .collect();
+        }
+        powers_of_g2.push(g2);
+        for i in 0..n {
+            powers_of_g2.push(g2 * s[i]);
+        }
+        Self {
+            powers_of_g,
+            powers_of_g2,
+        }
+    }
+
     pub fn new_toy(g: E::G1, g2: E::G2, s: Vec<E::ScalarField>) -> Self {
         let n = s.len();
         let rng = &mut ark_std::test_rng();
@@ -483,9 +530,10 @@ mod test {
         }
         let g1 = <Bls12<ark_bls12_381::Config> as Pairing>::G1::rand(rng);
         let g2 = <Bls12<ark_bls12_381::Config> as Pairing>::G2::rand(rng);
-        let cub = PolynomialCommitmentCub::<Bls12_381>::new(g1, g2, s);
-        let commitment  = cub.mature();
-        let verification = commitment.clone();
+        let cub = PolynomialCommitmentCub::<Bls12_381>::new(g1, g2, s.clone());
+        let ugly_cub = PolynomialCommitmentCub::<Bls12_381>::new_ugly(g1, g2, s, 4);
+        let commitment  = ugly_cub.mature();
+        let verification = cub.mature();
         let net = LocalTestNet::new_local_testnet(4).await.unwrap();
         let result = net
             .simulate_network_round(
