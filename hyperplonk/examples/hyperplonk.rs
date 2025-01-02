@@ -15,7 +15,7 @@ use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Parser)]
 struct Cli {
-    /// The packing size, should be 1/4 of the party size as well as a power of 2.
+    /// The packing size, should be 1/8 of the party size as well as a power of 2.
     #[arg(long)]
     l: usize,
     /// log2 of the total number of variables.
@@ -38,7 +38,7 @@ async fn main() {
 async fn hyperplonk_distributed_bench(n: usize, l: usize) {
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     let params = PackedProvingParameters::new(n, l, &pp);
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
     black_box(
         dhyperplonk::<Bls12<ark_bls12_381::Config>, _>(
@@ -57,7 +57,7 @@ async fn hyperplonk_distributed_bench(n: usize, l: usize) {
 async fn hyperplonk_distributed_bench(n: usize, l: usize) {
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     let params = PackedProvingParameters::new(n, l, &pp);
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
     let timer = start_timer!("Simulate distributed Hyperplonk");
     let _ = net

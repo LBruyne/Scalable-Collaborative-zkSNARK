@@ -67,34 +67,34 @@ impl<E: Pairing> PackedProvingParameters<E> {
         let rng = &mut StdRng::from_entropy();
         let gate_count = (1 << n);
         // Shares of witness polynomial M
-        let V = random_evaluations(gate_count * 4 / l);
+        let V = random_evaluations(gate_count * 4 /pp.l);
         let a_evals = fix_variable(&V, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
         let b_evals = fix_variable(&V, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
         let c_evals = fix_variable(&V, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
         // Shares of input polynomial I
-        let I = random_evaluations(gate_count / l);
+        let I = random_evaluations(gate_count /pp.l);
         // plain I
-        let I_p = random_evaluations(gate_count / l / 4);
+        let I_p = random_evaluations(gate_count / pp.n);
         // Shares of selector polynomial Q_1, Q_2
-        let S1 = random_evaluations(gate_count / l);
-        let S2 = random_evaluations(gate_count / l);
-        let S1_p = random_evaluations(gate_count / l / 4);
-        let S2_p = random_evaluations(gate_count / l / 4);
+        let S1 = random_evaluations(gate_count /pp.l);
+        let S2 = random_evaluations(gate_count /pp.l);
+        let S1_p = random_evaluations(gate_count / pp.n);
+        let S2_p = random_evaluations(gate_count / pp.n);
         // Shares of permutation polynomial S_\sigma and identity polynomial S_id
-        let ssigma: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / l);
-        let ssigma_p: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / l / 4);
+        let ssigma: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 /pp.l);
+        let ssigma_p: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / pp.n);
         let ssigma_a = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
         let ssigma_b = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
         let ssigma_c = fix_variable(&ssigma, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
-        let sid: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / l);
-        let sid_p: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / l / 4);
+        let sid: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 /pp.l);
+        let sid_p: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / pp.n);
 
         // Shares of eq polynomial. For benchmarking purposes, we generate it in advance and use it repeatedly in the protocol.
-        let eq = random_evaluations(gate_count / l);
-        let eq_r1 = random_evaluations(gate_count * 4 / l);
-        let eq_r1_p = random_evaluations(gate_count * 4 / l / 4);
-        let eq_r2 = random_evaluations(gate_count * 4 / l);
-        let eq_r2_p = random_evaluations(gate_count * 4 / l / 4);
+        let eq = random_evaluations(gate_count /pp.l);
+        let eq_r1 = random_evaluations(gate_count * 4 /pp.l);
+        let eq_r1_p = random_evaluations(gate_count * 4 / pp.n);
+        let eq_r2 = random_evaluations(gate_count * 4 /pp.l);
+        let eq_r2_p = random_evaluations(gate_count * 4 / pp.n);
         // Collaborative polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice.
         let c_commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_single(n + 2, pp);
         let d_commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_random(n + 2);
@@ -107,7 +107,7 @@ impl<E: Pairing> PackedProvingParameters<E> {
         let beta = E::ScalarField::rand(rng);
         let gamma = E::ScalarField::rand(rng);
         // Dummies
-        let reduce_target = random_evaluations(gate_count / l / l);
+        let reduce_target = random_evaluations(gate_count /pp.l /pp.l);
 
         PackedProvingParameters {
             V,

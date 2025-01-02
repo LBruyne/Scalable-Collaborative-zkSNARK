@@ -36,9 +36,9 @@ impl<F: FftField> PackedSharingParams<F> {
     /// Creates a new instance of PackedSharingParams with the given packing factor
     #[allow(unused)]
     pub fn new(l: usize) -> Self {
-        let n = l * 4;
+        let n = l * 8;
         let t = l - 1;
-        debug_assert_eq!(n, 2 * (t + l + 1));
+        debug_assert_eq!(n, 4 * (t + l + 1));
 
         let share = Radix2EvaluationDomain::<F>::new(n).unwrap();
         let secret = Radix2EvaluationDomain::<F>::new(l + t + 1)
@@ -185,7 +185,7 @@ mod tests {
     use PackedSharingParams;
 
     const L: usize = 4;
-    const N: usize = L * 4;
+    const N: usize = L * 8;
     const T: usize = N / 2 - L - 1;
 
     #[test]
