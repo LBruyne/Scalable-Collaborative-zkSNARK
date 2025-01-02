@@ -217,6 +217,23 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
         }
         result.mature()
     }
+    /// A toy protocol that generates a shared parameter.
+    pub fn new_random(
+        len_log_2: usize,
+    ) -> PolynomialCommitment<E> {
+        let rng = &mut ark_std::test_rng();
+
+        let mut result = Self {
+            powers_of_g: vec![Vec::new(); len_log_2 + 1],
+            powers_of_g2: (0..len_log_2 + 1).map(|_| E::G2::rand(rng)).collect(),
+        };
+        for i in 0..len_log_2 + 1 {
+            // Last few powers may not be properly packed, fill in some dummy values
+            let powers_of_g = (0..((1 << i))).map(|_| E::G1::rand(rng)).collect();
+            result.powers_of_g[i] = powers_of_g;
+        }
+        result.mature()
+    }
 }
 
 impl<E: Pairing> PolynomialCommitment<E> {
@@ -235,7 +252,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         sid: MultiplexedStreamID,
     ) -> Result<Vec<E::G1>, MPCNetError> {
         let timer = start_timer!("Local: Something", net.is_leader());
-        let bases: &Vec<Vec<_>> = &pevals
+        let bases: Vec<Vec<_>> = pevals
             .iter()
             .map(|peval| {
                 let level = (peval.len() * pp.l).trailing_zeros() as usize;
@@ -248,7 +265,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         // if net.is_leader() {
         //     eprintln!("dMSM batch size: {}", bases.len());
         // }
-        d_msm(bases, pevals, pp, net, sid).await
+        d_msm(&bases, pevals, pp, net, sid).await
     }
 
     pub fn d_local_commit(

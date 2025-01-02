@@ -292,7 +292,7 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     let mut last_round = A_f.clone();
     // Phase 1
     let timer = start_timer!("Local: Phase 1", net.is_leader());
-    for i in 0..n - s {
+    for i in 0..n {
         let parts = last_round.split_at(last_round.len() / 2);
         let res1 = parts.0.iter().sum();
         let res2 = parts.1.iter().sum();
@@ -315,7 +315,7 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     // Phase 2
     let result = if let Some(local_polys) = local_polys {
         let timer = start_timer!("Leader: Phase 2", net.is_leader());
-        let mut result = (0..n - s)
+        let mut result = (0..n)
             .flat_map(|i| {
                 local_polys
                     .iter()
@@ -325,7 +325,7 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
             .collect::<Vec<_>>();
         let A_f = local_polys.iter().map(|x| x[n - s].1).collect::<Vec<_>>();
         let mut last_round = A_f.clone();
-        for i in n - s..n {
+        for i in n..n+s {
             let parts = last_round.split_at(last_round.len() / 2);
             let res1 = parts.0.iter().sum();
             let res2 = parts.1.iter().sum();
@@ -366,7 +366,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     // In this part the shares can be viewed as a whole. There's no need to go into them
     // The result of this part is a degree 2d share since we perform multiplication between shares.
     let timer = start_timer!("Local: Phase 1", net.is_leader());
-    for i in 0..n - s {
+    for i in 0..n {
         let parts_f = last_round_f.split_at(last_round_f.len() / 2);
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
         let res: (F, F, F) = {
@@ -429,7 +429,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     // Phase 2
     let result = if let Some(local_polys) = local_polys {
         let timer = start_timer!("Leader: Phase 2", net.is_leader());
-        let mut result = (0..n - s)
+        let mut result = (0..n)
             .flat_map(|i| {
                 local_polys
                     .iter()
@@ -441,57 +441,57 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
         let A_g = local_polys.iter().map(|x| x[n - s].0).collect::<Vec<_>>();
         let mut last_round_f = A_f.clone();
         let mut last_round_g = A_g.clone();
-        for i in n - s..n {
-                    let parts_f = last_round_f.split_at(last_round_f.len() / 2);
-        let parts_g = last_round_g.split_at(last_round_g.len() / 2);
-        let res: (F, F, F) = {
-            // t=0
-            let part0_sum = parts_f
-                .0
-                .iter()
-                .zip(parts_g.0.iter())
-                .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
-            // t=1
-            let part1_sum = parts_f
-                .1
-                .iter()
-                .zip(parts_g.1.iter())
-                .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
-            // t=2,
-            // in which case, the evaluation of f and g is not present in the bookkeeping table,
-            // we need to calculate them from (1-t)*x0+t*x1
-            let part2_f: Vec<_> = parts_f
+        for i in n..n+s {
+            let parts_f = last_round_f.split_at(last_round_f.len() / 2);
+            let parts_g = last_round_g.split_at(last_round_g.len() / 2);
+            let res: (F, F, F) = {
+                // t=0
+                let part0_sum = parts_f
+                    .0
+                    .iter()
+                    .zip(parts_g.0.iter())
+                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
+                // t=1
+                let part1_sum = parts_f
+                    .1
+                    .iter()
+                    .zip(parts_g.1.iter())
+                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
+                // t=2,
+                // in which case, the evaluation of f and g is not present in the bookkeeping table,
+                // we need to calculate them from (1-t)*x0+t*x1
+                let part2_f: Vec<_> = parts_f
+                    .0
+                    .iter()
+                    .zip(parts_f.1.iter())
+                    .map(|(x, y)| -*x + *y * F::from(2_u64))
+                    .collect();
+                let part2_g: Vec<_> = parts_g
+                    .0
+                    .iter()
+                    .zip(parts_g.1.iter())
+                    .map(|(x, y)| -*x + *y * F::from(2_u64))
+                    .collect();
+                let part2_sum = part2_f
+                    .iter()
+                    .zip(part2_g.iter())
+                    .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
+                (part0_sum, part1_sum, part2_sum)
+            };
+            result.push(res);
+            // (1-u)*x0 + u*x1
+            last_round_f = parts_f
                 .0
                 .iter()
                 .zip(parts_f.1.iter())
-                .map(|(x, y)| -*x + *y * F::from(2_u64))
-                .collect();
-            let part2_g: Vec<_> = parts_g
+                .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+                .collect::<Vec<_>>();
+            last_round_g = parts_g
                 .0
                 .iter()
                 .zip(parts_g.1.iter())
-                .map(|(x, y)| -*x + *y * F::from(2_u64))
-                .collect();
-            let part2_sum = part2_f
-                .iter()
-                .zip(part2_g.iter())
-                .fold(F::zero(), |acc, (x, y)| acc + *x * *y);
-            (part0_sum, part1_sum, part2_sum)
-        };
-        result.push(res);
-        // (1-u)*x0 + u*x1
-        last_round_f = parts_f
-            .0
-            .iter()
-            .zip(parts_f.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
-            .collect::<Vec<_>>();
-        last_round_g = parts_g
-            .0
-            .iter()
-            .zip(parts_g.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
-            .collect::<Vec<_>>();
+                .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+                .collect::<Vec<_>>();
         }
         end_timer!(timer);
         result
