@@ -11,7 +11,7 @@ use dist_primitive::random_evaluations;
 use dist_primitive::{
     dacc_product::c_acc_product_and_share,
     dpoly_comm::{PolynomialCommitment, PolynomialCommitmentCub},
-    dsumcheck::c_sumcheck_product,
+    dsumcheck::{c_sumcheck_product, sumcheck_product},
     mle::fix_variable,
     utils::serializing_net::MPCSerializeNet,
 };
@@ -19,6 +19,7 @@ use mpc_net::{end_timer, start_timer};
 use mpc_net::{MPCNetError, MultiplexedStreamID};
 use secret_sharing::pss::PackedSharingParams;
 
+// Those fields with _p suffixes are plain and distributed values, those without are shares.
 #[derive(Clone, Debug)]
 pub struct PackedProvingParameters<E: Pairing> {
     pub V: Vec<E::ScalarField>,
@@ -40,6 +41,7 @@ pub struct PackedProvingParameters<E: Pairing> {
     pub sid_p: Vec<E::ScalarField>,
     // Challenges
     pub eq: Vec<E::ScalarField>,
+    pub eq_top_p: Vec<E::ScalarField>,
     pub eq_r1: Vec<E::ScalarField>,
     pub eq_r1_p: Vec<E::ScalarField>,
     pub eq_r2: Vec<E::ScalarField>,
@@ -67,33 +69,34 @@ impl<E: Pairing> PackedProvingParameters<E> {
         let rng = &mut StdRng::from_entropy();
         let gate_count = (1 << n);
         // Shares of witness polynomial M
-        let V = random_evaluations(gate_count * 4 /pp.l);
+        let V = random_evaluations(gate_count * 4 / pp.l);
         let a_evals = fix_variable(&V, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
         let b_evals = fix_variable(&V, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
         let c_evals = fix_variable(&V, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
         // Shares of input polynomial I
-        let I = random_evaluations(gate_count /pp.l);
+        let I = random_evaluations(gate_count / pp.l);
         // plain I
         let I_p = random_evaluations(gate_count / pp.n);
         // Shares of selector polynomial Q_1, Q_2
-        let S1 = random_evaluations(gate_count /pp.l);
-        let S2 = random_evaluations(gate_count /pp.l);
+        let S1 = random_evaluations(gate_count / pp.l);
+        let S2 = random_evaluations(gate_count / pp.l);
         let S1_p = random_evaluations(gate_count / pp.n);
         let S2_p = random_evaluations(gate_count / pp.n);
         // Shares of permutation polynomial S_\sigma and identity polynomial S_id
-        let ssigma: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 /pp.l);
+        let ssigma: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / pp.l);
         let ssigma_p: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / pp.n);
         let ssigma_a = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
         let ssigma_b = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
         let ssigma_c = fix_variable(&ssigma, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
-        let sid: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 /pp.l);
+        let sid: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / pp.l);
         let sid_p: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count * 4 / pp.n);
 
         // Shares of eq polynomial. For benchmarking purposes, we generate it in advance and use it repeatedly in the protocol.
-        let eq = random_evaluations(gate_count /pp.l);
-        let eq_r1 = random_evaluations(gate_count * 4 /pp.l);
+        let eq = random_evaluations(gate_count / pp.l);
+        let eq_top_p = random_evaluations(pp.n*2);
+        let eq_r1 = random_evaluations(gate_count * 4 / pp.l);
         let eq_r1_p = random_evaluations(gate_count * 4 / pp.n);
-        let eq_r2 = random_evaluations(gate_count * 4 /pp.l);
+        let eq_r2 = random_evaluations(gate_count * 4 / pp.l);
         let eq_r2_p = random_evaluations(gate_count * 4 / pp.n);
         // Collaborative polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice.
         let c_commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_single(n + 2, pp);
@@ -107,7 +110,7 @@ impl<E: Pairing> PackedProvingParameters<E> {
         let beta = E::ScalarField::rand(rng);
         let gamma = E::ScalarField::rand(rng);
         // Dummies
-        let reduce_target = random_evaluations(gate_count /pp.l /pp.l);
+        let reduce_target = random_evaluations(gate_count / pp.l / pp.l);
 
         PackedProvingParameters {
             V,
@@ -128,6 +131,7 @@ impl<E: Pairing> PackedProvingParameters<E> {
             sid,
             sid_p,
             eq,
+            eq_top_p,
             eq_r1,
             eq_r1_p,
             eq_r2,
@@ -248,8 +252,8 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     // 2.a compute A_s
     // A_s is the PSS of a vector with length n. Just get some random value here as local value.
     let local_s_p = random_evaluations(gate_count * 4 / net.n_parties());
-    let local_s = random_evaluations(gate_count * 4  / net.n_parties() / pp.l);
-    let mut s = Vec::with_capacity(gate_count * 4  / pp.l);
+    let local_s = random_evaluations(gate_count * 4 / net.n_parties() / pp.l);
+    let mut s = Vec::with_capacity(gate_count * 4 / pp.l);
     for i in 0..net.n_parties() {
         // If I am the current party, send shares to others.
         let send = if i == net.party_id() as usize {
@@ -379,11 +383,92 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
         .step_by(2)
         .map(<E as Pairing>::ScalarField::clone)
         .collect();
-    // and commit them
-    wiring_commits.push(pk.d_commitment.d_commit(&v1x, &net, sid).await.unwrap());
-    wiring_commits.push(pk.d_commitment.d_commit(&vx0, &net, sid).await.unwrap());
-    wiring_commits.push(pk.d_commitment.d_commit(&vx1, &net, sid).await.unwrap());
-    // We then run a series of zerochecks
+    
+    // Compute u = (v(1,x) - v(x,0) * v(x,1)) * eq(x)
+    let u: Vec<_> = v1x
+    .iter()
+    .zip(vx0.iter().zip(vx1.iter().zip(pk.eq_r2_p.iter())))
+    .map(|(a, (b, (c, d)))| (*a - *b * *c) * *d)
+    .collect();
+    wiring_commits.push(pk.d_commitment.d_commit(&u, &net, sid).await.unwrap());
+
+    // We then run a series of sumchecks
+    let s = net.n_parties().trailing_zeros() as usize;
+    let mut current_v1x = v1x[..v1x.len() / 2].to_vec();
+    let mut current_vx0 = vx0[..vx0.len() / 2].to_vec();
+    let mut current_vx1 = vx1[..vx1.len() / 2].to_vec();
+    let mut current_eq = pk.eq_r2_p[..pk.eq_r2_p.len() / 2].to_vec();
+    for i in 1..n-s+1 {
+        // dsumcheck the first half of current_u
+        // This is actually 50% more costly
+        wiring_proofs.push(
+            d_sumcheck_product(
+                &current_v1x,
+                &current_eq,
+                &pk.challenge_r2[i..].to_vec(),
+                net,
+                sid,
+            )
+            .await?,
+        );
+        wiring_proofs.push(
+            d_sumcheck_product(
+                &current_vx0,
+                &current_vx1,
+                &pk.challenge_r2[i..].to_vec(),
+                net,
+                sid,
+            )
+            .await?,
+        );
+        current_v1x = current_v1x[current_v1x.len() / 2..].to_vec();
+        current_vx0 = current_vx0[current_vx0.len() / 2..].to_vec();
+        current_vx1 = current_vx1[current_vx1.len() / 2..].to_vec();
+        current_eq = current_eq[current_eq.len() / 2..].to_vec();
+    }
+
+    // Next we run a similar open procedure
+    let mut current_u = u[..u.len() / 2].to_vec();
+    for i in 1..n-s+1 {
+        // open the first half of current_u
+        wiring_opens.push(
+            pk.d_commitment
+                .d_open(&current_u, &pk.challenge_r2[i..].to_vec(), net, sid)
+                .await?,
+        );
+        current_u = current_u[current_u.len() / 2..].to_vec();
+    }
+    if let Some(leader_tree) = top {
+        // Compute corresponding v1x, vx0, vx1
+        let v1x: Vec<_> = leader_tree
+            .iter()
+            .skip(leader_tree.len() / 2)
+            .map(<E as Pairing>::ScalarField::clone)
+            .collect();
+        let vx0: Vec<_> = leader_tree
+            .iter()
+            .step_by(2)
+            .map(<E as Pairing>::ScalarField::clone)
+            .collect();
+        let vx1: Vec<_> = leader_tree
+            .iter()
+            .skip(1)
+            .step_by(2)
+            .map(<E as Pairing>::ScalarField::clone)
+            .collect();
+        let u: Vec<_> = v1x
+            .iter()
+            .zip(vx0.iter().zip(vx1.iter().zip(pk.eq_r2_p.iter())))
+            .map(|(a, (b, (c, d)))| (*a - *b * *c) * *d)
+            .collect();
+        wiring_proofs.push(sumcheck_product(
+            &v1x,
+            &pk.eq_top_p,
+            &pk.challenge_r2[..s].to_vec(),
+        ));
+        wiring_proofs.push(sumcheck_product(&vx0, &vx1, &pk.challenge_r2[..s].to_vec()));
+        wiring_opens.push(pk.d_commitment.open(&u, &pk.challenge_r2[..s].to_vec()));
+    }
 
     end_timer!(wire_timer);
     // end of step 2

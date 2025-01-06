@@ -323,7 +323,7 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
                     .reduce(|(a1, b1), (a2, b2)| (a1 + a2, b1 + b2))
             })
             .collect::<Vec<_>>();
-        let A_f = local_polys.iter().map(|x| x[n - s].1).collect::<Vec<_>>();
+        let A_f = local_polys.iter().map(|x| x.last().unwrap().1).collect::<Vec<_>>();
         let mut last_round = A_f.clone();
         for i in n..n+s {
             let parts = last_round.split_at(last_round.len() / 2);
@@ -437,8 +437,8 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                     .reduce(|(a1, b1, c1), (a2, b2, c2)| (a1 + a2, b1 + b2, c1 + c2))
             })
             .collect::<Vec<_>>();
-        let A_f = local_polys.iter().map(|x| x[n - s].1).collect::<Vec<_>>();
-        let A_g = local_polys.iter().map(|x| x[n - s].0).collect::<Vec<_>>();
+        let A_f = local_polys.iter().map(|x| x.last().unwrap().1).collect::<Vec<_>>();
+        let A_g = local_polys.iter().map(|x| x.last().unwrap().0).collect::<Vec<_>>();
         let mut last_round_f = A_f.clone();
         let mut last_round_g = A_g.clone();
         for i in n..n+s {
