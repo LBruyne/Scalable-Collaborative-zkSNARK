@@ -367,17 +367,17 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
 
     // 2.e.2 zerocheck on q(x) = v(1,x) - v(x,0) * v(x,1)
     // We are literally running l sumchecks, let's get these three v first
-    let v1x = subtree
+    let v1x:Vec<_> = subtree
         .iter()
         .skip(subtree.len() / 2)
         .map(<E as Pairing>::ScalarField::clone)
         .collect();
-    let vx0 = subtree
+    let vx0:Vec<_> = subtree
         .iter()
         .step_by(2)
         .map(<E as Pairing>::ScalarField::clone)
         .collect();
-    let vx1 = subtree
+    let vx1:Vec<_> = subtree
         .iter()
         .skip(1)
         .step_by(2)
