@@ -37,12 +37,26 @@ async fn main() {
 /// This benchmark just runs the leader's part of the protocol without any networking involved.
 #[cfg(feature = "leader")]
 async fn hyperplonk_distributed_bench(n: usize, l: usize) {
+    use hyperplonk::dhyperplonk::chyperplonk;
+
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     let params = PackedProvingParameters::new(n, l, &pp);
     let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
     black_box(
         dhyperplonk::<Bls12<ark_bls12_381::Config>, _>(
+            n,
+            &params,
+            &pp,
+            net.get_leader(),
+            MultiplexedStreamID::Zero,
+        )
+        .await
+        .unwrap(),
+    );
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
+    black_box(
+        chyperplonk::<Bls12<ark_bls12_381::Config>, _>(
             n,
             &params,
             &pp,

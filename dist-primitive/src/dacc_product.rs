@@ -275,11 +275,11 @@ pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
 
     // These three shares need to be reduced. To make the leader computation corrrect we run 1/N of it
     let reduce_timer = start_timer!("Reduce shares", net.is_leader());
-    let share0_reduce = &share0[..share0.len()/pp.n].to_vec();
+    let share0_reduce = &share0[..share0.len()/pp.n*2].to_vec();
    degree_reduce_many(share0_reduce, pp, net, sid).await?;
-    let share1_reduce = &share1[..share1.len()/pp.n].to_vec();
+    let share1_reduce = &share1[..share1.len()/pp.n*2].to_vec();
    degree_reduce_many(share1_reduce, pp, net, sid).await?;
-    let share2_reduce = &share2[..share2.len()/pp.n].to_vec();
+    let share2_reduce = &share2[..share2.len()/pp.n*2].to_vec();
    degree_reduce_many(share2_reduce, pp, net, sid).await?;
 
     end_timer!(reduce_timer);
