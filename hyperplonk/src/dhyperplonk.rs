@@ -512,9 +512,9 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     ));
     end_timer!(open_timer);
 
-    let degree_reduce_timer = start_timer!("Degree reduce", net.is_leader());
-    degree_reduce_many(&pk.reduce_target, pp, net, sid).await?;
-    end_timer!(degree_reduce_timer);
+    // let degree_reduce_timer = start_timer!("Degree reduce", net.is_leader());
+    // degree_reduce_many(&pk.reduce_target, pp, net, sid).await?;
+    // end_timer!(degree_reduce_timer);
     end_timer!(prover_timer);
 
     end_timer!(timer_all);
