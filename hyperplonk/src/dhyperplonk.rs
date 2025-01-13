@@ -117,15 +117,12 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
             Vec<Vec<(E::ScalarField, E::ScalarField, E::ScalarField)>>,
             Vec<(E::G1, (E::ScalarField, Vec<E::G1>))>,
         ),
-        Vec<(
-            Vec<Vec<(E::ScalarField, E::ScalarField, E::ScalarField)>>,
-            Vec<(E::G1, (E::ScalarField, Vec<E::G1>))>,
-        )>,
+        (Vec<<E as Pairing>::G1>, Vec<(<E as Pairing>::ScalarField, Vec<<E as Pairing>::G1>)>, Vec<Vec<(<E as Pairing>::ScalarField, <E as Pairing>::ScalarField, <E as Pairing>::ScalarField)>>),
     ),
     MPCNetError,
 > {
     let gate_count = (1 << n) / pp.l;
-    
+
     // Now run the protocol.
     let timer_all = start_timer!("Distributed HyperPlonk", net.is_leader());
 
@@ -240,10 +237,10 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
     let fs: Vec<Vec<E::ScalarField>> = vec![num, den];
     end_timer!(timer);
 
-    let mut wire_identity = Vec::new();
+    let mut wiring_proofs = Vec::new();
+    let mut wiring_commits = Vec::new();
+    let mut wiring_opens = Vec::new();
     for evaluations in &fs {
-        let mut proofs = Vec::new();
-        let mut commits = Vec::new();
         // Compute V
         let (vx0, vx1, v1x) = d_acc_product_and_share(
             evaluations,
@@ -258,46 +255,18 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
         .await
         .unwrap();
         // Commit
-        let com_v0x = pk
-            .commitment
-            .d_commit(&vec![evaluations.clone()], &pp, &net, sid)
-            .await
-            .unwrap()[0];
-        let com_v1x = pk
-            .commitment
-            .d_commit(&vec![v1x.clone()], &pp, &net, sid)
-            .await
-            .unwrap()[0];
-        // Open
-        commits.push((
-            com_v0x,
-            pk.commitment
-                .d_open(&evaluations, &pk.challenge, pp, net, sid)
-                .await?,
-        ));
-        commits.push((
-            com_v1x,
-            pk.commitment
-                .d_open(&v1x, &pk.challenge, pp, net, sid)
-                .await?,
-        ));
+        wiring_commits.push(pk.commitment.d_commit(&vec![evaluations.clone()], &pp, &net, sid).await?[0]);
+        wiring_opens.push(pk.commitment.d_open(&evaluations, &pk.challenge, &pp, &net, sid).await?);
+        wiring_commits.push(pk.commitment.d_commit(&vec![vx0.clone()], &pp, &net, sid).await?[0]);
+        wiring_opens.push(pk.commitment.d_open(&vx0, &pk.challenge, &pp, &net, sid).await?);
+        wiring_commits.push(pk.commitment.d_commit(&vec![vx1.clone()], &pp, &net, sid).await?[0]);
+        wiring_opens.push(pk.commitment.d_open(&vx1, &pk.challenge, &pp, &net, sid).await?);
+        wiring_commits.push(pk.commitment.d_commit(&vec![v1x.clone()], &pp, &net, sid).await?[0]);
+        wiring_opens.push(pk.commitment.d_open(&v1x, &pk.challenge, &pp, &net, sid).await?);
         // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
-        proofs.push(
-            d_sumcheck_product(&pk.eq, &v1x, &pk.challenge, pp, net, sid)
-                .await
-                .unwrap(),
-        );
-        proofs.push(
-            d_sumcheck_product(&pk.eq, &vx0, &pk.challenge, pp, net, sid)
-                .await
-                .unwrap(),
-        );
-        proofs.push(
-            d_sumcheck_product(&vx0, &vx1, &pk.challenge, pp, net, sid)
-                .await
-                .unwrap(),
-        );
-        wire_identity.push((proofs, commits));
+        wiring_proofs.push(d_sumcheck_product(&pk.eq, &v1x, &pk.challenge, &pp, &net, sid).await?);
+        wiring_proofs.push(d_sumcheck_product(&pk.eq, &vx0, &pk.challenge, &pp, &net, sid).await?);
+        wiring_proofs.push(d_sumcheck_product(&vx0, &vx1, &pk.challenge, &pp, &net, sid).await?);
     }
     end_timer!(wire_timer);
 
@@ -372,6 +341,6 @@ pub async fn dhyperplonk<E: Pairing, Net: MPCSerializeNet>(
 
     Ok((
         (gate_identity_proofs, gate_identity_commitments),
-        wire_identity,
+        (wiring_commits, wiring_opens, wiring_proofs),
     ))
 }
