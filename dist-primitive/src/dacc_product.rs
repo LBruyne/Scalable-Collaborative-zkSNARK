@@ -3,7 +3,7 @@ use std::cmp::min;
 use std::hint::black_box;
 
 use crate::{
-    unpack, utils::{operator::transpose, serializing_net::MPCSerializeNet}
+    degree_reduce::degree_reduce_many, unpack, utils::{operator::transpose, serializing_net::MPCSerializeNet}
 };
 use ark_ff::FftField;
 use ark_std::iterable::Iterable;
@@ -244,6 +244,15 @@ pub async fn d_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     share2.iter_mut().enumerate().for_each(|(i, share)| {
         *share *= unmask2[i];
     });
+
+    let reduce_timer = start_timer!("Reduce shares", net.is_leader());
+    let share0_reduce = &share0[..share0.len()/pp.n].to_vec();
+   degree_reduce_many(share0_reduce, pp, net, sid).await?;
+    let share1_reduce = &share1[..share1.len()/pp.n].to_vec();
+   degree_reduce_many(share1_reduce, pp, net, sid).await?;
+    let share2_reduce = &share2[..share2.len()/pp.n].to_vec();
+   degree_reduce_many(share2_reduce, pp, net, sid).await?;
+   end_timer!(reduce_timer);
     
     end_timer!(timer);
     Ok((share0, share1, share2))
