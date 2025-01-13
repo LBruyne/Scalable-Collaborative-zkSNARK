@@ -7,6 +7,7 @@ use clap::Parser;
 use hyperplonk::dhyperplonk::dhyperplonk;
 use hyperplonk::dhyperplonk::PackedProvingParameters;
 use hyperplonk::hyperplonk::local_hyperplonk;
+use hyperplonk::hyperplonk::local_hyperplonkpp;
 use mpc_net::LocalTestNet;
 use mpc_net::MPCNet; 
 use mpc_net::{end_timer, start_timer};
@@ -87,5 +88,7 @@ async fn hyperplonk_distributed_bench(n: usize, l: usize) {
 fn hyperplonk_local_bench(n: usize) {
     // generate shares
     let res = local_hyperplonk::<Bls12<ark_bls12_381::Config>>(n);
+    black_box(res);
+    let res = local_hyperplonkpp::<Bls12<ark_bls12_381::Config>>(n);
     black_box(res);
 }

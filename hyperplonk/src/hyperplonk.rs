@@ -29,23 +29,22 @@ pub fn local_hyperplonk<E: Pairing>(
     let q1 = random_evaluations(gate_count);
     let q2 = random_evaluations(gate_count);
     // Permutation polynomial S_\sigma and identity polynomial S_id
-    let ssigma = random_evaluations(gate_count * 4);
-    let ssigma_a_evals = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
-    let ssigma_b_evals = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
-    let ssigma_c_evals = fix_variable(&ssigma, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
-    let sid: Vec<<E as Pairing>::ScalarField> = random_evaluations(gate_count);
-    let beta = E::ScalarField::rand(rng);
-    let alpha = E::ScalarField::rand(rng);
+    let ssigma:Vec<E::ScalarField> = random_evaluations(gate_count * 4);
+
     // Eq polynomial. For benchmarking purposes, we generate it in advance and use it repeatedly in the protocol.
     let eq = random_evaluations(gate_count);
+    let eq_p2 = random_evaluations(gate_count*4);
     // Polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice.
     let g1 = E::G1::rand(rng);
     let g2 = E::G2::rand(rng);
-    let s: Vec<E::ScalarField> = random_evaluations(n);
+    let s: Vec<E::ScalarField> = random_evaluations(n+2);
     let commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_toy(g1, g2, s).mature();
     // Challenge for polynomial commitment opening.
     let challenge = random_evaluations(n);
-    // Other challenges.
+    let challengep2 = random_evaluations(n+2);
+    let sid: Vec<E::ScalarField> = random_evaluations(gate_count*4);
+    let beta = E::ScalarField::rand(rng);
+    let alpha = E::ScalarField::rand(rng);
 
     // Now run the protocol.
     let timer_all = start_timer!("Local HyperPlonk");
@@ -60,9 +59,6 @@ pub fn local_hyperplonk<E: Pairing>(
     let com_q1 = commitment.commit(&q1);
     let com_q2 = commitment.commit(&q2);
 
-    let com_ssigma_a = commitment.commit(&ssigma_a_evals);
-    let com_ssigma_b = commitment.commit(&ssigma_b_evals);
-    let com_ssigma_c = commitment.commit(&ssigma_c_evals);
     end_timer!(commit_timer);
 
     let prover_timer = start_timer!("HyperPlonk Prover");
@@ -102,15 +98,15 @@ pub fn local_hyperplonk<E: Pairing>(
     let wire_timer = start_timer!("Wire identity");
     // Compute f, g
     // f(x) = \prod (w_i(x) + \beta*sid_i(x) + \gamma)
-    let s: Vec<E::ScalarField> = random_evaluations(n);
-    let num: Vec<_> = (0..gate_count)
+    let s: Vec<E::ScalarField> = random_evaluations(gate_count*4);
+    let num: Vec<_> = (0..gate_count*4)
         .map(|i| {
             s[i] + alpha * sid[i] + beta
         })
         .collect();
-    let den: Vec<_> = (0..gate_count)
+    let den: Vec<_> = (0..gate_count*4)
         .map(|i| {
-            eq[i] + alpha * ssigma[i] + beta
+            eq_p2[i] + alpha * ssigma[i] + beta
         })
         .collect();
     let h = num.iter().zip(den.iter()).map(|(a, b)| *a / *b).collect();
@@ -119,24 +115,24 @@ pub fn local_hyperplonk<E: Pairing>(
     // Commit
     // Open (Here we omit repeated openings on the same polynomial).
     wiring_commits.push(commitment.commit(&h));
-    wiring_opens.push(commitment.open(&h, &challenge));
+    wiring_opens.push(commitment.open(&h, &challengep2));
     wiring_commits.push(commitment.commit(&num));
-    wiring_opens.push(commitment.open(&num, &challenge));
+    wiring_opens.push(commitment.open(&num, &challengep2));
     wiring_commits.push(commitment.commit(&den));
-    wiring_opens.push(commitment.open(&den, &challenge));
+    wiring_opens.push(commitment.open(&den, &challengep2));
     wiring_commits.push(commitment.commit(&vx0));
-    wiring_opens.push(commitment.open(&vx0, &challenge));
+    wiring_opens.push(commitment.open(&vx0, &challengep2));
     wiring_commits.push(commitment.commit(&vx1));
-    wiring_opens.push(commitment.open(&vx1, &challenge));
+    wiring_opens.push(commitment.open(&vx1, &challengep2));
     wiring_commits.push(commitment.commit(&v1x));
-    wiring_opens.push(commitment.open(&v1x, &challenge));
+    wiring_opens.push(commitment.open(&v1x, &challengep2));
     // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
-    wiring_proofs.push(sumcheck_product(&eq, &v1x, &challenge));
-    wiring_proofs.push(sumcheck_product(&eq, &vx0, &challenge));
-    wiring_proofs.push(sumcheck_product(&vx0, &vx1, &challenge));
-    wiring_proofs.push(sumcheck_product(&eq, &den, &challenge));
-    wiring_proofs.push(sumcheck_product(&eq, &num, &challenge));
-    wiring_proofs.push(sumcheck_product(&h, &den, &challenge));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &v1x, &challengep2));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &vx0, &challengep2));
+    wiring_proofs.push(sumcheck_product(&vx0, &vx1, &challengep2));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &den, &challengep2));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &num, &challengep2));
+    wiring_proofs.push(sumcheck_product(&h, &den, &challengep2));
     end_timer!(wire_timer);
 
     // Open
@@ -147,9 +143,6 @@ pub fn local_hyperplonk<E: Pairing>(
     gate_identity_commitments.push((com_in, commitment.open(&input, &challenge)));
     gate_identity_commitments.push((com_q1, commitment.open(&q1, &challenge)));
     gate_identity_commitments.push((com_q2, commitment.open(&q2, &challenge)));
-    gate_identity_commitments.push((com_ssigma_a, commitment.open(&ssigma_a_evals, &challenge)));
-    gate_identity_commitments.push((com_ssigma_b, commitment.open(&ssigma_b_evals, &challenge)));
-    gate_identity_commitments.push((com_ssigma_c, commitment.open(&ssigma_c_evals, &challenge)));
     end_timer!(open_timer);
 
     end_timer!(prover_timer);
@@ -178,29 +171,27 @@ pub fn local_hyperplonkpp<E: Pairing>(
     let q1 = random_evaluations(gate_count);
     let q2 = random_evaluations(gate_count);
     // Permutation polynomial S_\sigma and identity polynomial S_id
-    let ssigma = random_evaluations(gate_count * 4);
-    let ssigma_a_evals = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ZERO]);
-    let ssigma_b_evals = fix_variable(&ssigma, &vec![E::ScalarField::ZERO, E::ScalarField::ONE]);
-    let ssigma_c_evals = fix_variable(&ssigma, &vec![E::ScalarField::ONE, E::ScalarField::ZERO]);
+    let ssigma:Vec<E::ScalarField> = random_evaluations(gate_count * 4);
 
     // Eq polynomial. For benchmarking purposes, we generate it in advance and use it repeatedly in the protocol.
     let eq = random_evaluations(gate_count);
+    let eq_p2 = random_evaluations(gate_count*4);
     // Polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice.
     let g1 = E::G1::rand(rng);
     let g2 = E::G2::rand(rng);
-    let s: Vec<E::ScalarField> = random_evaluations(n);
+    let s: Vec<E::ScalarField> = random_evaluations(n+2);
     let commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_toy(g1, g2, s).mature();
     // Challenge for polynomial commitment opening.
     let challenge = random_evaluations(n);
     let challengep2 = random_evaluations(n+2);
     let challengep2_2 = random_evaluations(n+2);
-    // Other challenges.
-
-    // Now run the protocol.
-    let timer_all = start_timer!("Local HyperPlonk");
-    let sid: Vec<E::ScalarField> = random_evaluations(gate_count);
+    let sid: Vec<E::ScalarField> = random_evaluations(gate_count*4);
     let beta = E::ScalarField::rand(rng);
     let alpha = E::ScalarField::rand(rng);
+
+    // Now run the protocol.
+    let timer_all = start_timer!("Local HyperPlonk++");
+
     // Commit to 4+2+3=9 polynomials
     let commit_timer = start_timer!("Commit");
     let com_a = commitment.commit(&a_evals);
@@ -211,9 +202,6 @@ pub fn local_hyperplonkpp<E: Pairing>(
     let com_q1 = commitment.commit(&q1);
     let com_q2 = commitment.commit(&q2);
 
-    let com_ssigma_a = commitment.commit(&ssigma_a_evals);
-    let com_ssigma_b = commitment.commit(&ssigma_b_evals);
-    let com_ssigma_c = commitment.commit(&ssigma_c_evals);
     end_timer!(commit_timer);
 
     let prover_timer = start_timer!("HyperPlonk Prover");
@@ -259,14 +247,14 @@ pub fn local_hyperplonkpp<E: Pairing>(
     wiring_opens.push(commitment.open(&m, &challengep2_2));
     // Compute f, g
     // f(x) = \prod (w_i(x) + \beta*sid_i(x) + \gamma)
-    let num: Vec<_> = (0..gate_count)
+    let num: Vec<_> = (0..gate_count*4)
         .map(|i| {
             s[i] + alpha * sid[i] + beta
         })
         .collect();
-    let den: Vec<_> = (0..gate_count)
+    let den: Vec<_> = (0..gate_count*4)
         .map(|i| {
-            eq[i] + alpha * ssigma[i] + beta
+            eq_p2[i] + alpha * ssigma[i] + beta
         })
         .collect();
     let h = num.iter().zip(den.iter()).map(|(a, b)| *a / *b).collect();
@@ -275,22 +263,22 @@ pub fn local_hyperplonkpp<E: Pairing>(
     // Commit
     // Open (Here we omit repeated openings on the same polynomial).
     wiring_commits.push(commitment.commit(&h));
-    wiring_opens.push(commitment.open(&h, &challenge));
+    wiring_opens.push(commitment.open(&h, &challengep2));
     wiring_commits.push(commitment.commit(&num));
-    wiring_opens.push(commitment.open(&num, &challenge));
+    wiring_opens.push(commitment.open(&num, &challengep2));
     wiring_commits.push(commitment.commit(&vx0));
-    wiring_opens.push(commitment.open(&vx0, &challenge));
+    wiring_opens.push(commitment.open(&vx0, &challengep2));
     wiring_commits.push(commitment.commit(&vx1));
-    wiring_opens.push(commitment.open(&vx1, &challenge));
+    wiring_opens.push(commitment.open(&vx1, &challengep2));
     wiring_commits.push(commitment.commit(&v1x));
-    wiring_opens.push(commitment.open(&v1x, &challenge));
+    wiring_opens.push(commitment.open(&v1x, &challengep2));
     // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
-    wiring_proofs.push(sumcheck_product(&eq, &v1x, &challenge));
-    wiring_proofs.push(sumcheck_product(&eq, &vx0, &challenge));
-    wiring_proofs.push(sumcheck_product(&vx0, &vx1, &challenge));
-    wiring_proofs.push(sumcheck_product(&eq, &den, &challenge));
-    wiring_proofs.push(sumcheck_product(&eq, &num, &challenge));
-    wiring_proofs.push(sumcheck_product(&h, &den, &challenge));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &v1x, &challengep2));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &vx0, &challengep2));
+    wiring_proofs.push(sumcheck_product(&vx0, &vx1, &challengep2));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &den, &challengep2));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &num, &challengep2));
+    wiring_proofs.push(sumcheck_product(&h, &den, &challengep2));
     end_timer!(wire_timer);
 
     // Open
@@ -301,9 +289,6 @@ pub fn local_hyperplonkpp<E: Pairing>(
     gate_identity_commitments.push((com_in, commitment.open(&input, &challenge)));
     gate_identity_commitments.push((com_q1, commitment.open(&q1, &challenge)));
     gate_identity_commitments.push((com_q2, commitment.open(&q2, &challenge)));
-    gate_identity_commitments.push((com_ssigma_a, commitment.open(&ssigma_a_evals, &challenge)));
-    gate_identity_commitments.push((com_ssigma_b, commitment.open(&ssigma_b_evals, &challenge)));
-    gate_identity_commitments.push((com_ssigma_c, commitment.open(&ssigma_c_evals, &challenge)));
     end_timer!(open_timer);
 
     end_timer!(prover_timer);
