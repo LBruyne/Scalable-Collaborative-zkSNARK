@@ -109,11 +109,11 @@ impl<E: Pairing> PackedProvingParameters<E> {
         let alpha = E::ScalarField::rand(rng);
         let beta = E::ScalarField::rand(rng);
         let gamma = E::ScalarField::rand(rng);
-         // Masks.
-        let mask = random_evaluations(gate_count*4/pp.l);
-        let unmask0 = random_evaluations(gate_count*4/pp.l);
-        let unmask1 = random_evaluations(gate_count*4/pp.l);
-        let unmask2 = random_evaluations(gate_count*4/pp.l);
+        // Masks.
+        let mask = random_evaluations(gate_count * 4 / pp.l);
+        let unmask0 = random_evaluations(gate_count * 4 / pp.l);
+        let unmask1 = random_evaluations(gate_count * 4 / pp.l);
+        let unmask2 = random_evaluations(gate_count * 4 / pp.l);
         // Dummies
         let reduce_target = random_evaluations(gate_count / pp.l / pp.l);
 
@@ -720,10 +720,10 @@ pub async fn chyperplonk<E: Pairing, Net: MPCSerializeNet>(
     // Compute f, g
     // f(x) = \prod (w_i(x) + \beta*sid_i(x) + \gamma)
     let timer = start_timer!("Local: Something", net.is_leader());
-    let num = (0..gate_count*4)
+    let num = (0..gate_count * 4)
         .map(|i| pk.V[i] + pk.alpha * pk.sid[i] + pk.beta)
         .collect();
-    let den = (0..gate_count*4)
+    let den = (0..gate_count * 4)
         .map(|i| pk.eq_r1[i] + pk.alpha * pk.ssigma[i] + pk.beta)
         .collect();
     let fs: Vec<Vec<E::ScalarField>> = vec![num, den];
@@ -788,8 +788,10 @@ pub async fn chyperplonk<E: Pairing, Net: MPCSerializeNet>(
                 .await?,
         );
         // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
-        wiring_proofs.push(c_sumcheck_product(&pk.eq_r1, &v1x, &pk.challenge, &pp, &net, sid).await?);
-        wiring_proofs.push(c_sumcheck_product(&pk.eq_r1, &vx0, &pk.challenge, &pp, &net, sid).await?);
+        wiring_proofs
+            .push(c_sumcheck_product(&pk.eq_r1, &v1x, &pk.challenge, &pp, &net, sid).await?);
+        wiring_proofs
+            .push(c_sumcheck_product(&pk.eq_r1, &vx0, &pk.challenge, &pp, &net, sid).await?);
         wiring_proofs.push(c_sumcheck_product(&vx0, &vx1, &pk.challenge, &pp, &net, sid).await?);
     }
     end_timer!(wire_timer);
@@ -849,4 +851,372 @@ pub async fn chyperplonk<E: Pairing, Net: MPCSerializeNet>(
         (gate_identity_proofs, gate_identity_commitments),
         (wiring_proofs, wiring_commits, wiring_opens),
     ))
+}
+
+pub async fn dpermcheck<E: Pairing, Net: MPCSerializeNet>(
+    n: usize, // n is the log2 of the circuit size
+    pk: &PackedProvingParameters<E>,
+    pp: &PackedSharingParams<E::ScalarField>,
+    net: &Net,
+    sid: MultiplexedStreamID,
+) -> Result<
+    (
+        Vec<
+            Vec<(
+                <E as Pairing>::ScalarField,
+                <E as Pairing>::ScalarField,
+                <E as Pairing>::ScalarField,
+            )>,
+        >,
+        Vec<<E as Pairing>::G1>,
+        Vec<(<E as Pairing>::ScalarField, Vec<<E as Pairing>::G1>)>,
+    ),
+    MPCNetError,
+> {
+    let gate_count = 1 << n;
+
+    // Now run the protocol.
+    let local_s_p: Vec<E::ScalarField> = random_evaluations(gate_count * 4 / net.n_parties());
+    let timer_all = start_timer!("Distributed Permcheck", net.is_leader());
+
+    // Wiring identity, step 2 in figure 11
+    let mut wiring_proofs = Vec::new();
+    let mut wiring_commits = Vec::new();
+    let mut wiring_opens = Vec::new();
+
+    // prodcheck
+    // Compute h
+    let h_length = gate_count * 4 / net.n_parties();
+    let offset = h_length * net.party_id() as usize;
+    let num: Vec<_> = (0..h_length)
+        .map(|i| {
+            let index = i;
+            local_s_p[index] + pk.alpha * pk.sid_p[index] + pk.beta
+        })
+        .collect();
+    let den: Vec<_> = (0..h_length)
+        .map(|i| {
+            let index = i;
+            pk.eq_r1_p[index] + pk.alpha * pk.ssigma_p[index] + pk.beta
+        })
+        .collect();
+    // Compute h = num/den, in fact we should leave the form in upcoming steps, this is simplification
+    let h_p = num.iter().zip(den.iter()).map(|(a, b)| *a / *b).collect();
+
+    // Compute subtree of v
+    let (subtree, top) = d_acc_product(&h_p, net, sid).await.unwrap();
+    // 2.e.1 zerocheck on p(x) = h(x) - v(0,x)
+    // Commit h, den and num
+    wiring_commits.push(pk.d_commitment.d_commit(&h_p, &net, sid).await.unwrap());
+    wiring_commits.push(pk.d_commitment.d_commit(&num, &net, sid).await.unwrap());
+
+    // sumcheck product for p and eq
+    wiring_proofs.push(d_sumcheck_product(&h_p, &pk.eq_r2_p, &pk.challenge_r2, net, sid).await?);
+    // Open p
+    wiring_opens.push(
+        pk.d_commitment
+            .d_open(&h_p, &pk.challenge_r2, net, sid)
+            .await?,
+    );
+    wiring_opens.push(
+        pk.d_commitment
+            .d_open(&pk.eq_r2_p, &pk.challenge_r2, net, sid)
+            .await?,
+    );
+
+    // 2.e.2 zerocheck on q(x) = v(1,x) - v(x,0) * v(x,1)
+    // We are literally running l sumchecks, let's get these three v first
+    let v1x: Vec<_> = subtree
+        .iter()
+        .skip(subtree.len() / 2)
+        .map(<E as Pairing>::ScalarField::clone)
+        .collect();
+    let vx0: Vec<_> = subtree
+        .iter()
+        .step_by(2)
+        .map(<E as Pairing>::ScalarField::clone)
+        .collect();
+    let vx1: Vec<_> = subtree
+        .iter()
+        .skip(1)
+        .step_by(2)
+        .map(<E as Pairing>::ScalarField::clone)
+        .collect();
+
+    // Compute (v(1,x) - v(x,0) * v(x,1)) * eq(x)
+    wiring_commits.push(pk.d_commitment.d_commit(&v1x, &net, sid).await.unwrap());
+    wiring_commits.push(pk.d_commitment.d_commit(&vx0, &net, sid).await.unwrap());
+    wiring_commits.push(pk.d_commitment.d_commit(&vx1, &net, sid).await.unwrap());
+
+    // We then run a series of sumchecks
+    let s = net.n_parties().trailing_zeros() as usize;
+    let mut current_v1x = v1x[..v1x.len() / 2].to_vec();
+    let mut current_vx0 = vx0[..vx0.len() / 2].to_vec();
+    let mut current_vx1 = vx1[..vx1.len() / 2].to_vec();
+    let mut current_eq = pk.eq_r2_p[..pk.eq_r2_p.len() / 2].to_vec();
+    let mut current_den = den[..den.len() / 2].to_vec();
+    let mut current_num = num[..num.len() / 2].to_vec();
+    let mut current_h = h_p[..h_p.len() / 2].to_vec();
+    for i in 1..n - s + 1 {
+        // dsumcheck the first half of current_u
+        // This is actually 50% more costly
+        wiring_proofs.push(
+            d_sumcheck_product(
+                &current_eq,
+                &current_v1x,
+                &pk.challenge_r2[i..].to_vec(),
+                net,
+                sid,
+            )
+            .await?,
+        );
+        wiring_proofs.push(
+            d_sumcheck_product(
+                &current_eq,
+                &current_vx0,
+                &pk.challenge_r2[i..].to_vec(),
+                net,
+                sid,
+            )
+            .await?,
+        );
+        wiring_proofs.push(
+            d_sumcheck_product(
+                &current_vx0,
+                &current_vx1,
+                &pk.challenge_r2[i..].to_vec(),
+                net,
+                sid,
+            )
+            .await?,
+        );
+        wiring_proofs.push(
+            d_sumcheck_product(
+                &current_eq,
+                &current_den,
+                &pk.challenge_r2[i..].to_vec(),
+                net,
+                sid,
+            )
+            .await?,
+        );
+        wiring_proofs.push(
+            d_sumcheck_product(
+                &current_eq,
+                &current_num,
+                &pk.challenge_r2[i..].to_vec(),
+                net,
+                sid,
+            )
+            .await?,
+        );
+        wiring_proofs.push(
+            d_sumcheck_product(
+                &current_h,
+                &current_den,
+                &pk.challenge_r2[i..].to_vec(),
+                net,
+                sid,
+            )
+            .await?,
+        );
+
+        // Next we run a similar open procedure
+        wiring_opens.push(
+            pk.d_commitment
+                .d_open(&current_h, &pk.challenge_r2[i..].to_vec(), net, sid)
+                .await?,
+        );
+        wiring_opens.push(
+            pk.d_commitment
+                .d_open(&current_v1x, &pk.challenge_r2[i..].to_vec(), net, sid)
+                .await?,
+        );
+        wiring_opens.push(
+            pk.d_commitment
+                .d_open(&current_vx0, &pk.challenge_r2[i..].to_vec(), net, sid)
+                .await?,
+        );
+        wiring_opens.push(
+            pk.d_commitment
+                .d_open(&current_vx1, &pk.challenge_r2[i..].to_vec(), net, sid)
+                .await?,
+        );
+        wiring_opens.push(
+            pk.d_commitment
+                .d_open(&current_num, &pk.challenge_r2[i..].to_vec(), net, sid)
+                .await?,
+        );
+
+        current_v1x = current_v1x[current_v1x.len() / 2..].to_vec();
+        current_vx0 = current_vx0[current_vx0.len() / 2..].to_vec();
+        current_vx1 = current_vx1[current_vx1.len() / 2..].to_vec();
+        current_eq = current_eq[current_eq.len() / 2..].to_vec();
+        current_den = current_den[current_den.len() / 2..].to_vec();
+        current_num = current_num[current_num.len() / 2..].to_vec();
+        current_h = current_h[current_h.len() / 2..].to_vec();
+    }
+
+    if let Some(leader_tree) = top {
+        // Get top value of den,h,num
+        let eq = random_evaluations(leader_tree.len() / 2);
+        let den = random_evaluations(leader_tree.len() / 2);
+        let num = random_evaluations(leader_tree.len() / 2);
+        // h = num/den
+        let h = num.iter().zip(den.iter()).map(|(a, b)| *a / *b).collect();
+        // Compute corresponding v1x, vx0, vx1
+        let v1x: Vec<_> = leader_tree
+            .iter()
+            .skip(leader_tree.len() / 2)
+            .map(<E as Pairing>::ScalarField::clone)
+            .collect();
+        let vx0: Vec<_> = leader_tree
+            .iter()
+            .step_by(2)
+            .map(<E as Pairing>::ScalarField::clone)
+            .collect();
+        let vx1: Vec<_> = leader_tree
+            .iter()
+            .skip(1)
+            .step_by(2)
+            .map(<E as Pairing>::ScalarField::clone)
+            .collect();
+        wiring_commits.push(pk.d_commitment.commit(&h));
+        wiring_opens.push(pk.d_commitment.open(&h, &pk.challenge_r2[..s]));
+        wiring_commits.push(pk.d_commitment.commit(&num));
+        wiring_opens.push(pk.d_commitment.open(&num, &pk.challenge_r2[..s]));
+        wiring_commits.push(pk.d_commitment.commit(&vx0));
+        wiring_opens.push(pk.d_commitment.open(&vx0, &pk.challenge_r2[..s]));
+        wiring_commits.push(pk.d_commitment.commit(&vx1));
+        wiring_opens.push(pk.d_commitment.open(&vx1, &pk.challenge_r2[..s]));
+        wiring_commits.push(pk.d_commitment.commit(&v1x));
+        wiring_opens.push(pk.d_commitment.open(&v1x, &pk.challenge_r2[..s]));
+        // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
+        wiring_proofs.push(sumcheck_product(&eq, &v1x, &pk.challenge_r2[..s].to_vec()));
+        wiring_proofs.push(sumcheck_product(&eq, &vx0, &pk.challenge_r2[..s].to_vec()));
+        wiring_proofs.push(sumcheck_product(&vx0, &vx1, &pk.challenge_r2[..s].to_vec()));
+        wiring_proofs.push(sumcheck_product(&eq, &den, &pk.challenge_r2[..s].to_vec()));
+        wiring_proofs.push(sumcheck_product(&eq, &num, &pk.challenge_r2[..s].to_vec()));
+        wiring_proofs.push(sumcheck_product(&h, &den, &pk.challenge_r2[..s].to_vec()));
+    }
+
+    end_timer!(timer_all);
+
+    if net.is_leader() {
+        println!("Comm: {:?}", net.get_comm());
+    }
+
+    Ok((wiring_proofs, wiring_commits, wiring_opens))
+}
+
+pub async fn cpermcheck<E: Pairing, Net: MPCSerializeNet>(
+    n: usize, // n is the log2 of the circuit size
+    pk: &PackedProvingParameters<E>,
+    pp: &PackedSharingParams<E::ScalarField>,
+    net: &Net,
+    sid: MultiplexedStreamID,
+) -> Result<
+    (
+        Vec<
+            Vec<(
+                <E as Pairing>::ScalarField,
+                <E as Pairing>::ScalarField,
+                <E as Pairing>::ScalarField,
+            )>,
+        >,
+        Vec<<E as Pairing>::G1>,
+        Vec<(<E as Pairing>::ScalarField, Vec<<E as Pairing>::G1>)>,
+    ),
+    MPCNetError,
+> {
+    let gate_count = (1 << n) / pp.l;
+
+    // Now run the protocol.
+    let timer_all = start_timer!("", net.is_leader());
+
+    let prover_timer = start_timer!("Old Distributed Permcheck", net.is_leader());
+
+    // Compute f, g
+    // f(x) = \prod (w_i(x) + \beta*sid_i(x) + \gamma)
+    let num = (0..gate_count * 4)
+        .map(|i| pk.V[i] + pk.alpha * pk.sid[i] + pk.beta)
+        .collect();
+    let den = (0..gate_count * 4)
+        .map(|i| pk.eq_r1[i] + pk.alpha * pk.ssigma[i] + pk.beta)
+        .collect();
+    let fs: Vec<Vec<E::ScalarField>> = vec![num, den];
+
+    let mut wiring_proofs = Vec::new();
+    let mut wiring_commits = Vec::new();
+    let mut wiring_opens = Vec::new();
+    for evaluations in &fs {
+        // Compute V
+        let (vx0, vx1, v1x) = c_acc_product_and_share(
+            evaluations,
+            &pk.mask,
+            &pk.unmask0,
+            &pk.unmask1,
+            &pk.unmask2,
+            pp,
+            net,
+            sid,
+        )
+        .await
+        .unwrap();
+        // Commit
+        wiring_commits.push(
+            pk.c_commitment
+                .c_commit(&vec![evaluations.clone()], &pp, &net, sid)
+                .await?[0],
+        );
+        wiring_opens.push(
+            pk.c_commitment
+                .c_open(&evaluations, &pk.challenge, &pp, &net, sid)
+                .await?,
+        );
+        wiring_commits.push(
+            pk.c_commitment
+                .c_commit(&vec![vx0.clone()], &pp, &net, sid)
+                .await?[0],
+        );
+        wiring_opens.push(
+            pk.c_commitment
+                .c_open(&vx0, &pk.challenge, &pp, &net, sid)
+                .await?,
+        );
+        wiring_commits.push(
+            pk.c_commitment
+                .c_commit(&vec![vx1.clone()], &pp, &net, sid)
+                .await?[0],
+        );
+        wiring_opens.push(
+            pk.c_commitment
+                .c_open(&vx1, &pk.challenge, &pp, &net, sid)
+                .await?,
+        );
+        wiring_commits.push(
+            pk.c_commitment
+                .c_commit(&vec![v1x.clone()], &pp, &net, sid)
+                .await?[0],
+        );
+        wiring_opens.push(
+            pk.c_commitment
+                .c_open(&v1x, &pk.challenge, &pp, &net, sid)
+                .await?,
+        );
+        // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
+        wiring_proofs
+            .push(c_sumcheck_product(&pk.eq_r1, &v1x, &pk.challenge, &pp, &net, sid).await?);
+        wiring_proofs
+            .push(c_sumcheck_product(&pk.eq_r1, &vx0, &pk.challenge, &pp, &net, sid).await?);
+        wiring_proofs.push(c_sumcheck_product(&vx0, &vx1, &pk.challenge, &pp, &net, sid).await?);
+    }
+
+    end_timer!(timer_all);
+
+    if net.is_leader() {
+        println!("Comm: {:?}", net.get_comm());
+    }
+
+    Ok((wiring_proofs, wiring_commits, wiring_opens))
 }
