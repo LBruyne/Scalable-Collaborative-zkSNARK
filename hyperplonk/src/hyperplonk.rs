@@ -114,6 +114,10 @@ pub fn local_hyperplonk<E: Pairing>(
     let (vx0, vx1, v1x) = acc_product(&h);
     // Commit
     // Open (Here we omit repeated openings on the same polynomial).
+    wiring_commits.push(commitment.commit(&sid));
+    wiring_opens.push(commitment.open(&sid, &challengep2));
+    wiring_commits.push(commitment.commit(&ssigma));
+    wiring_opens.push(commitment.open(&ssigma, &challengep2));
     wiring_commits.push(commitment.commit(&h));
     wiring_opens.push(commitment.open(&h, &challengep2));
     wiring_commits.push(commitment.commit(&num));
@@ -266,10 +270,16 @@ pub fn local_hyperplonkpp<E: Pairing>(
     let (vx0, vx1, v1x) = acc_product(&h);
     // Commit
     // Open (Here we omit repeated openings on the same polynomial).
+    wiring_commits.push(commitment.commit(&sid));
+    wiring_opens.push(commitment.open(&sid, &challengep2));
+    wiring_commits.push(commitment.commit(&ssigma));
+    wiring_opens.push(commitment.open(&ssigma, &challengep2));
     wiring_commits.push(commitment.commit(&h));
     wiring_opens.push(commitment.open(&h, &challengep2));
     wiring_commits.push(commitment.commit(&num));
     wiring_opens.push(commitment.open(&num, &challengep2));
+    wiring_commits.push(commitment.commit(&den));
+    wiring_opens.push(commitment.open(&den, &challengep2));
     wiring_commits.push(commitment.commit(&vx0));
     wiring_opens.push(commitment.open(&vx0, &challengep2));
     wiring_commits.push(commitment.commit(&vx1));
