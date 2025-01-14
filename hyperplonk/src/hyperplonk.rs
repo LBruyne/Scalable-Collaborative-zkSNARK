@@ -49,7 +49,7 @@ pub fn local_hyperplonk<E: Pairing>(
     // Now run the protocol.
     let timer_all = start_timer!("Local HyperPlonk");
 
-    // Commit to 4+2+3=9 polynomials
+    // Commit to 4+2=6 polynomials
     let commit_timer = start_timer!("Commit");
     let com_a = commitment.commit(&a_evals);
     let com_b = commitment.commit(&b_evals);
@@ -97,20 +97,20 @@ pub fn local_hyperplonk<E: Pairing>(
     let mut wiring_opens = Vec::new();
     let wire_timer = start_timer!("Wire identity");
     // Compute f, g
-    // f(x) = \prod (w_i(x) + \beta*sid_i(x) + \gamma)
-    let s: Vec<E::ScalarField> = random_evaluations(gate_count*4);
+    // f(x) = \prod (w_i(x) + \alpha*sid_i(x) + \beta)
+    // g(x) = \prod (w_i(x) + \alpha*ssigma_i(x) + \beta)
     let num: Vec<_> = (0..gate_count*4)
         .map(|i| {
-            s[i] + alpha * sid[i] + beta
+            m[i] + alpha * sid[i] + beta
         })
         .collect();
     let den: Vec<_> = (0..gate_count*4)
         .map(|i| {
-            eq_p2[i] + alpha * ssigma[i] + beta
+            m[i] + alpha * ssigma[i] + beta
         })
         .collect();
     let h = num.iter().zip(den.iter()).map(|(a, b)| *a / *b).collect();
-    // Compute V
+    // Compute V, where v0x = h
     let (vx0, vx1, v1x) = acc_product(&h);
     // Commit
     // Open (Here we omit repeated openings on the same polynomial).
@@ -130,9 +130,10 @@ pub fn local_hyperplonk<E: Pairing>(
     wiring_proofs.push(sumcheck_product(&eq_p2, &v1x, &challengep2));
     wiring_proofs.push(sumcheck_product(&eq_p2, &vx0, &challengep2));
     wiring_proofs.push(sumcheck_product(&vx0, &vx1, &challengep2));
+    // Sumcheck for F(x)=eq(x)*(g*v0x-f).
     wiring_proofs.push(sumcheck_product(&eq_p2, &den, &challengep2));
-    wiring_proofs.push(sumcheck_product(&eq_p2, &num, &challengep2));
     wiring_proofs.push(sumcheck_product(&h, &den, &challengep2));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &num, &challengep2));
     end_timer!(wire_timer);
 
     // Open
@@ -192,7 +193,7 @@ pub fn local_hyperplonkpp<E: Pairing>(
     // Now run the protocol.
     let timer_all = start_timer!("Local HyperPlonk++");
 
-    // Commit to 4+2+3=9 polynomials
+    // Commit to 4+2=6 polynomials
     let commit_timer = start_timer!("Commit");
     let com_a = commitment.commit(&a_evals);
     let com_b = commitment.commit(&b_evals);
@@ -239,19 +240,22 @@ pub fn local_hyperplonkpp<E: Pairing>(
     let mut wiring_commits = Vec::new();
     let mut wiring_opens = Vec::new();
     let wire_timer = start_timer!("Wire identity");
+    // s is M' in the paper.
     let s = random_evaluations(gate_count * 4);
     wiring_commits.push(commitment.commit(&s));
+    // Sumcheck for V(r_1) = \sumcheck M' * V
     wiring_proofs.push(sumcheck_product(&m, &s, &challengep2));
     wiring_opens.push(commitment.open(&s, &challengep2));
     wiring_opens.push(commitment.open(&m, &challengep2));
     wiring_opens.push(commitment.open(&m, &challengep2_2));
     // Compute f, g
-    // f(x) = \prod (w_i(x) + \beta*sid_i(x) + \gamma)
+    // f(x) = \prod (M'(x) + \alpha*sid(x) + \beta)
     let num: Vec<_> = (0..gate_count*4)
         .map(|i| {
             s[i] + alpha * sid[i] + beta
         })
         .collect();
+    // g(x) = \prod (eq(x) + \alpha*ssigma(x) + \beta)
     let den: Vec<_> = (0..gate_count*4)
         .map(|i| {
             eq_p2[i] + alpha * ssigma[i] + beta
@@ -276,9 +280,10 @@ pub fn local_hyperplonkpp<E: Pairing>(
     wiring_proofs.push(sumcheck_product(&eq_p2, &v1x, &challengep2));
     wiring_proofs.push(sumcheck_product(&eq_p2, &vx0, &challengep2));
     wiring_proofs.push(sumcheck_product(&vx0, &vx1, &challengep2));
+    // Sumcheck for F(x)=eq(x)*(g*v0x-f).
     wiring_proofs.push(sumcheck_product(&eq_p2, &den, &challengep2));
-    wiring_proofs.push(sumcheck_product(&eq_p2, &num, &challengep2));
     wiring_proofs.push(sumcheck_product(&h, &den, &challengep2));
+    wiring_proofs.push(sumcheck_product(&eq_p2, &num, &challengep2));
     end_timer!(wire_timer);
 
     // Open
