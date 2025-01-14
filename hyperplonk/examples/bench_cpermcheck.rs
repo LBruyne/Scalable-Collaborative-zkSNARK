@@ -5,6 +5,7 @@ use ark_ec::{bls12::Bls12, pairing::Pairing};
 
 use clap::Parser;
 
+use hyperplonk::dhyperplonk::cpermcheck;
 use hyperplonk::dhyperplonk::dhyperplonk;
 use hyperplonk::dhyperplonk::dpermcheck;
 use hyperplonk::dhyperplonk::PackedProvingParameters;
@@ -45,7 +46,7 @@ async fn permcheck_distributed_bench(net: &MPCNetConnection<TcpStream>, n: usize
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     let params = PackedProvingParameters::new(n, l, &pp);
     black_box(
-        dpermcheck::<Bls12<ark_bls12_381::Config>, _>(
+        cpermcheck::<Bls12<ark_bls12_381::Config>, _>(
             n,
             &params,
             &pp,

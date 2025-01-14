@@ -31,4 +31,8 @@ hack/run-hyperplonk/tmp
 hack/run-hyperplonk/tmp.zip
 hack/run-zksaas/tmp
 hack/run-zksaas/tmp.zip
+*.tar.gz
+**/tmp
+**/tmp.zip
 *.zip
+ip_address.txt

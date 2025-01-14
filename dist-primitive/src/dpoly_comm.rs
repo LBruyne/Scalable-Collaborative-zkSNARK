@@ -262,8 +262,8 @@ impl<E: Pairing> PolynomialCommitment<E> {
         // if net.is_leader() {
         //     eprintln!("dMSM batch size: {}", bases.len());
         // }
-        let result = d_msm(&bases, pevals, pp, net, sid).await;
         end_timer!(timer);
+        let result = d_msm(&bases, pevals, pp, net, sid).await;
         return result;
     }
 
@@ -291,6 +291,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
     ) -> Result<E::G1, MPCNetError> {
         let timer = start_timer!("Local: d_commit", net.is_leader());
         let local_commitment = self.d_local_commit(peval, net.party_id(), net.n_parties());
+        end_timer!(timer);
         let result = net.leader_compute_element(
             &local_commitment,
             sid,
@@ -301,7 +302,6 @@ impl<E: Pairing> PolynomialCommitment<E> {
             "d_commit",
         )
         .await;
-        end_timer!(timer);
         return result;
     }
 
@@ -375,6 +375,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         let party_log = net.n_parties().trailing_zeros() as usize;
         let local_points = &point[party_log..];
         let local_open = self.d_local_open(peval, local_points, net.party_id(), net.n_parties());
+        end_timer!(timer);
         let result = net
             .leader_compute_element(
                 &local_open,
@@ -404,7 +405,6 @@ impl<E: Pairing> PolynomialCommitment<E> {
             )
             .await;
 
-        end_timer!(timer);
         return result;
     }
 
@@ -417,7 +417,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         net: &Net,
         sid: MultiplexedStreamID,
     ) -> Result<(E::ScalarField, Vec<E::G1>), MPCNetError> {
-        let all_timer = start_timer!("Local: c_open", net.is_leader());
+        let all_timer = start_timer!("c_open", net.is_leader());
         let mut result = Vec::new();
         // n and l must be powers of 2
         let n: usize = peval.len().trailing_zeros() as usize; // peval.len = 2^n

@@ -94,7 +94,7 @@ pub async fn c_sumcheck<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<Vec<(F, F)>, MPCNetError> {
-    let d_sumcheck_timer = start_timer!("Distributed sumcheck", net.is_leader());
+    let d_sumcheck_timer = start_timer!("Collaborative sumcheck", net.is_leader());
     let mut result = Vec::new();
     // n and l must be powers of 2
     let n = shares.len().trailing_zeros() as usize;
@@ -149,7 +149,7 @@ pub async fn c_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<Vec<(F, F, F)>, MPCNetError> {
-    let d_sumcheck_product_timer = start_timer!("Distributed sumcheck product", net.is_leader());
+    let d_sumcheck_product_timer = start_timer!("Collaborative sumcheck product", net.is_leader());
     let mut result = Vec::new();
     let n: usize = shares_f.len().trailing_zeros() as usize;
     let l: usize = pp.l.trailing_zeros() as usize;
@@ -308,10 +308,10 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     }
     debug_assert!(last_round.len() == 1);
     result.push((F::ZERO, last_round[0]));
+    end_timer!(timer);
     let local_polys = net
         .worker_send_or_leader_receive_element(&result, sid)
         .await?;
-    end_timer!(timer);
     // Phase 2
     let result = if let Some(local_polys) = local_polys {
         let timer = start_timer!("Leader: Phase 2", net.is_leader());
@@ -425,7 +425,6 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     let local_polys = net
         .worker_send_or_leader_receive_element(&result, sid)
         .await?;
-    let timer = start_timer!("Local: Phase 2", net.is_leader());
     // Phase 2
     let result = if let Some(local_polys) = local_polys {
         let timer = start_timer!("Leader: Phase 2", net.is_leader());

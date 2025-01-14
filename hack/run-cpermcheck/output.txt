@@ -1,0 +1,1306 @@
+Start:   Local HyperPlonk (thread ThreadId(1))
+·Start:   Commit (thread ThreadId(1))
+·End:     Commit (thread ThreadId(1)) 3.501s
+·Start:   HyperPlonk Prover (thread ThreadId(1))
+··Start:   Gate identity (thread ThreadId(1))
+··End:     Gate identity (thread ThreadId(1)) 55.611ms
+··Start:   Wire identity (thread ThreadId(1))
+··End:     Wire identity (thread ThreadId(1)) 3.426s
+··Start:   Open (thread ThreadId(1))
+··End:     Open (thread ThreadId(1)) 4.119s
+·End:     HyperPlonk Prover (thread ThreadId(1)) 7.601s
+End:     Local HyperPlonk (thread ThreadId(1)) 11.103s
+Start:   Comm: from 0 to leader, 1B (thread ThreadId(1))
+End:     Comm: from 0 to leader, 1B (thread ThreadId(1)) 105.950ms
+Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+End:     Comm: from leader to all, 128B (thread ThreadId(1)) 1.683ms
+Start:   Simulate distributed Hyperplonk (thread ThreadId(1))
+·Start:   Distributed HyperPlonk (thread ThreadId(1))
+··Start:   Commit (thread ThreadId(1))
+···Start:   Local: Something (thread ThreadId(1))
+···End:     Local: Something (thread ThreadId(1)) 29.345µs
+···Start:   Local: MSM (thread ThreadId(1))
+···End:     Local: MSM (thread ThreadId(1)) 18.930ms
+···Start:   Send to leader for MSM (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 2.389s
+····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 48.037ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.253s
+···End:     Send to leader for MSM (thread ThreadId(1)) 4.700s
+···Start:   Local: Something (thread ThreadId(1))
+···End:     Local: Something (thread ThreadId(1)) 11.487µs
+···Start:   Local: MSM (thread ThreadId(1))
+···End:     Local: MSM (thread ThreadId(1)) 19.532ms
+···Start:   Send to leader for MSM (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 194.266ms
+····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 49.158ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.273s
+···End:     Send to leader for MSM (thread ThreadId(1)) 2.526s
+···Start:   Local: Something (thread ThreadId(1))
+···End:     Local: Something (thread ThreadId(1)) 9.932µs
+···Start:   Local: MSM (thread ThreadId(1))
+···End:     Local: MSM (thread ThreadId(1)) 18.780ms
+···Start:   Send to leader for MSM (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 188.556ms
+····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 48.092ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.266s
+···End:     Send to leader for MSM (thread ThreadId(1)) 2.512s
+···Start:   Local: Something (thread ThreadId(1))
+···End:     Local: Something (thread ThreadId(1)) 11.097µs
+···Start:   Local: MSM (thread ThreadId(1))
+···End:     Local: MSM (thread ThreadId(1)) 18.470ms
+···Start:   Send to leader for MSM (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 189.806ms
+····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 48.033ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.265s
+···End:     Send to leader for MSM (thread ThreadId(1)) 2.512s
+···Start:   Local: Something (thread ThreadId(1))
+···End:     Local: Something (thread ThreadId(1)) 12.189µs
+···Start:   Local: MSM (thread ThreadId(1))
+···End:     Local: MSM (thread ThreadId(1)) 18.617ms
+···Start:   Send to leader for MSM (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 188.333ms
+····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 48.343ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.255s
+···End:     Send to leader for MSM (thread ThreadId(1)) 2.502s
+···Start:   Local: Something (thread ThreadId(1))
+···End:     Local: Something (thread ThreadId(1)) 10.743µs
+···Start:   Local: MSM (thread ThreadId(1))
+···End:     Local: MSM (thread ThreadId(1)) 18.599ms
+···Start:   Send to leader for MSM (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 188.672ms
+····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 48.712ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.256s
+···End:     Send to leader for MSM (thread ThreadId(1)) 2.504s
+···Start:   Local: Something (thread ThreadId(1))
+···End:     Local: Something (thread ThreadId(1)) 11.721µs
+···Start:   Local: MSM (thread ThreadId(1))
+···End:     Local: MSM (thread ThreadId(1)) 18.599ms
+···Start:   Send to leader for MSM (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 189.102ms
+····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 48.360ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.255s
+···End:     Send to leader for MSM (thread ThreadId(1)) 2.503s
+···Start:   Local: Something (thread ThreadId(1))
+···End:     Local: Something (thread ThreadId(1)) 11.838µs
+···Start:   Local: MSM (thread ThreadId(1))
+···End:     Local: MSM (thread ThreadId(1)) 18.555ms
+···Start:   Send to leader for MSM (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 188.378ms
+····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 48.664ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.272s
+···End:     Send to leader for MSM (thread ThreadId(1)) 2.519s
+···Start:   Local: Something (thread ThreadId(1))
+···End:     Local: Something (thread ThreadId(1)) 37.963µs
+···Start:   Local: MSM (thread ThreadId(1))
+···End:     Local: MSM (thread ThreadId(1)) 18.770ms
+···Start:   Send to leader for MSM (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 198.054ms
+····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 54.998ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 49.385ms
+···End:     Send to leader for MSM (thread ThreadId(1)) 313.793ms
+··End:     Commit (thread ThreadId(1)) 22.765s
+··Start:   Distributed HyperPlonk Prover (thread ThreadId(1))
+···Start:   Gate identity (thread ThreadId(1))
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 298.243µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.380ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.279ms
+·····End:     PSStoSS (thread ThreadId(1)) 5.318ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 215.626µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 44.200ms
+·····End:     PSStoSS (thread ThreadId(1)) 46.049ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 10.182µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 51.705ms
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 297.499µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.212ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.324ms
+·····End:     PSStoSS (thread ThreadId(1)) 5.211ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 214.856µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 40.989ms
+·····End:     PSStoSS (thread ThreadId(1)) 42.858ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 9.986µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 48.407ms
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 306.008µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 14.428ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.166ms
+·····End:     PSStoSS (thread ThreadId(1)) 18.313ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 163.319µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 39.521ms
+·····End:     PSStoSS (thread ThreadId(1)) 41.349ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 10.279µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 60.013ms
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 302.067µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 2.125ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.114ms
+·····End:     PSStoSS (thread ThreadId(1)) 6.069ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 174.000µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 40.577ms
+·····End:     PSStoSS (thread ThreadId(1)) 42.406ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 10.690µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 48.820ms
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 285.853µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 872.324µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.049ms
+·····End:     PSStoSS (thread ThreadId(1)) 4.543ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 163.403µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 42.007ms
+·····End:     PSStoSS (thread ThreadId(1)) 43.745ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 9.936µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 48.616ms
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 285.751µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 886.809µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.062ms
+·····End:     PSStoSS (thread ThreadId(1)) 4.565ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 162.543µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 484.939ms
+·····End:     PSStoSS (thread ThreadId(1)) 486.695ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 10.607µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 491.582ms
+···End:     Gate identity (thread ThreadId(1)) 749.200ms
+···Start:   Wire identity (thread ThreadId(1))
+····Start:   Local: Something (thread ThreadId(1))
+····End:     Local: Something (thread ThreadId(1)) 277.103µs
+····Start:   Distributed product accumulation and sharing (thread ThreadId(1))
+·····Start:   Leader distributes masked elements (thread ThreadId(1))
+······Start:   Local: Compute masked x (thread ThreadId(1))
+······End:     Local: Compute masked x (thread ThreadId(1)) 25.165µs
+······Start:   Comm: from 0 to 0, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 1, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 2, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 3, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 4, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 5, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 6, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 7, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 8, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 9, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 10, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 11, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 12, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 13, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 14, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 15, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 16, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 17, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 18, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 19, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 20, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 21, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 22, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 23, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 24, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 25, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 26, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 27, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 28, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 29, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 30, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 31, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 32, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 33, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 34, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 35, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 36, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 37, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 38, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 39, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 40, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 41, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 42, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 43, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 44, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 45, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 46, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 47, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 48, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 49, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 50, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 51, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 52, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 53, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 54, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 55, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 56, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 57, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 58, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 59, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 60, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 61, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 62, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 63, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 64, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 65, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 66, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 67, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 68, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 69, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 70, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 71, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 72, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 73, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 74, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 75, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 76, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 77, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 78, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 79, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 80, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 81, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 82, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 83, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 84, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 85, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 86, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 87, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 88, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 89, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 90, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 91, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 92, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 93, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 94, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 95, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 96, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 97, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 98, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 99, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 100, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 101, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 102, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 103, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 104, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 105, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 106, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 107, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 108, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 109, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 110, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 111, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 112, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 113, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 114, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 115, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 116, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 117, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 118, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 119, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 120, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 121, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 122, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 123, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 124, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 125, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 126, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 127, 264B (thread ThreadId(1))
+······End:     Comm: from 0 to 1, 264B (thread ThreadId(1)) 2.560ms
+······End:     Comm: from 0 to 3, 264B (thread ThreadId(1)) 3.669ms
+······End:     Comm: from 0 to 4, 264B (thread ThreadId(1)) 3.671ms
+······End:     Comm: from 0 to 5, 264B (thread ThreadId(1)) 3.665ms
+······End:     Comm: from 0 to 6, 264B (thread ThreadId(1)) 3.650ms
+······End:     Comm: from 0 to 7, 264B (thread ThreadId(1)) 3.648ms
+······End:     Comm: from 0 to 8, 264B (thread ThreadId(1)) 3.647ms
+······End:     Comm: from 0 to 9, 264B (thread ThreadId(1)) 3.646ms
+······End:     Comm: from 0 to 10, 264B (thread ThreadId(1)) 3.645ms
+······End:     Comm: from 0 to 11, 264B (thread ThreadId(1)) 3.644ms
+······End:     Comm: from 0 to 12, 264B (thread ThreadId(1)) 3.643ms
+······End:     Comm: from 0 to 13, 264B (thread ThreadId(1)) 3.642ms
+······End:     Comm: from 0 to 14, 264B (thread ThreadId(1)) 3.641ms
+······End:     Comm: from 0 to 15, 264B (thread ThreadId(1)) 3.639ms
+······End:     Comm: from 0 to 16, 264B (thread ThreadId(1)) 3.638ms
+······End:     Comm: from 0 to 17, 264B (thread ThreadId(1)) 3.637ms
+······End:     Comm: from 0 to 18, 264B (thread ThreadId(1)) 3.636ms
+······End:     Comm: from 0 to 19, 264B (thread ThreadId(1)) 3.641ms
+······End:     Comm: from 0 to 20, 264B (thread ThreadId(1)) 3.641ms
+······End:     Comm: from 0 to 21, 264B (thread ThreadId(1)) 3.640ms
+······End:     Comm: from 0 to 22, 264B (thread ThreadId(1)) 3.639ms
+······End:     Comm: from 0 to 23, 264B (thread ThreadId(1)) 3.637ms
+······End:     Comm: from 0 to 24, 264B (thread ThreadId(1)) 3.636ms
+······End:     Comm: from 0 to 25, 264B (thread ThreadId(1)) 3.634ms
+······End:     Comm: from 0 to 26, 264B (thread ThreadId(1)) 3.632ms
+······End:     Comm: from 0 to 27, 264B (thread ThreadId(1)) 3.630ms
+······End:     Comm: from 0 to 28, 264B (thread ThreadId(1)) 3.629ms
+······End:     Comm: from 0 to 29, 264B (thread ThreadId(1)) 3.628ms
+······End:     Comm: from 0 to 30, 264B (thread ThreadId(1)) 3.627ms
+······End:     Comm: from 0 to 31, 264B (thread ThreadId(1)) 3.625ms
+······End:     Comm: from 0 to 32, 264B (thread ThreadId(1)) 3.625ms
+······End:     Comm: from 0 to 33, 264B (thread ThreadId(1)) 3.623ms
+······End:     Comm: from 0 to 34, 264B (thread ThreadId(1)) 3.622ms
+······End:     Comm: from 0 to 35, 264B (thread ThreadId(1)) 3.622ms
+······End:     Comm: from 0 to 36, 264B (thread ThreadId(1)) 3.621ms
+······End:     Comm: from 0 to 37, 264B (thread ThreadId(1)) 3.620ms
+······End:     Comm: from 0 to 38, 264B (thread ThreadId(1)) 3.619ms
+······End:     Comm: from 0 to 39, 264B (thread ThreadId(1)) 3.617ms
+······End:     Comm: from 0 to 40, 264B (thread ThreadId(1)) 3.616ms
+······End:     Comm: from 0 to 41, 264B (thread ThreadId(1)) 3.615ms
+······End:     Comm: from 0 to 42, 264B (thread ThreadId(1)) 3.614ms
+······End:     Comm: from 0 to 43, 264B (thread ThreadId(1)) 3.612ms
+······End:     Comm: from 0 to 44, 264B (thread ThreadId(1)) 3.611ms
+······End:     Comm: from 0 to 45, 264B (thread ThreadId(1)) 3.610ms
+······End:     Comm: from 0 to 46, 264B (thread ThreadId(1)) 3.609ms
+······End:     Comm: from 0 to 47, 264B (thread ThreadId(1)) 3.607ms
+······End:     Comm: from 0 to 48, 264B (thread ThreadId(1)) 3.606ms
+······End:     Comm: from 0 to 49, 264B (thread ThreadId(1)) 3.605ms
+······End:     Comm: from 0 to 50, 264B (thread ThreadId(1)) 3.604ms
+······End:     Comm: from 0 to 51, 264B (thread ThreadId(1)) 3.602ms
+······End:     Comm: from 0 to 52, 264B (thread ThreadId(1)) 3.601ms
+······End:     Comm: from 0 to 53, 264B (thread ThreadId(1)) 3.600ms
+······End:     Comm: from 0 to 54, 264B (thread ThreadId(1)) 3.599ms
+······End:     Comm: from 0 to 55, 264B (thread ThreadId(1)) 3.597ms
+······End:     Comm: from 0 to 56, 264B (thread ThreadId(1)) 3.596ms
+······End:     Comm: from 0 to 57, 264B (thread ThreadId(1)) 3.598ms
+······End:     Comm: from 0 to 58, 264B (thread ThreadId(1)) 3.597ms
+······End:     Comm: from 0 to 59, 264B (thread ThreadId(1)) 3.595ms
+······End:     Comm: from 0 to 60, 264B (thread ThreadId(1)) 3.593ms
+······End:     Comm: from 0 to 61, 264B (thread ThreadId(1)) 3.592ms
+······End:     Comm: from 0 to 62, 264B (thread ThreadId(1)) 3.591ms
+······End:     Comm: from 0 to 63, 264B (thread ThreadId(1)) 3.589ms
+······End:     Comm: from 0 to 64, 264B (thread ThreadId(1)) 3.587ms
+······End:     Comm: from 0 to 65, 264B (thread ThreadId(1)) 3.587ms
+······End:     Comm: from 0 to 66, 264B (thread ThreadId(1)) 3.584ms
+······End:     Comm: from 0 to 67, 264B (thread ThreadId(1)) 3.583ms
+······End:     Comm: from 0 to 68, 264B (thread ThreadId(1)) 3.583ms
+······End:     Comm: from 0 to 69, 264B (thread ThreadId(1)) 3.581ms
+······End:     Comm: from 0 to 70, 264B (thread ThreadId(1)) 3.580ms
+······End:     Comm: from 0 to 71, 264B (thread ThreadId(1)) 3.579ms
+······End:     Comm: from 0 to 72, 264B (thread ThreadId(1)) 3.578ms
+······End:     Comm: from 0 to 73, 264B (thread ThreadId(1)) 3.577ms
+······End:     Comm: from 0 to 74, 264B (thread ThreadId(1)) 3.576ms
+······End:     Comm: from 0 to 75, 264B (thread ThreadId(1)) 3.575ms
+······End:     Comm: from 0 to 76, 264B (thread ThreadId(1)) 3.574ms
+······End:     Comm: from 0 to 77, 264B (thread ThreadId(1)) 3.572ms
+······End:     Comm: from 0 to 78, 264B (thread ThreadId(1)) 3.571ms
+······End:     Comm: from 0 to 79, 264B (thread ThreadId(1)) 3.570ms
+······End:     Comm: from 0 to 80, 264B (thread ThreadId(1)) 3.569ms
+······End:     Comm: from 0 to 81, 264B (thread ThreadId(1)) 3.568ms
+······End:     Comm: from 0 to 82, 264B (thread ThreadId(1)) 3.567ms
+······End:     Comm: from 0 to 83, 264B (thread ThreadId(1)) 3.565ms
+······End:     Comm: from 0 to 84, 264B (thread ThreadId(1)) 3.564ms
+······End:     Comm: from 0 to 85, 264B (thread ThreadId(1)) 3.563ms
+······End:     Comm: from 0 to 86, 264B (thread ThreadId(1)) 3.562ms
+······End:     Comm: from 0 to 87, 264B (thread ThreadId(1)) 3.560ms
+······End:     Comm: from 0 to 88, 264B (thread ThreadId(1)) 3.559ms
+······End:     Comm: from 0 to 89, 264B (thread ThreadId(1)) 3.558ms
+······End:     Comm: from 0 to 90, 264B (thread ThreadId(1)) 3.557ms
+······End:     Comm: from 0 to 91, 264B (thread ThreadId(1)) 3.556ms
+······End:     Comm: from 0 to 92, 264B (thread ThreadId(1)) 3.555ms
+······End:     Comm: from 0 to 93, 264B (thread ThreadId(1)) 3.554ms
+······End:     Comm: from 0 to 94, 264B (thread ThreadId(1)) 3.553ms
+······End:     Comm: from 0 to 95, 264B (thread ThreadId(1)) 3.552ms
+······End:     Comm: from 0 to 96, 264B (thread ThreadId(1)) 3.550ms
+······End:     Comm: from 0 to 97, 264B (thread ThreadId(1)) 3.549ms
+······End:     Comm: from 0 to 98, 264B (thread ThreadId(1)) 3.548ms
+······End:     Comm: from 0 to 99, 264B (thread ThreadId(1)) 3.547ms
+······End:     Comm: from 0 to 100, 264B (thread ThreadId(1)) 3.545ms
+······End:     Comm: from 0 to 101, 264B (thread ThreadId(1)) 3.544ms
+······End:     Comm: from 0 to 102, 264B (thread ThreadId(1)) 3.543ms
+······End:     Comm: from 0 to 103, 264B (thread ThreadId(1)) 3.542ms
+······End:     Comm: from 0 to 104, 264B (thread ThreadId(1)) 3.541ms
+······End:     Comm: from 0 to 105, 264B (thread ThreadId(1)) 3.540ms
+······End:     Comm: from 0 to 106, 264B (thread ThreadId(1)) 3.538ms
+······End:     Comm: from 0 to 107, 264B (thread ThreadId(1)) 3.537ms
+······End:     Comm: from 0 to 108, 264B (thread ThreadId(1)) 3.536ms
+······End:     Comm: from 0 to 109, 264B (thread ThreadId(1)) 3.536ms
+······End:     Comm: from 0 to 110, 264B (thread ThreadId(1)) 3.534ms
+······End:     Comm: from 0 to 111, 264B (thread ThreadId(1)) 3.536ms
+······End:     Comm: from 0 to 112, 264B (thread ThreadId(1)) 3.535ms
+······End:     Comm: from 0 to 113, 264B (thread ThreadId(1)) 3.594ms
+······End:     Comm: from 0 to 114, 264B (thread ThreadId(1)) 3.593ms
+······End:     Comm: from 0 to 115, 264B (thread ThreadId(1)) 3.592ms
+······End:     Comm: from 0 to 116, 264B (thread ThreadId(1)) 3.591ms
+······End:     Comm: from 0 to 117, 264B (thread ThreadId(1)) 3.590ms
+······End:     Comm: from 0 to 118, 264B (thread ThreadId(1)) 3.589ms
+······End:     Comm: from 0 to 119, 264B (thread ThreadId(1)) 3.587ms
+······End:     Comm: from 0 to 120, 264B (thread ThreadId(1)) 3.586ms
+······End:     Comm: from 0 to 121, 264B (thread ThreadId(1)) 3.600ms
+······End:     Comm: from 0 to 122, 264B (thread ThreadId(1)) 3.599ms
+······End:     Comm: from 0 to 123, 264B (thread ThreadId(1)) 3.598ms
+······End:     Comm: from 0 to 124, 264B (thread ThreadId(1)) 3.597ms
+······End:     Comm: from 0 to 125, 264B (thread ThreadId(1)) 3.609ms
+······End:     Comm: from 0 to 2, 264B (thread ThreadId(1)) 6.157ms
+······End:     Comm: from 0 to 126, 264B (thread ThreadId(1)) 8.656ms
+······End:     Comm: from 0 to 0, 264B (thread ThreadId(1)) 58.077ms
+······End:     Comm: from 0 to 127, 264B (thread ThreadId(1)) 59.967ms
+·····End:     Leader distributes masked elements (thread ThreadId(1)) 62.794ms
+·····Start:   Local: Computes subtree (thread ThreadId(1))
+·····End:     Local: Computes subtree (thread ThreadId(1)) 8.300µs
+·····Start:   Send elements to leader (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 4104B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 4104B (thread ThreadId(1)) 57.253ms
+·····End:     Send elements to leader (thread ThreadId(1)) 57.998ms
+·····Start:   Leader: Compute leader tree (thread ThreadId(1))
+·····End:     Leader: Compute leader tree (thread ThreadId(1)) 143.889µs
+·····Start:   Local: Compute subtree share (thread ThreadId(1))
+·····End:     Local: Compute subtree share (thread ThreadId(1)) 398.866µs
+·····Start:   Share subtree (thread ThreadId(1))
+······Start:   Comm: from 0 to all, 128B (thread ThreadId(1))
+······End:     Comm: from 0 to all, 128B (thread ThreadId(1)) 1.297ms
+······Start:   Comm: from 0 to all, 128B (thread ThreadId(1))
+······End:     Comm: from 0 to all, 128B (thread ThreadId(1)) 918.578µs
+······Start:   Comm: from 0 to all, 128B (thread ThreadId(1))
+······End:     Comm: from 0 to all, 128B (thread ThreadId(1)) 1.892ms
+·····End:     Share subtree (thread ThreadId(1)) 475.041ms
+·····Start:   Leader: Compute leader tree share (thread ThreadId(1))
+·····End:     Leader: Compute leader tree share (thread ThreadId(1)) 26.841ms
+·····Start:   Share leader tree (thread ThreadId(1))
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 8.073ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.166ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.461s
+·····End:     Share leader tree (thread ThreadId(1)) 2.475s
+····End:     Distributed product accumulation and sharing (thread ThreadId(1)) 3.099s
+····Start:   Local: Something (thread ThreadId(1))
+····End:     Local: Something (thread ThreadId(1)) 9.249µs
+····Start:   Local: MSM (thread ThreadId(1))
+····End:     Local: MSM (thread ThreadId(1)) 18.765ms
+····Start:   Send to leader for MSM (thread ThreadId(1))
+·····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+·····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 19.184ms
+·····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+·····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 48.413ms
+·····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+·····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.324s
+····End:     Send to leader for MSM (thread ThreadId(1)) 2.401s
+····Start:   Local: Something (thread ThreadId(1))
+····End:     Local: Something (thread ThreadId(1)) 31.853µs
+····Start:   Local: MSM (thread ThreadId(1))
+····End:     Local: MSM (thread ThreadId(1)) 18.636ms
+····Start:   Send to leader for MSM (thread ThreadId(1))
+·····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+·····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 112.954ms
+·····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+·····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 158.488ms
+·····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+·····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.280s
+····End:     Send to leader for MSM (thread ThreadId(1)) 3.562s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 102.929µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 24.985µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.914ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 218.258ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 490.897ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 94.694ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 900.953ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 4.911ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.255s
+·····End:     PSStoSS (thread ThreadId(1)) 3.261s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 162.825µs
+····End:     Distributed opening (thread ThreadId(1)) 4.190s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 75.588µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 20.546µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.356ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 216.052ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 1.587s
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 94.712ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 1.994s
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 4.813ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 278.494ms
+·····End:     PSStoSS (thread ThreadId(1)) 285.244ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 2.284ms
+····End:     Distributed opening (thread ThreadId(1)) 2.308s
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 318.647µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 52.072ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.413ms
+·····End:     PSStoSS (thread ThreadId(1)) 56.214ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 222.193µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 42.220ms
+·····End:     PSStoSS (thread ThreadId(1)) 44.299ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 10.522µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 100.873ms
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 319.347µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 857.604µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 1.692ms
+·····End:     PSStoSS (thread ThreadId(1)) 4.173ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 178.925µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 51.228ms
+·····End:     PSStoSS (thread ThreadId(1)) 53.252ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 10.067µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 57.783ms
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 320.389µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.445ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 1.888ms
+·····End:     PSStoSS (thread ThreadId(1)) 5.221ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 158.118µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 201.053ms
+·····End:     PSStoSS (thread ThreadId(1)) 203.110ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 11.416µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 208.692ms
+····Start:   Distributed product accumulation and sharing (thread ThreadId(1))
+·····Start:   Leader distributes masked elements (thread ThreadId(1))
+······Start:   Local: Compute masked x (thread ThreadId(1))
+······End:     Local: Compute masked x (thread ThreadId(1)) 25.713µs
+······Start:   Comm: from 0 to 0, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 1, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 2, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 3, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 4, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 5, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 6, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 7, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 8, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 9, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 10, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 11, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 12, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 13, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 14, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 15, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 16, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 17, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 18, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 19, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 20, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 21, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 22, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 23, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 24, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 25, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 26, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 27, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 28, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 29, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 30, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 31, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 32, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 33, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 34, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 35, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 36, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 37, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 38, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 39, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 40, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 41, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 42, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 43, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 44, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 45, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 46, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 47, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 48, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 49, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 50, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 51, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 52, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 53, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 54, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 55, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 56, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 57, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 58, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 59, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 60, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 61, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 62, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 63, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 64, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 65, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 66, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 67, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 68, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 69, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 70, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 71, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 72, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 73, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 74, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 75, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 76, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 77, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 78, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 79, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 80, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 81, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 82, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 83, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 84, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 85, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 86, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 87, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 88, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 89, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 90, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 91, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 92, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 93, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 94, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 95, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 96, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 97, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 98, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 99, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 100, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 101, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 102, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 103, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 104, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 105, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 106, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 107, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 108, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 109, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 110, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 111, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 112, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 113, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 114, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 115, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 116, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 117, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 118, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 119, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 120, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 121, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 122, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 123, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 124, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 125, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 126, 264B (thread ThreadId(1))
+······Start:   Comm: from 0 to 127, 264B (thread ThreadId(1))
+······End:     Comm: from 0 to 1, 264B (thread ThreadId(1)) 2.228ms
+······End:     Comm: from 0 to 3, 264B (thread ThreadId(1)) 3.325ms
+······End:     Comm: from 0 to 4, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 5, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 6, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 7, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 8, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 9, 264B (thread ThreadId(1)) 3.335ms
+······End:     Comm: from 0 to 10, 264B (thread ThreadId(1)) 3.334ms
+······End:     Comm: from 0 to 11, 264B (thread ThreadId(1)) 3.333ms
+······End:     Comm: from 0 to 12, 264B (thread ThreadId(1)) 3.332ms
+······End:     Comm: from 0 to 13, 264B (thread ThreadId(1)) 3.331ms
+······End:     Comm: from 0 to 14, 264B (thread ThreadId(1)) 3.331ms
+······End:     Comm: from 0 to 15, 264B (thread ThreadId(1)) 3.331ms
+······End:     Comm: from 0 to 16, 264B (thread ThreadId(1)) 3.331ms
+······End:     Comm: from 0 to 17, 264B (thread ThreadId(1)) 3.330ms
+······End:     Comm: from 0 to 18, 264B (thread ThreadId(1)) 3.329ms
+······End:     Comm: from 0 to 19, 264B (thread ThreadId(1)) 3.344ms
+······End:     Comm: from 0 to 20, 264B (thread ThreadId(1)) 3.344ms
+······End:     Comm: from 0 to 21, 264B (thread ThreadId(1)) 3.344ms
+······End:     Comm: from 0 to 22, 264B (thread ThreadId(1)) 3.343ms
+······End:     Comm: from 0 to 23, 264B (thread ThreadId(1)) 3.342ms
+······End:     Comm: from 0 to 24, 264B (thread ThreadId(1)) 3.341ms
+······End:     Comm: from 0 to 25, 264B (thread ThreadId(1)) 3.341ms
+······End:     Comm: from 0 to 26, 264B (thread ThreadId(1)) 3.341ms
+······End:     Comm: from 0 to 27, 264B (thread ThreadId(1)) 3.340ms
+······End:     Comm: from 0 to 28, 264B (thread ThreadId(1)) 3.340ms
+······End:     Comm: from 0 to 29, 264B (thread ThreadId(1)) 3.339ms
+······End:     Comm: from 0 to 30, 264B (thread ThreadId(1)) 3.339ms
+······End:     Comm: from 0 to 31, 264B (thread ThreadId(1)) 3.337ms
+······End:     Comm: from 0 to 32, 264B (thread ThreadId(1)) 3.337ms
+······End:     Comm: from 0 to 33, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 34, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 35, 264B (thread ThreadId(1)) 3.360ms
+······End:     Comm: from 0 to 36, 264B (thread ThreadId(1)) 3.360ms
+······End:     Comm: from 0 to 37, 264B (thread ThreadId(1)) 3.360ms
+······End:     Comm: from 0 to 38, 264B (thread ThreadId(1)) 3.360ms
+······End:     Comm: from 0 to 39, 264B (thread ThreadId(1)) 3.359ms
+······End:     Comm: from 0 to 40, 264B (thread ThreadId(1)) 3.359ms
+······End:     Comm: from 0 to 41, 264B (thread ThreadId(1)) 3.357ms
+······End:     Comm: from 0 to 42, 264B (thread ThreadId(1)) 3.357ms
+······End:     Comm: from 0 to 43, 264B (thread ThreadId(1)) 3.356ms
+······End:     Comm: from 0 to 44, 264B (thread ThreadId(1)) 3.355ms
+······End:     Comm: from 0 to 45, 264B (thread ThreadId(1)) 3.355ms
+······End:     Comm: from 0 to 46, 264B (thread ThreadId(1)) 3.355ms
+······End:     Comm: from 0 to 47, 264B (thread ThreadId(1)) 3.354ms
+······End:     Comm: from 0 to 48, 264B (thread ThreadId(1)) 3.354ms
+······End:     Comm: from 0 to 49, 264B (thread ThreadId(1)) 3.353ms
+······End:     Comm: from 0 to 50, 264B (thread ThreadId(1)) 3.358ms
+······End:     Comm: from 0 to 51, 264B (thread ThreadId(1)) 3.356ms
+······End:     Comm: from 0 to 52, 264B (thread ThreadId(1)) 3.356ms
+······End:     Comm: from 0 to 53, 264B (thread ThreadId(1)) 3.356ms
+······End:     Comm: from 0 to 54, 264B (thread ThreadId(1)) 3.355ms
+······End:     Comm: from 0 to 55, 264B (thread ThreadId(1)) 3.353ms
+······End:     Comm: from 0 to 56, 264B (thread ThreadId(1)) 3.353ms
+······End:     Comm: from 0 to 57, 264B (thread ThreadId(1)) 3.352ms
+······End:     Comm: from 0 to 58, 264B (thread ThreadId(1)) 3.352ms
+······End:     Comm: from 0 to 59, 264B (thread ThreadId(1)) 3.346ms
+······End:     Comm: from 0 to 60, 264B (thread ThreadId(1)) 3.346ms
+······End:     Comm: from 0 to 61, 264B (thread ThreadId(1)) 3.345ms
+······End:     Comm: from 0 to 62, 264B (thread ThreadId(1)) 3.345ms
+······End:     Comm: from 0 to 63, 264B (thread ThreadId(1)) 3.343ms
+······End:     Comm: from 0 to 64, 264B (thread ThreadId(1)) 3.343ms
+······End:     Comm: from 0 to 65, 264B (thread ThreadId(1)) 3.343ms
+······End:     Comm: from 0 to 66, 264B (thread ThreadId(1)) 3.342ms
+······End:     Comm: from 0 to 67, 264B (thread ThreadId(1)) 3.346ms
+······End:     Comm: from 0 to 68, 264B (thread ThreadId(1)) 3.346ms
+······End:     Comm: from 0 to 69, 264B (thread ThreadId(1)) 3.345ms
+······End:     Comm: from 0 to 70, 264B (thread ThreadId(1)) 3.345ms
+······End:     Comm: from 0 to 71, 264B (thread ThreadId(1)) 3.344ms
+······End:     Comm: from 0 to 72, 264B (thread ThreadId(1)) 3.343ms
+······End:     Comm: from 0 to 73, 264B (thread ThreadId(1)) 3.342ms
+······End:     Comm: from 0 to 74, 264B (thread ThreadId(1)) 3.342ms
+······End:     Comm: from 0 to 75, 264B (thread ThreadId(1)) 3.342ms
+······End:     Comm: from 0 to 76, 264B (thread ThreadId(1)) 3.342ms
+······End:     Comm: from 0 to 77, 264B (thread ThreadId(1)) 3.341ms
+······End:     Comm: from 0 to 78, 264B (thread ThreadId(1)) 3.341ms
+······End:     Comm: from 0 to 79, 264B (thread ThreadId(1)) 3.340ms
+······End:     Comm: from 0 to 80, 264B (thread ThreadId(1)) 3.340ms
+······End:     Comm: from 0 to 81, 264B (thread ThreadId(1)) 3.339ms
+······End:     Comm: from 0 to 82, 264B (thread ThreadId(1)) 3.339ms
+······End:     Comm: from 0 to 83, 264B (thread ThreadId(1)) 3.338ms
+······End:     Comm: from 0 to 84, 264B (thread ThreadId(1)) 3.337ms
+······End:     Comm: from 0 to 85, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 86, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 87, 264B (thread ThreadId(1)) 3.336ms
+······End:     Comm: from 0 to 88, 264B (thread ThreadId(1)) 3.335ms
+······End:     Comm: from 0 to 89, 264B (thread ThreadId(1)) 3.334ms
+······End:     Comm: from 0 to 90, 264B (thread ThreadId(1)) 3.334ms
+······End:     Comm: from 0 to 91, 264B (thread ThreadId(1)) 3.334ms
+······End:     Comm: from 0 to 92, 264B (thread ThreadId(1)) 3.333ms
+······End:     Comm: from 0 to 93, 264B (thread ThreadId(1)) 3.333ms
+······End:     Comm: from 0 to 94, 264B (thread ThreadId(1)) 3.332ms
+······End:     Comm: from 0 to 95, 264B (thread ThreadId(1)) 3.331ms
+······End:     Comm: from 0 to 96, 264B (thread ThreadId(1)) 3.330ms
+······End:     Comm: from 0 to 97, 264B (thread ThreadId(1)) 3.329ms
+······End:     Comm: from 0 to 98, 264B (thread ThreadId(1)) 3.329ms
+······End:     Comm: from 0 to 99, 264B (thread ThreadId(1)) 3.328ms
+······End:     Comm: from 0 to 100, 264B (thread ThreadId(1)) 3.327ms
+······End:     Comm: from 0 to 101, 264B (thread ThreadId(1)) 3.327ms
+······End:     Comm: from 0 to 102, 264B (thread ThreadId(1)) 3.326ms
+······End:     Comm: from 0 to 103, 264B (thread ThreadId(1)) 3.325ms
+······End:     Comm: from 0 to 104, 264B (thread ThreadId(1)) 3.324ms
+······End:     Comm: from 0 to 105, 264B (thread ThreadId(1)) 3.325ms
+······End:     Comm: from 0 to 106, 264B (thread ThreadId(1)) 3.325ms
+······End:     Comm: from 0 to 107, 264B (thread ThreadId(1)) 3.324ms
+······End:     Comm: from 0 to 108, 264B (thread ThreadId(1)) 3.324ms
+······End:     Comm: from 0 to 109, 264B (thread ThreadId(1)) 3.323ms
+······End:     Comm: from 0 to 110, 264B (thread ThreadId(1)) 3.323ms
+······End:     Comm: from 0 to 111, 264B (thread ThreadId(1)) 3.322ms
+······End:     Comm: from 0 to 112, 264B (thread ThreadId(1)) 3.321ms
+······End:     Comm: from 0 to 113, 264B (thread ThreadId(1)) 3.321ms
+······End:     Comm: from 0 to 114, 264B (thread ThreadId(1)) 3.320ms
+······End:     Comm: from 0 to 115, 264B (thread ThreadId(1)) 3.320ms
+······End:     Comm: from 0 to 116, 264B (thread ThreadId(1)) 3.319ms
+······End:     Comm: from 0 to 117, 264B (thread ThreadId(1)) 3.318ms
+······End:     Comm: from 0 to 118, 264B (thread ThreadId(1)) 3.318ms
+······End:     Comm: from 0 to 119, 264B (thread ThreadId(1)) 3.317ms
+······End:     Comm: from 0 to 120, 264B (thread ThreadId(1)) 3.314ms
+······End:     Comm: from 0 to 121, 264B (thread ThreadId(1)) 3.313ms
+······End:     Comm: from 0 to 122, 264B (thread ThreadId(1)) 3.313ms
+······End:     Comm: from 0 to 123, 264B (thread ThreadId(1)) 3.312ms
+······End:     Comm: from 0 to 124, 264B (thread ThreadId(1)) 3.312ms
+······End:     Comm: from 0 to 125, 264B (thread ThreadId(1)) 3.312ms
+······End:     Comm: from 0 to 2, 264B (thread ThreadId(1)) 5.530ms
+······End:     Comm: from 0 to 126, 264B (thread ThreadId(1)) 6.356ms
+······End:     Comm: from 0 to 0, 264B (thread ThreadId(1)) 58.467ms
+······End:     Comm: from 0 to 127, 264B (thread ThreadId(1)) 60.693ms
+·····End:     Leader distributes masked elements (thread ThreadId(1)) 63.169ms
+·····Start:   Local: Computes subtree (thread ThreadId(1))
+·····End:     Local: Computes subtree (thread ThreadId(1)) 7.057µs
+·····Start:   Send elements to leader (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 4104B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 4104B (thread ThreadId(1)) 56.547ms
+·····End:     Send elements to leader (thread ThreadId(1)) 57.357ms
+·····Start:   Leader: Compute leader tree (thread ThreadId(1))
+·····End:     Leader: Compute leader tree (thread ThreadId(1)) 49.347µs
+·····Start:   Local: Compute subtree share (thread ThreadId(1))
+·····End:     Local: Compute subtree share (thread ThreadId(1)) 413.564µs
+·····Start:   Share subtree (thread ThreadId(1))
+······Start:   Comm: from 0 to all, 128B (thread ThreadId(1))
+······End:     Comm: from 0 to all, 128B (thread ThreadId(1)) 1.348ms
+······Start:   Comm: from 0 to all, 128B (thread ThreadId(1))
+······End:     Comm: from 0 to all, 128B (thread ThreadId(1)) 1.043ms
+······Start:   Comm: from 0 to all, 128B (thread ThreadId(1))
+······End:     Comm: from 0 to all, 128B (thread ThreadId(1)) 2.104ms
+·····End:     Share subtree (thread ThreadId(1)) 439.251ms
+·····Start:   Leader: Compute leader tree share (thread ThreadId(1))
+·····End:     Leader: Compute leader tree share (thread ThreadId(1)) 25.983ms
+·····Start:   Share leader tree (thread ThreadId(1))
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 6.564ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.367ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.431s
+·····End:     Share leader tree (thread ThreadId(1)) 2.444s
+····End:     Distributed product accumulation and sharing (thread ThreadId(1)) 3.030s
+····Start:   Local: Something (thread ThreadId(1))
+····End:     Local: Something (thread ThreadId(1)) 9.201µs
+····Start:   Local: MSM (thread ThreadId(1))
+····End:     Local: MSM (thread ThreadId(1)) 18.810ms
+····Start:   Send to leader for MSM (thread ThreadId(1))
+·····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+·····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 95.506ms
+·····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+·····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 48.445ms
+·····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+·····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.323s
+····End:     Send to leader for MSM (thread ThreadId(1)) 2.477s
+····Start:   Local: Something (thread ThreadId(1))
+····End:     Local: Something (thread ThreadId(1)) 9.749µs
+····Start:   Local: MSM (thread ThreadId(1))
+····End:     Local: MSM (thread ThreadId(1)) 18.617ms
+····Start:   Send to leader for MSM (thread ThreadId(1))
+·····Start:   Comm: from 0 to leader, 56B (thread ThreadId(1))
+·····End:     Comm: from 0 to leader, 56B (thread ThreadId(1)) 131.157ms
+·····Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+·····End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 158.471ms
+·····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+·····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.304s
+····End:     Send to leader for MSM (thread ThreadId(1)) 3.604s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 64.289µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 63.994µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.637ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 217.652ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 492.750ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 103.312ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 910.370ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 5.087ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.260s
+·····End:     PSStoSS (thread ThreadId(1)) 3.267s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 173.554µs
+····End:     Distributed opening (thread ThreadId(1)) 4.205s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 131.539µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 19.571µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.727ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 219.494ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 1.577s
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 94.417ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 1.988s
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 4.898ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 278.741ms
+·····End:     PSStoSS (thread ThreadId(1)) 285.505ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 2.318ms
+····End:     Distributed opening (thread ThreadId(1)) 2.303s
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 360.866µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 51.576ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.293ms
+·····End:     PSStoSS (thread ThreadId(1)) 55.578ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 216.913µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 40.280ms
+·····End:     PSStoSS (thread ThreadId(1)) 42.412ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 10.621µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 98.418ms
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 300.991µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 897.617µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 2.000ms
+·····End:     PSStoSS (thread ThreadId(1)) 4.560ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 166.128µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 53.901ms
+·····End:     PSStoSS (thread ThreadId(1)) 55.980ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 10.356µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 60.882ms
+····Start:   Distributed sumcheck product (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 292.772µs
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.474ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 1.933ms
+·····End:     PSStoSS (thread ThreadId(1)) 5.245ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 132.878µs
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.303s
+·····End:     PSStoSS (thread ThreadId(1)) 3.305s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 11.929µs
+····End:     Distributed sumcheck product (thread ThreadId(1)) 3.311s
+···End:     Wire identity (thread ThreadId(1)) 35.097s
+···Start:   Open (thread ThreadId(1))
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 61.948µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 14.455µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.855ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 189.863ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 486.829ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 97.502ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 870.019ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.545ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.286s
+·····End:     PSStoSS (thread ThreadId(1)) 3.289s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 117.355µs
+····End:     Distributed opening (thread ThreadId(1)) 4.186s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 100.384µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 33.243µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.467ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 189.479ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 487.400ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 98.580ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 871.147ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.515ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.288s
+·····End:     PSStoSS (thread ThreadId(1)) 3.291s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 120.484µs
+····End:     Distributed opening (thread ThreadId(1)) 4.189s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 112.549µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 24.563µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.708ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 192.838ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 505.403ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 98.351ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 892.338ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.527ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.278s
+·····End:     PSStoSS (thread ThreadId(1)) 3.281s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 119.295µs
+····End:     Distributed opening (thread ThreadId(1)) 4.200s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 62.805µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 10.316µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.730ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 191.747ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 494.954ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 97.663ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 880.022ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.526ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.281s
+·····End:     PSStoSS (thread ThreadId(1)) 3.284s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 148.958µs
+····End:     Distributed opening (thread ThreadId(1)) 4.191s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 77.873µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 30.741µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.720ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 191.259ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 489.028ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 97.852ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 873.915ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.515ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.299s
+·····End:     PSStoSS (thread ThreadId(1)) 3.302s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 130.676µs
+····End:     Distributed opening (thread ThreadId(1)) 4.203s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 75.808µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 10.777µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.716ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 189.674ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 496.255ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 98.841ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 884.161ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.517ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.296s
+·····End:     PSStoSS (thread ThreadId(1)) 3.299s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 163.593µs
+····End:     Distributed opening (thread ThreadId(1)) 4.210s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 81.844µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 10.366µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.817ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 190.397ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 497.199ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 98.264ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 881.734ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.560ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.293s
+·····End:     PSStoSS (thread ThreadId(1)) 3.296s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 130.036µs
+····End:     Distributed opening (thread ThreadId(1)) 4.205s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 114.604µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 16.397µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.702ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 189.974ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 493.755ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 97.740ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 877.602ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.536ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 3.280s
+·····End:     PSStoSS (thread ThreadId(1)) 3.283s
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 171.116µs
+····End:     Distributed opening (thread ThreadId(1)) 4.188s
+····Start:   Distributed opening (thread ThreadId(1))
+·····Start:   Local: Phase 1 (thread ThreadId(1))
+·····End:     Local: Phase 1 (thread ThreadId(1)) 97.617µs
+·····Start:   Local: Something (thread ThreadId(1))
+·····End:     Local: Something (thread ThreadId(1)) 37.320µs
+·····Start:   Local: MSM (thread ThreadId(1))
+·····End:     Local: MSM (thread ThreadId(1)) 26.467ms
+·····Start:   Send to leader for MSM (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 488B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 488B (thread ThreadId(1)) 189.683ms
+······Start:   Leader: Compute element (MSM Leader) (thread ThreadId(1))
+······End:     Leader: Compute element (MSM Leader) (thread ThreadId(1)) 492.906ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 97.616ms
+·····End:     Send to leader for MSM (thread ThreadId(1)) 876.284ms
+·····Start:   PSStoSS (thread ThreadId(1))
+······Start:   Comm: from 0 to leader, 32B (thread ThreadId(1))
+······End:     Comm: from 0 to leader, 32B (thread ThreadId(1)) 1.501ms
+······Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+······End:     Comm: from leader to all, 128B (thread ThreadId(1)) 13.611ms
+·····End:     PSStoSS (thread ThreadId(1)) 16.736ms
+·····Start:   Local: Phase 2 (thread ThreadId(1))
+·····End:     Local: Phase 2 (thread ThreadId(1)) 125.465µs
+····End:     Distributed opening (thread ThreadId(1)) 919.808ms
+···End:     Open (thread ThreadId(1)) 34.497s
+···Start:   Degree reduce (thread ThreadId(1))
+····Start:   Comm: from 0 to leader, 1032B (thread ThreadId(1))
+····End:     Comm: from 0 to leader, 1032B (thread ThreadId(1)) 701.951µs
+····Start:   Leader: Compute element (Degree Reduce Many) (thread ThreadId(1))
+····End:     Leader: Compute element (Degree Reduce Many) (thread ThreadId(1)) 1.760ms
+····Start:   Comm: from leader to all, 128B (thread ThreadId(1))
+····End:     Comm: from leader to all, 128B (thread ThreadId(1)) 105.899ms
+···End:     Degree reduce (thread ThreadId(1)) 108.934ms
+··End:     Distributed HyperPlonk Prover (thread ThreadId(1)) 70.452s
+·End:     Distributed HyperPlonk (thread ThreadId(1)) 93.218s
+Comm: (14411071, 2425319)
+Comm: (14411071, 2425319)
+End:     Simulate distributed Hyperplonk (thread ThreadId(1)) 93.241s

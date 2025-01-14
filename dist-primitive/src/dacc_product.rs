@@ -263,6 +263,7 @@ pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     end_timer!(share_leader_tree_timer);
 
     // Each party unmask the shares.
+    let timer = start_timer!("Local: Unmask", net.is_leader());
     share0.iter_mut().enumerate().for_each(|(i, share)| {
         *share *= unmask0[i];
     });
@@ -272,8 +273,9 @@ pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     share2.iter_mut().enumerate().for_each(|(i, share)| {
         *share *= unmask2[i];
     });
+    end_timer!(timer);
 
-    // These three shares need to be reduced. To make the leader computation corrrect we run 1/N of it
+    // These three shares need to be reduced. To make the leader computation correct we run 1/N of it
     let reduce_timer = start_timer!("Reduce shares", net.is_leader());
     let share0_reduce = &share0[..share0.len()/pp.n*2].to_vec();
    degree_reduce_many(share0_reduce, pp, net, sid).await?;

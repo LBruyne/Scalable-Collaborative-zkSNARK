@@ -19,7 +19,7 @@ fi
 server_id=$1
 n=$2
 l=$3
-server_count=$((4*$l))
+server_count=$((8*$l))
 
 if ! which unzip &> /dev/null; then
     echo "unzip is not installed. Running the script..."
@@ -33,6 +33,6 @@ unzip -o /tmp/tmp.zip -d /tmp/
 rm /tmp/tmp.zip
 
 cd /tmp/tmp
-ps aux | awk '/bench_gkr/ && !/awk/ {print $2}' | xargs kill
+ps aux | awk '/bench_dpermcheck/ && !/awk/ {print $2}' | xargs kill
 sleep 1
-RUST_BACKTRACE=1 /usr/bin/time -v ./bench_gkr --file ./network-address/$server_count --l $l --d 8 --w $n --id $server_id 2>&1 | tee /tmp/gkr.log
+RUST_BACKTRACE=1 /usr/bin/time -v ./bench_dpermcheck --file ./network-address/$server_count --l $l --n $n --id $server_id 2>&1 | tee /tmp/bench_dpermcheck.log

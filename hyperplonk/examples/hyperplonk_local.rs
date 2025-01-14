@@ -31,8 +31,6 @@ async fn main() {
 
 fn hyperplonk_local_bench(n: usize) {
     // generate shares
-    let res = local_hyperplonkpp::<Bls12<ark_bls12_381::Config>>(n);
+    let res = local_hyperplonk::<Bls12<ark_bls12_381::Config>>(n);
     black_box(res);
-    // let res = local_hyperplonkpp::<Bls12<ark_bls12_381::Config>>(n);
-    // black_box(res);
 }
