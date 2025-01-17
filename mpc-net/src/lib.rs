@@ -171,7 +171,7 @@ pub trait MPCNet: Send + Sync {
 
         if let Some(bytes_out) = bytes_out {
             let timer = start_timer!(
-                format!("Comm: from leader to all, {}B", bytes_out.len()),
+                format!("Comm: from leader to all, {}B", bytes_out[0].len()),
                 self.is_leader()
             );
 
@@ -220,7 +220,7 @@ pub trait MPCNet: Send + Sync {
 
         if let Some(bytes_out) = bytes_out {
             let timer = start_timer!(
-                format!("Comm: from {} to all, {}B", own_id, bytes_out.len()),
+                format!("Comm: from {} to all, {}B", own_id, bytes_out[0].len()),
                 self.is_leader()
             );
 

@@ -171,7 +171,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
                 powers_of_g: vec![Vec::new(); self.powers_of_g.len()],
                 powers_of_g2: self.powers_of_g2.clone(),
             };
-            l * 4
+            l * 8
         ];
         for i in 0..self.powers_of_g.len() {
             let v = &self.powers_of_g[i];
@@ -186,7 +186,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
                     .map(|chunk| pp.pack_from_public(chunk.to_vec()))
                     .collect()
             });
-            for j in (0..l * 4).rev() {
+            for j in (0..l * 8).rev() {
                 result[j].powers_of_g[i] = powers_of_g.remove(j);
             }
         }
@@ -217,10 +217,9 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
         }
         result.mature()
     }
-    /// A toy protocol that generates a shared parameter.
-    pub fn new_random(len_log_2: usize) -> PolynomialCommitment<E> {
+    pub fn new_random(len_log_2: usize, party_count:usize) -> PolynomialCommitment<E> {
         let rng = &mut ark_std::test_rng();
-
+        let len_log_2 = len_log_2 - party_count.trailing_zeros() as usize;
         let mut result = Self {
             powers_of_g: vec![Vec::new(); len_log_2 + 1],
             powers_of_g2: (0..len_log_2 + 1).map(|_| E::G2::rand(rng)).collect(),
@@ -270,15 +269,13 @@ impl<E: Pairing> PolynomialCommitment<E> {
     pub fn d_local_commit(
         &self,
         peval: &Vec<E::ScalarField>,
-        id: u32,
-        party_count: usize,
     ) -> E::G1 {
-        let level = (peval.len() * party_count).trailing_zeros() as usize;
+        let level = peval.len().trailing_zeros() as usize;
         assert!(level < self.powers_of_g.len());
-        assert!((peval.len() * party_count) == 2_usize.pow(level as u32));
+        assert!(peval.len() == 2_usize.pow(level as u32));
         // eprintln!("MSM len: {}", peval.len());
         E::G1::msm(
-            &self.powers_of_g[level][id as usize * peval.len()..(id + 1) as usize * peval.len()],
+            &self.powers_of_g[level],
             peval,
         )
         .unwrap()
@@ -290,7 +287,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         sid: MultiplexedStreamID,
     ) -> Result<E::G1, MPCNetError> {
         let timer = start_timer!("Local: d_commit", net.is_leader());
-        let local_commitment = self.d_local_commit(peval, net.party_id(), net.n_parties());
+        let local_commitment = self.d_local_commit(peval);
         end_timer!(timer);
         let result = net.leader_compute_element(
             &local_commitment,
@@ -337,8 +334,6 @@ impl<E: Pairing> PolynomialCommitment<E> {
         &self,
         peval: &Vec<E::ScalarField>,
         point: &[E::ScalarField],
-        id: u32,
-        party_count: usize,
     ) -> (E::ScalarField, Vec<E::G1>) {
         let mut result = Vec::new();
         let n = peval.len().trailing_zeros() as usize; // peval.len = 2^n
@@ -358,7 +353,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
                 .map(|(&x, &y)| (E::ScalarField::one() - point[i]) * x + point[i] * y)
                 .collect();
             current_r = r_i;
-            result.push(self.d_local_commit(&q_i, id, party_count));
+            result.push(self.d_local_commit(&q_i));
         }
         (current_r[0], result)
     }
@@ -374,7 +369,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         let timer = start_timer!("Local: d_open", net.is_leader());
         let party_log = net.n_parties().trailing_zeros() as usize;
         let local_points = &point[party_log..];
-        let local_open = self.d_local_open(peval, local_points, net.party_id(), net.n_parties());
+        let local_open = self.d_local_open(peval, local_points);
         end_timer!(timer);
         let result = net
             .leader_compute_element(
@@ -524,12 +519,12 @@ mod test {
         let rng = &mut ark_std::test_rng();
         let mut s = Vec::new();
         let mut u = Vec::new();
-        for _ in 0..4 {
+        for _ in 0..8 {
             s.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
             u.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
         }
         let mut peval = Vec::new();
-        for _ in 0..2_usize.pow(4) {
+        for _ in 0..2_usize.pow(8) {
             peval.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
         }
         let g1 = <Bls12<ark_bls12_381::Config> as Pairing>::G1::rand(rng);
@@ -546,28 +541,28 @@ mod test {
         let rng = &mut ark_std::test_rng();
         let mut s = Vec::new();
         let mut u = Vec::new();
-        for _ in 0..4 {
+        for _ in 0..8 {
             s.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
             u.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
         }
         let mut peval = Vec::new();
-        for _ in 0..2_usize.pow(4) {
+        for _ in 0..2_usize.pow(8) {
             peval.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
         }
         let g1 = <Bls12<ark_bls12_381::Config> as Pairing>::G1::rand(rng);
         let g2 = <Bls12<ark_bls12_381::Config> as Pairing>::G2::rand(rng);
         let cub = PolynomialCommitmentCub::<Bls12_381>::new(g1, g2, s.clone());
-        let ugly_cub = PolynomialCommitmentCub::<Bls12_381>::new_ugly(g1, g2, s, 4);
+        let ugly_cub = PolynomialCommitmentCub::<Bls12_381>::new_ugly(g1, g2, s, 8);
         let commitment = ugly_cub.mature();
         let verification = cub.mature();
-        let net = LocalTestNet::new_local_testnet(4).await.unwrap();
+        let net = LocalTestNet::new_local_testnet(8).await.unwrap();
         let result = net
             .simulate_network_round(
                 (u.clone(), commitment, peval.clone()),
                 |net, (u, commitment, peval)| async move {
-                    let party_count = 4;
+                    let party_count = 8;
                     let id = net.party_id();
-                    let peval = &peval[4 * id as usize..4 * (id + 1) as usize].into();
+                    let peval = &peval[8 * id as usize..8 * (id + 1) as usize].into();
                     let commit = commitment
                         .d_commit(&peval, &net, MultiplexedStreamID::Zero)
                         .await

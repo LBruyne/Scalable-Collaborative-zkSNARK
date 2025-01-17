@@ -14,6 +14,7 @@ address_file="$1"
 ip="$2"
 
 scp -i ~/.ssh/zkp.pem ~/.ssh/zkp.pem root@$2:/root/.ssh/
+
 ssh -i ~/.ssh/zkp.pem root@$2 "/bin/bash -s" <<EOF 
             # Change to the directory where the zip file is located
             cd /root
@@ -47,30 +48,32 @@ for ((i=3;i<=8;i++)); do
     head -n $((2**$i)) "ip_addresses_port.txt" > ./network-address/$((2**$i))
 done
 
-pushd run-hyperplonk
-    bash pack.sh
-    scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/hyperplonk/
-popd
+scp -i ~/.ssh/zkp.pem run_all.sh root@$2:/root/
 
-pushd run-hyperplonk-dataparallel
-    bash pack.sh
-    scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/hyperplonk-dataparallel/
-popd
-
-# pushd run-zksaas
+# pushd run-hyperplonk
 #     bash pack.sh
-#     scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/zksaas/
+#     scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/hyperplonk/
 # popd
 
-pushd run-cpermcheck
+# pushd run-hyperplonk-dataparallel
+#     bash pack.sh
+#     scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/hyperplonk-dataparallel/
+# popd
+
+pushd run-zksaas
     bash pack.sh
-    scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/cpermcheck/
+    scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/zksaas/
 popd
 
-pushd run-dpermcheck
-    bash pack.sh
-    scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/dpermcheck/
-popd
+# pushd run-cpermcheck
+#     bash pack.sh
+#     scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/cpermcheck/
+# popd
+
+# pushd run-dpermcheck
+#     bash pack.sh
+#     scp -i ~/.ssh/zkp.pem tmp.zip run.sh ip_addresses.txt handle_server.sh root@$2:/root/dpermcheck/
+# popd
 
 rm ip_addresses.txt
 rm ip_addresses_port.txt

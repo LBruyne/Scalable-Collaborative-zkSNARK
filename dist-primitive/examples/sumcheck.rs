@@ -81,7 +81,7 @@ impl ProductDelegator {
 
 #[derive(Parser)]
 struct Cli {
-    /// The packing size, should be 1/4 of the party size as well as a power of 2.
+    /// The packing size, should be 1/8 of the party size as well as a power of 2.
     #[arg(long)]
     l: usize,
     /// log2 of the total number of variables.
@@ -114,7 +114,7 @@ async fn sumcheck_bench(n: usize, l: usize) {
     end_timer!(sc);
     black_box(proof);
     
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     let x = delegator.delegate(l);
     let dsc = start_timer!("Distributed Sumcheck Leader");
     let proof = c_sumcheck(
@@ -145,7 +145,7 @@ async fn sumcheck_bench(n: usize, l: usize) {
     end_timer!(sc);
     black_box(proof);
 
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
     let dsc = start_timer!("Simulate sumcheck");
     // This is a Vec of Vecs, where each Vec is a party's shares.
@@ -196,7 +196,7 @@ async fn sumcheck_product_bench(n: usize, l: usize) {
     end_timer!(sc);
     black_box(proof);
     
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     let (x, y) = delegator.delegate(l);
     let dsc = start_timer!("Distributed SumcheckProduct Leader");
     let proof = c_sumcheck_product(
@@ -228,7 +228,7 @@ async fn sumcheck_product_bench(n: usize, l: usize) {
     end_timer!(sc);
     black_box(proof);
 
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
     let dsc = start_timer!("Simulate SumcheckProduct");
     // This is a Vec of Vecs, where each Vec is a party's shares.

@@ -7,7 +7,7 @@ if [ -z "$1" ]; then
 fi
 
 # bash pack.sh
-
+trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 # IP address file parameter
 ip_address_file="$1"
 
@@ -25,6 +25,10 @@ wait
 log_dir="./output"
 for m in {16..28}; do
     for log_l in {1..5}; do
+    if (( m - log_l >= 20 )); then
+        echo "Skipping iteration: m = $m, log_l = $log_l (m - log_l >= 20)"
+        continue
+    fi
     l=$((2**$log_l))
     echo "Running m = $m and l = $l"
     index=0

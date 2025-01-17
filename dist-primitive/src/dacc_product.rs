@@ -77,7 +77,7 @@ pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
         "Distributed product accumulation and sharing",
         net.is_leader()
     );
-    let party_count = pp.l * 4;
+    let party_count = pp.n;
     // Every party gets n/N of the shares. Assert failed if not enough shares.
     assert!(shares.len() > party_count);
     let block_size = shares.len() / party_count;
@@ -111,7 +111,7 @@ pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
 
     // First share the subtree.
     let compute_subtree_share_timer = start_timer!("Local: Compute subtree share", net.is_leader());
-    let party_count = pp.l * 4;
+    let party_count = pp.n;
     let num_to_send = min(party_count, subtree.len());
     // Only share the following part, and the rest will be shared by the leader.
     let subtree_to_share = subtree[..subtree.len() - num_to_send].to_vec();
@@ -298,7 +298,7 @@ pub async fn c_acc_product<F: FftField, Net: MPCSerializeNet>(
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<(Vec<F>, Option<Vec<F>>), MPCNetError> {
-    let party_count = pp.l * 4;
+    let party_count = pp.n;
 
     // Each party calculates a sub-tree
     let subtree_timer = start_timer!("Local: Computes subtree", net.is_leader());
@@ -448,7 +448,7 @@ mod tests {
 
     #[test]
     fn acc_product_test() {
-        let x: Vec<Fr> = (1..=4).map(|i| Fr::from(i)).collect();
+        let x: Vec<Fr> = (1..=8).map(|i| Fr::from(i)).collect();
         let (res_0, res_1, res_2) = acc_product(&x);
         assert_eq!(
             res_0,

@@ -100,7 +100,7 @@ impl<E: Pairing> PackedProvingParameters<E> {
         let eq_r2_p = random_evaluations(gate_count * 4 / pp.n);
         // Collaborative polynomial commitment. For benchmarking purposes, we reuse the parameters, which should be avoided in practice.
         let c_commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_single(n + 2, pp);
-        let d_commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_random(n + 2);
+        let d_commitment: PolynomialCommitment<E> = PolynomialCommitmentCub::new_random(n + 2, pp.n);
         // Challenge for polynomial commitment opening.
         let challenge = random_evaluations(n);
         let challenge_r1 = random_evaluations(n + 2);
@@ -1295,7 +1295,7 @@ pub async fn cpermcheck<E: Pairing, Net: MPCSerializeNet>(
     );
     wiring_opens.push(
         pk.c_commitment
-            .c_open(&pk.ssigma, &pk.challenge, &pp, &net, sid)
+            .c_open(&pk.ssigma, &pk.challenge_r1, &pp, &net, sid)
             .await?,
     );
     wiring_commits.push(
@@ -1305,7 +1305,7 @@ pub async fn cpermcheck<E: Pairing, Net: MPCSerializeNet>(
     );
     wiring_opens.push(
         pk.c_commitment
-            .c_open(&pk.sid, &pk.challenge, &pp, &net, sid)
+            .c_open(&pk.sid, &pk.challenge_r1, &pp, &net, sid)
             .await?,
     );
     for evaluations in &fs {
@@ -1330,7 +1330,7 @@ pub async fn cpermcheck<E: Pairing, Net: MPCSerializeNet>(
         );
         wiring_opens.push(
             pk.c_commitment
-                .c_open(&evaluations, &pk.challenge, &pp, &net, sid)
+                .c_open(&evaluations, &pk.challenge_r1, &pp, &net, sid)
                 .await?,
         );
         wiring_commits.push(
@@ -1340,7 +1340,7 @@ pub async fn cpermcheck<E: Pairing, Net: MPCSerializeNet>(
         );
         wiring_opens.push(
             pk.c_commitment
-                .c_open(&vx0, &pk.challenge, &pp, &net, sid)
+                .c_open(&vx0, &pk.challenge_r1, &pp, &net, sid)
                 .await?,
         );
         wiring_commits.push(
@@ -1350,7 +1350,7 @@ pub async fn cpermcheck<E: Pairing, Net: MPCSerializeNet>(
         );
         wiring_opens.push(
             pk.c_commitment
-                .c_open(&vx1, &pk.challenge, &pp, &net, sid)
+                .c_open(&vx1, &pk.challenge_r1, &pp, &net, sid)
                 .await?,
         );
         wiring_commits.push(
@@ -1360,19 +1360,19 @@ pub async fn cpermcheck<E: Pairing, Net: MPCSerializeNet>(
         );
         wiring_opens.push(
             pk.c_commitment
-                .c_open(&v1x, &pk.challenge, &pp, &net, sid)
+                .c_open(&v1x, &pk.challenge_r1, &pp, &net, sid)
                 .await?,
         );
         // Sumcheck for F(x)=eq(x)*(v1x-vx0*vx1).
         wiring_proofs
-            .push(c_sumcheck_product(&pk.eq_r1, &v1x, &pk.challenge, &pp, &net, sid).await?);
+            .push(c_sumcheck_product(&pk.eq_r1, &v1x, &pk.challenge_r1, &pp, &net, sid).await?);
         wiring_proofs
-            .push(c_sumcheck_product(&pk.eq_r1, &vx0, &pk.challenge, &pp, &net, sid).await?);
-        wiring_proofs.push(c_sumcheck_product(&vx0, &vx1, &pk.challenge, &pp, &net, sid).await?);
+            .push(c_sumcheck_product(&pk.eq_r1, &vx0, &pk.challenge_r1, &pp, &net, sid).await?);
+        wiring_proofs.push(c_sumcheck_product(&vx0, &vx1, &pk.challenge_r1, &pp, &net, sid).await?);
         // q(x) can be checked by evaluation
         wiring_opens.push(
             pk.c_commitment
-                .c_open(&evaluations, &pk.challenge, &pp, &net, sid)
+                .c_open(&evaluations, &pk.challenge_r1, &pp, &net, sid)
                 .await?,
         );
     }

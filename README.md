@@ -34,7 +34,7 @@ The benchmarks are based on the aformentioned `benchmark` mode. To run a benchma
 192.168.1.2
 192.168.1.3
 192.168.1.4
-192.168.1.5,
+192.168.1.5
 
 ```
 Make sure it ends with a new line, and the ip of jump server as the input to the script. Notably there are a few things to tweak:
@@ -45,10 +45,17 @@ Make sure it ends with a new line, and the ip of jump server as the input to the
 4. Change the directories if you don't like them
 5. Change the ports if they are not available
 
-We strongly advise you run the script or you may have to read through the script yourself to understand how the scripts work and how to manually set up the addresses. To run the benchmark for HyperPlonk and GKR, respectively, you have to:
+There are 5 benchmarks available. They are:
+1. hyperplonk
+2. hyperplonk-dataparallel
+3. cpermcheck
+4. dpermcheck
+5. zksaas
+
+We strongly advise you run the script or you may have to read through the script yourself to understand how the scripts work and how to manually set up the addresses. To run the benchmarks, you have to:
 
 1. Go to the jump server
-2. `cd` to `hyperplonk` or  `gkr`
+2. `cd` to the desired bench
 3. Change the benchmark scales in `handle_server.sh`, and run following commands:
     ```bash
     ./handle_server.sh ./ip_addresses.txt
@@ -76,7 +83,7 @@ just run --release --example sumcheck -F leader -- --l 32 --n 20
 # WARNING: If you encounter a `Too many open files` error, please adjust your environment setting with `ulimit -HSn 65536` 
 ```
 
-This command will locally simulate one server's task in a cluster where $128=l*4$ parties engage in and the input number of sumcheck is $2^{20}$. 
+This command will locally simulate one server's task in a cluster where $256=l*8$ parties engage in and the input number of sumcheck is $2^{20}$. 
 
 To further benchmark the distributed primitives described in the paper, please check the scripts under `hack` folder (e.g., `hack/bench_sumcheck.sh`). We only provide commands for leader mode. To switch modes, try different Rust features. You can change to `benchmark` mode if you have enough hardware resources.
 

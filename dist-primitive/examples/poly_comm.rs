@@ -16,7 +16,7 @@ use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Parser)]
 struct Cli {
-    /// The packing size, should be 1/4 of the party size as well as a power of 2.
+    /// The packing size, should be 1/8 of the party size as well as a power of 2.
     #[arg(long)]
     l: usize,
     /// log2 of the total number of variables.
@@ -74,7 +74,7 @@ async fn mvpc_bench(n: usize, l: usize) {
 
     // Distributed
     {
-        let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+        let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
         let timer = start_timer!("Distributed");
         let pp =
             PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
@@ -146,7 +146,7 @@ async fn mvpc_bench(n: usize, l: usize) {
     }
     // Distributed
     {
-        let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+        let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
         // Now simulate the protocol
         let timer = start_timer!("Simulate distributed polynomial commitment");
         let sharing = start_timer!("Sharing");
