@@ -45,7 +45,7 @@ Make sure it ends with a new line, and the ip of jump server as the input to the
 4. Change the directories if you don't like them
 5. Change the ports if they are not available
 
-There are 5 benchmarks available. They are:
+There are 5 benchmarks available. They are: TODO: Filling the refs
 1. hyperplonk
 2. hyperplonk-dataparallel
 3. cpermcheck
@@ -83,7 +83,7 @@ just run --release --example sumcheck -F leader -- --l 32 --n 20
 # WARNING: If you encounter a `Too many open files` error, please adjust your environment setting with `ulimit -HSn 65536` 
 ```
 
-This command will locally simulate one server's task in a cluster where $256=l*8$ parties engage in and the input number of sumcheck is $2^{20}$. 
+This command will locally simulate one server's task in a cluster where $128=l*8$ parties engage in and the input number of sumcheck is $2^{20}$. 
 
 To further benchmark the distributed primitives described in the paper, please check the scripts under `hack` folder (e.g., `hack/bench_sumcheck.sh`). We only provide commands for leader mode. To switch modes, try different Rust features. You can change to `benchmark` mode if you have enough hardware resources.
 
