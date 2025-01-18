@@ -89,16 +89,16 @@ To further benchmark the distributed primitives described in the paper, please c
 
 ### Distributed ZKPs
 
-We offer implementation and examples for collaborative Libra (in the `gkr` crate) and collaborative HyperPlonk (in the `hyperplonk` crate). For example, to run the comparison between local Libra and collaborative Libra:
+We offer implementation and examples for collaborative HyperPlonk (in the `hyperplonk` crate). For example, to run the comparison between local Hyperplonk and collaborative Hyperplonk:
 
 ```bash
 # At the root directory
-just run --release --example gkr -F leader -- --l 32 --d 16 --w 16
+just run --release --example hyperplonk -F leader -- --l 16 --n 15
 ```
 
-In this command, $l$ represents the packing factor, and the circuit size is calculated as $n = d \times 2^{w}$.
+In this command, $l$ represents the packing factor, and the circuit size is $2^{n}$.
 
-The program outputs the time taken for the a server running the protocol and its actual communication cost (both incoming and outgoing data) during the proof generation. This output can be redirected to a file for further analysis. To switch modes, try different Rust features. You can change to `benchmark` mode if you have enough hardware resources.
+The program outputs the time taken for the a server running the protocol and its actual communication cost (both incoming and outgoing data) during the proof generation. This output can be redirected to a file for further analysis.
 
 ## Project layout
 

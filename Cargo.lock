@@ -606,32 +606,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 
 [[package]]
-name = "gkr"
-version = "0.1.0"
-dependencies = [
- "ark-bls12-381",
- "ark-ec",
- "ark-ff",
- "ark-poly",
- "ark-serialize",
- "ark-std",
- "async-trait",
- "clap",
- "colored",
- "digest",
- "dist-primitive",
- "env_logger 0.11.3",
- "futures",
- "log",
- "mpc-net",
- "peak_alloc",
- "rand",
- "rayon",
- "secret-sharing",
- "tokio",
-]
-
-[[package]]
 name = "hashbrown"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
