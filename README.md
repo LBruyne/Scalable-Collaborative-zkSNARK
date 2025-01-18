@@ -103,7 +103,6 @@ The program outputs the time taken for the a server running the protocol and its
 ## Project layout
 
 - `dist-primitive`: The distributed primitives.
-- `gkr`: The collborative GKR protocol. 
 - `hyperplonk`: The collborative Hyperplonk protocol. 
 - `hack`: Scripts for running the experiments.
 - `mpc-net`: The network layer for the MPC.
