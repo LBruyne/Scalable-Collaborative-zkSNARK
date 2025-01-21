@@ -45,12 +45,12 @@ Make sure it ends with a new line, and the ip of jump server as the input to the
 4. Change the directories if you don't like them
 5. Change the ports if they are not available
 
-There are 5 benchmarks available. They are: TODO: Filling the refs
-1. hyperplonk
-2. hyperplonk-dataparallel
-3. cpermcheck
-4. dpermcheck
-5. zksaas
+There are 5 benchmarks available. They are:
+1. hyperplonk §5.2
+2. hyperplonk-dataparallel §5.3
+3. cpermcheck §4.3
+4. dpermcheck §5.1
+5. zksaas 
 
 We strongly advise you run the script or you may have to read through the script yourself to understand how the scripts work and how to manually set up the addresses. To run the benchmarks, you have to:
 
