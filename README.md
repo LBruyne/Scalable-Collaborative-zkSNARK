@@ -6,7 +6,9 @@ The project is built upon [arkworks ecosystem](https://github.com/arkworks-rs).
 
 ## Illustration
 
-This is a Proof-of-Concept (PoC) implementation. In this work, we assume a peer-to-peer network for smooth operation of the MPC protocol. Each peer can be a low-specification instance (e.g., 2 vCPU and 4 GB memory is enough), where peers will be connected through LAN/WAN. The parties can collaboratively generate a ZK proof for large-scale circuits while preserving witness privacy.
+**WARNING:** This is a Proof-of-Concept (PoC) implementation. Therefore, the benchmarks are mainly for measuring complexities and we do not promise the correctness of proof.
+
+In this work, we assume a peer-to-peer network for smooth operation of the MPC protocol. Each peer can be a low-end instance (e.g., 2 vCPU and 4 GB memory is enough), where peers will be connected through LAN/WAN. The parties can collaboratively generate a ZK proof for large-scale circuits while preserving witness privacy.
 
 We provide three kinds of modes, which are classified as follows and can be switched by adjusting Rust features:
 
@@ -29,7 +31,9 @@ cargo 1.80.0-nightly (05364cb2f 2024-05-03)
 
 ### Benchmark
 
-The benchmarks are based on the aformentioned `benchmark` mode. To run a benchmark with packing factor $l$ you need $l\times 4$ servers. If you have an additional jump server for your cluster, things are easier. There is a script located at `hack/prepare-server.sh` for preparing the jump server for the benchmarks. For servers communication, you will need a ip address file filled with server ip like this:
+The benchmarks are based on the aformentioned `benchmark` mode. To run a benchmark with packing factor $l$ you need $l\times 8$ servers. 
+
+If you have an additional *jump server* for your cluster, things are easier. There is a script located at `hack/prepare-server.sh` for preparing the jump server for the benchmarks. For servers communication, you will need an ip address file filled with server ip like this:
 ```
 192.168.1.2
 192.168.1.3
@@ -45,12 +49,13 @@ Make sure it ends with a new line, and the ip of jump server as the input to the
 4. Change the directories if you don't like them
 5. Change the ports if they are not available
 
-There are 5 benchmarks available. They are:
-1. hyperplonk §5.2
-2. hyperplonk-dataparallel §5.3
-3. cpermcheck §4.3
-4. dpermcheck §5.1
-5. zksaas 
+There are 4 benchmarks available. They are:
+1. Collaborative and monolithic Hyperplonk §5.2
+2. Collaborative Hyperplonk (data-parallel) §5.3
+3. Collaborative permcheck (prodcheck) §4.3
+4. Distributed permcheck §5.1
+ 
+Benchmark of zkSaaS can be found [here](https://github.com/guruvamsi-policharla/zksaas).
 
 We strongly advise you run the script or you may have to read through the script yourself to understand how the scripts work and how to manually set up the addresses. To run the benchmarks, you have to:
 
@@ -62,9 +67,9 @@ We strongly advise you run the script or you may have to read through the script
     ```
 4. You shall see results in `output` folder. We also provide a `read_data.ipynb` script for reading these output into .csv files.
 
-### Distributed primitives
+### Collaborative \& Distributed primitives
 
-We also offer Rust examples for distributed primitives under the `dist-primitive` folder. If you have [`just`](https://github.com/casey/just) installed, you can run:
+We also offer Rust examples for Collaborative and Distributed primitives under the `dist-primitive` folder. If you have [`just`](https://github.com/casey/just) installed, you can run:
 
 ```bash
 just run --release --example <example name> <args>
@@ -87,9 +92,9 @@ This command will locally simulate one server's task in a cluster where $128=l*8
 
 To further benchmark the distributed primitives described in the paper, please check the scripts under `hack` folder (e.g., `hack/bench_sumcheck.sh`). We only provide commands for leader mode. To switch modes, try different Rust features. You can change to `benchmark` mode if you have enough hardware resources.
 
-### Distributed ZKPs
+### Collaborative ZKPs
 
-We offer implementation and examples for collaborative HyperPlonk (in the `hyperplonk` crate). For example, to run the comparison between local Hyperplonk and collaborative Hyperplonk:
+We offer implementation and examples for collaborative HyperPlonk (in the `hyperplonk` crate). For example, to run the comparison between monolithic Hyperplonk and collaborative Hyperplonk:
 
 ```bash
 # At the root directory
