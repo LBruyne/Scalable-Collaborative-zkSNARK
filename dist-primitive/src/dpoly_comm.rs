@@ -217,7 +217,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
         }
         result.mature()
     }
-    pub fn new_random(len_log_2: usize, party_count:usize) -> PolynomialCommitment<E> {
+    pub fn new_random(len_log_2: usize, party_count: usize) -> PolynomialCommitment<E> {
         let rng = &mut ark_std::test_rng();
         let len_log_2 = len_log_2 - party_count.trailing_zeros() as usize;
         let mut result = Self {
@@ -266,19 +266,12 @@ impl<E: Pairing> PolynomialCommitment<E> {
         return result;
     }
 
-    pub fn d_local_commit(
-        &self,
-        peval: &Vec<E::ScalarField>,
-    ) -> E::G1 {
+    pub fn d_local_commit(&self, peval: &Vec<E::ScalarField>) -> E::G1 {
         let level = peval.len().trailing_zeros() as usize;
         assert!(level < self.powers_of_g.len());
         assert!(peval.len() == 2_usize.pow(level as u32));
         // eprintln!("MSM len: {}", peval.len());
-        E::G1::msm(
-            &self.powers_of_g[level],
-            peval,
-        )
-        .unwrap()
+        E::G1::msm(&self.powers_of_g[level], peval).unwrap()
     }
     pub async fn d_commit<Net: MPCSerializeNet>(
         &self,
@@ -289,16 +282,17 @@ impl<E: Pairing> PolynomialCommitment<E> {
         let timer = start_timer!("Local: d_commit", net.is_leader());
         let local_commitment = self.d_local_commit(peval);
         end_timer!(timer);
-        let result = net.leader_compute_element(
-            &local_commitment,
-            sid,
-            |commitments| {
-                let commitment = commitments.into_iter().sum();
-                vec![commitment; net.n_parties()]
-            },
-            "d_commit",
-        )
-        .await;
+        let result = net
+            .leader_compute_element(
+                &local_commitment,
+                sid,
+                |commitments| {
+                    let commitment = commitments.into_iter().sum();
+                    vec![commitment; net.n_parties()]
+                },
+                "d_commit",
+            )
+            .await;
         return result;
     }
 
