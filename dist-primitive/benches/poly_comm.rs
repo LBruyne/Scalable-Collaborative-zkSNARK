@@ -7,7 +7,7 @@ use ark_std::UniformRand;
 use criterion::{criterion_group, criterion_main, Criterion};
 use dist_primitive::dpoly_comm::PolynomialCommitmentCub;
 
-const SIZE_LOG:usize = 8;
+const SIZE_LOG:usize = 12;
 const SIZE :usize = 1 << SIZE_LOG;
 
 fn run(c: &mut Criterion) {
