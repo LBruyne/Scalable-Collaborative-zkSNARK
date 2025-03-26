@@ -1,4 +1,3 @@
-use std::hint::black_box;
 use crate::dmsm::d_msm;
 use crate::unpack::pss2ss;
 use crate::utils::operator::transpose;
@@ -9,11 +8,14 @@ use ark_ec::AffineRepr;
 use ark_ec::VariableBaseMSM;
 use ark_ff::UniformRand;
 use ark_ff::{One, Zero};
-use mpc_net::{end_timer, start_timer};
 use mpc_net::MPCNetError;
 use mpc_net::MultiplexedStreamID;
+use mpc_net::{end_timer, start_timer};
 use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
+use std::hint::black_box;
+use std::time::Duration;
+use std::time::Instant;
 
 /// This form is used to further pack the elements. Not eligible for computing.
 #[derive(Clone, Debug)]
@@ -231,6 +233,44 @@ impl<E: Pairing> PolynomialCommitment<E> {
         }
         (current_r[0], result)
     }
+
+    pub fn open_in_detail(
+        &self,
+        peval: &Vec<E::ScalarField>,
+        point: &Vec<E::ScalarField>,
+    ) -> (E::ScalarField, Vec<E::G1>) {
+        let mut result = Vec::new();
+        let n = peval.len().trailing_zeros() as usize; // peval.len = 2^n
+        assert_eq!(peval.len(), 2_usize.pow(n as u32));
+        let mut current_r = peval.clone();
+        // If you have 2^1 elements in peval, you need to compute 1 element in result
+        let mut r_total = Duration::ZERO;
+        let mut q_total = Duration::ZERO;
+        let mut commit_total = Duration::ZERO;
+        for i in 0..n {
+            let (part0, part1) = current_r.split_at(current_r.len() / 2);
+            let before_q = Instant::now();
+            let q_i: Vec<_> = part0
+                .iter()
+                .zip(part1.iter())
+                .map(|(&x, &y)| y - x)
+                .collect();
+            q_total += before_q.elapsed();
+            let before_r = Instant::now();
+            let r_i: Vec<_> = part0
+                .iter()
+                .zip(part1.iter())
+                .map(|(&x, &y)| (E::ScalarField::one() - point[i]) * x + point[i] * y)
+                .collect();
+            r_total += before_r.elapsed();
+            current_r = r_i;
+            let before_commit = Instant::now();
+            result.push(self.commit(&q_i));
+            commit_total += before_commit.elapsed();
+        }
+        (current_r[0], result)
+    }
+
     /// In this protocol, we make an optimization that batches all of dMSM into one round of communication.
     pub async fn d_open<Net: MPCSerializeNet>(
         &self,
@@ -285,7 +325,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
                 .zip(part1.iter())
                 .map(|(&x, &y)| (E::ScalarField::one() - point[i]) * x + point[i] * y)
                 .collect();
-            // Local small MSM between ss of q_i and ss of base. 
+            // Local small MSM between ss of q_i and ss of base.
             // Note that the base should also be regular shares, which is replaced by packed shares for simplicity here.
             let level = (q_i.len() * pp.l).trailing_zeros() as usize;
             res.push(E::G1::msm(&self.powers_of_g[level], &q_i).unwrap());
