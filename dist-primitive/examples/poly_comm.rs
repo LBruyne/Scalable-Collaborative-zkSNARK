@@ -28,5 +28,5 @@ fn main() {
     let cub = PolynomialCommitmentCub::<Bls12_381>::new_toy(g1, g2, s);
     let verification = cub.mature();
 
-    verification.open_in_detail(black_box(&peval), black_box(&u))
+    verification.open_in_detail(black_box(&peval), black_box(&u));
 }

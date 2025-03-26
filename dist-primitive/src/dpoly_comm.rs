@@ -268,6 +268,10 @@ impl<E: Pairing> PolynomialCommitment<E> {
             result.push(self.commit(&q_i));
             commit_total += before_commit.elapsed();
         }
+        println!(
+            "Q total: {:?}, R total: {:?}, Commit total: {:?}",
+            q_total, r_total, commit_total
+        );
         (current_r[0], result)
     }
 
