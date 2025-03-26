@@ -6,7 +6,7 @@ use ark_std::UniformRand;
 
 use dist_primitive::dpoly_comm::PolynomialCommitmentCub;
 
-const SIZE_LOG:usize = 12;
+const SIZE_LOG:usize = 10;
 const SIZE :usize = 1 << SIZE_LOG;
 
 fn main() {
@@ -28,5 +28,6 @@ fn main() {
     let cub = PolynomialCommitmentCub::<Bls12_381>::new_toy(g1, g2, s);
     let verification = cub.mature();
 
+    verification.commit_in_detail(black_box(&peval));
     verification.open_in_detail(black_box(&peval), black_box(&u));
 }

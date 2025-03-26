@@ -182,6 +182,19 @@ impl<E: Pairing> PolynomialCommitment<E> {
         // eprintln!("MSM len: {}", peval.len());
         E::G1::msm(&self.powers_of_g[level], peval).unwrap()
     }
+    pub fn commit_in_detail(&self, peval: &Vec<E::ScalarField>) -> E::G1 {
+        let level = peval.len().trailing_zeros() as usize;
+        assert!(level < self.powers_of_g.len());
+        assert!(peval.len() == 2_usize.pow(level as u32));
+        // eprintln!("MSM len: {}", peval.len());
+        let before_msm = Instant::now();
+        let result = E::G1::msm(&self.powers_of_g[level], peval).unwrap();
+        println!(
+            "Commit time: {:?}",
+            before_msm.elapsed()
+        );
+        result
+    }
     pub async fn d_commit<Net: MPCSerializeNet>(
         &self,
         pevals: &Vec<Vec<E::ScalarField>>,
