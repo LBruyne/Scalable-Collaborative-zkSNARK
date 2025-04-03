@@ -95,8 +95,8 @@ struct Cli {
 async fn main() {
     let args = Cli::parse();
     
-    csumcheck_product_bench(args.n, args.l).await;
     dsumcheck_product_bench(args.n, args.l).await;
+    csumcheck_product_bench(args.n, args.l).await;
 }
 
 async fn csumcheck_product_bench(n: usize, l: usize) {
