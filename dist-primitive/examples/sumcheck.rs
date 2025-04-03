@@ -100,16 +100,15 @@ async fn main() {
 }
 
 async fn csumcheck_product_bench(n: usize, l: usize) {
-    let delegator = ProductDelegator::new(n);
     let challenge = (0..n)
     .map(|_| Fr::rand(&mut ark_std::test_rng()))
     .collect::<Vec<_>>();    
-
+    let pp = PackedSharingParams::<Fr>::new(l);
     let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
     // This is a Vec of Vecs, where each Vec is a party's shares.
     // Here we bench the cost of sharing as well, however in practice, the sharing can be done offline in a streaming fashion.
-    let shares = Arc::new(delegator.delegate(l));
+    let shares = (vec![random_evaluations(2usize.pow(n as u32)/pp.l);pp.n],vec![random_evaluations(2usize.pow(n as u32)/pp.l);pp.n]);
     let dsc = start_timer!("Simulate SumcheckProduct");
     let proof = net
         .simulate_network_round(
