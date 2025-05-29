@@ -85,7 +85,7 @@ We strongly advise you run the script, or you may have to read through the scrip
 
 ### Collaborative \& Distributed primitives
 
-We also offer Rust examples for collaborative and distributed primitives under the `dist-primitive` folder. If you have [`just`](https://github.com/casey/just) installed, you can run:
+When there are not enough machines, we also offer Rust examples for *locally* evaluating collaborative and distributed primitives under the `dist-primitive` folder. If you have [`just`](https://github.com/casey/just) installed, you can run:
 
 ```bash
 just run --release --example <example name> <args>
@@ -100,18 +100,18 @@ RUSTFLAGS="-Ctarget-cpu=native -Awarnings" cargo +nightly run --release --exampl
 For example, to run a collaborative sumcheck protocol in a `leader` mode (only one party executes its job locally), run:
 
 ```bash
-just run --release --example sumcheck -F leader -- --l 16 --n 20
+just run --release --example sumcheck -F leader -- --l 8 --n 20
 # WARNING: If you encounter a `Too many open files` error, please adjust your environment setting with `ulimit -HSn 65536` 
 ```
 
-This command locally simulates the task of a single server in a network where $128 = l \times 8$ parties participate, and the input size for the sumcheck protocol is $2^{20}$. The output will indicate that the leader's running time is approximately $\frac{1}{16}$ of that of the local prover.
+This command locally simulates the task of a single server in a network where $64 = l \times 8$ parties participate, and the input size for the sumcheck protocol is $2^{20}$. The output will indicate that the leader's running time is approximately $\frac{1}{8}$ of that of the local prover.
 
 Also you can run:
 ```bash
-just run --release --example sumcheck -F local -- --l 16 --n 20
+just run --release --example sumcheck -F local -- --l 8 --n 20
 ```
 
-This command initiates a local network to perform the same task. The output time should be divided by $N = 128 = 8 \times 16$ to estimate the simulated execution time for each party.
+This command initiates a local network to perform the same task. The output time should be divided by $N = 64 = 8 \times 8$ to estimate the simulated execution time for each party.
 
 To further benchmark the collaborative primitives in a large scale, please check the scripts under `hack` folder (e.g., `hack/bench_sumcheck.sh`). We only provide commands for leader mode. To switch modes, try different Rust features. You can also change to `benchmark` mode if you have enough hardware resources.
 
@@ -121,12 +121,12 @@ We offer implementation and examples for collaborative HyperPlonk (in the `hyper
 
 ```bash
 # At the root directory
-just run --release --example hyperplonk -F leader -- --l 16 --n 15
+just run --release --example hyperplonk -F local -- --l 8 --n 15
+# WARNING: HyperPlonk currently cannot be run in a ``leader`` mode locally
 ```
 
-In this command, $l$ represents the packing factor, and the circuit size is $2^{n}$.
-
 The program outputs the time taken for the a server running the protocol and its actual communication cost (both incoming and outgoing data) during the proof generation. This output can be redirected to a file for further analysis.
+
 
 ## License
 

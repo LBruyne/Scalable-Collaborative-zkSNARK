@@ -181,8 +181,6 @@ pub trait MPCNet: Send + Sync {
                 });
             }
 
-            let m = bytes_out[0].len();
-
             for id in (0..self.n_parties()).filter(|p| *p != own_id as usize) {
                 // if bytes_out[id].len() != m {
                 //     return Err(MPCNetError::Protocol {

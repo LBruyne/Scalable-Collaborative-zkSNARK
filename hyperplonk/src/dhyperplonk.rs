@@ -3,10 +3,8 @@ use std::hint::black_box;
 use ark_ec::pairing::Pairing;
 use ark_ff::fields::Field;
 use ark_std::UniformRand;
-use dist_primitive::dacc_product::{c_acc_product, d_acc_product};
-use dist_primitive::degree_reduce::degree_reduce_many;
-use dist_primitive::dsumcheck::{d_sumcheck, d_sumcheck_product};
-use dist_primitive::mle::d_fix_variable;
+use dist_primitive::dacc_product::{d_acc_product};
+use dist_primitive::dsumcheck::{d_sumcheck_product};
 use dist_primitive::random_evaluations;
 use dist_primitive::{
     dacc_product::c_acc_product_and_share,

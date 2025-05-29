@@ -6,12 +6,9 @@ use ark_ec::{bls12::Bls12, pairing::Pairing};
 use clap::Parser;
 
 use hyperplonk::dhyperplonk::cpermcheck;
-use hyperplonk::dhyperplonk::dhyperplonk;
-use hyperplonk::dhyperplonk::dpermcheck;
 use hyperplonk::dhyperplonk::PackedProvingParameters;
 use mpc_net::multi::MPCNetConnection;
 use env_logger;
-use mpc_net::{end_timer, start_timer};
 use mpc_net::MultiplexedStreamID;
 use secret_sharing::pss::PackedSharingParams;
 use tokio::net::TcpStream;

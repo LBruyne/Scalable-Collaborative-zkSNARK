@@ -74,7 +74,7 @@ pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     sid: MultiplexedStreamID,
 ) -> Result<(Vec<F>, Vec<F>, Vec<F>), MPCNetError> {
     let timer = start_timer!(
-        "Distributed product accumulation and sharing",
+        "Collaborative product accumulation and sharing",
         net.is_leader()
     );
     let party_count = pp.n;
@@ -263,7 +263,7 @@ pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     end_timer!(share_leader_tree_timer);
 
     // Each party unmask the shares.
-    let timer = start_timer!("Local: Unmask", net.is_leader());
+    let unmask_timer = start_timer!("Local: Unmask", net.is_leader());
     share0.iter_mut().enumerate().for_each(|(i, share)| {
         *share *= unmask0[i];
     });
@@ -273,7 +273,7 @@ pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
     share2.iter_mut().enumerate().for_each(|(i, share)| {
         *share *= unmask2[i];
     });
-    end_timer!(timer);
+    end_timer!(unmask_timer);
 
     // These three shares need to be reduced. To make the leader computation correct we run 1/N of it
     let reduce_timer = start_timer!("Reduce shares", net.is_leader());
@@ -286,6 +286,7 @@ pub async fn c_acc_product_and_share<F: FftField, Net: MPCSerializeNet>(
 
     end_timer!(reduce_timer);
 
+    end_timer!(unmask_timer);
     end_timer!(timer);
     Ok((share0, share1, share2))
 }

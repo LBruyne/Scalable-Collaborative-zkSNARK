@@ -554,7 +554,6 @@ mod test {
             .simulate_network_round(
                 (u.clone(), commitment, peval.clone()),
                 |net, (u, commitment, peval)| async move {
-                    let party_count = 8;
                     let id = net.party_id();
                     let peval = &peval[8 * id as usize..8 * (id + 1) as usize].into();
                     let commit = commitment

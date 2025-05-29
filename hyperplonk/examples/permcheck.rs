@@ -4,10 +4,7 @@ use ark_ec::{bls12::Bls12, pairing::Pairing};
 
 use clap::Parser;
 
-use hyperplonk::dhyperplonk::dhyperplonk;
 use hyperplonk::dhyperplonk::PackedProvingParameters;
-use hyperplonk::hyperplonk::local_hyperplonk;
-use hyperplonk::hyperplonk::local_hyperplonkpp;
 use mpc_net::LocalTestNet;
 use mpc_net::MPCNet; 
 use mpc_net::{end_timer, start_timer};
@@ -33,8 +30,7 @@ async fn main() {
     dpermcheck_bench(args.n, args.l).await;
 }
 
-/// This benchmark just runs the leader's part of the protocol without any networking involved.
-#[cfg(feature = "leader")]
+#[cfg(not(feature = "leader"))]
 async fn cpermcheck_bench(n: usize, l: usize) {
     use hyperplonk::dhyperplonk::cpermcheck;
 
@@ -42,36 +38,58 @@ async fn cpermcheck_bench(n: usize, l: usize) {
     let params = PackedProvingParameters::new(n, l, &pp);
     let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
-    black_box(
-        cpermcheck::<Bls12<ark_bls12_381::Config>, _>(
-            n,
-            &params,
-            &pp,
-            net.get_leader(),
-            MultiplexedStreamID::Zero,
-        )
-        .await
-        .unwrap(),
-    );
+    let timer = start_timer!("Simulate Collaborative Permutation Check");
+    let _ = net
+        .simulate_network_round(params, move | net, params | async move {
+            let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
+            black_box(
+                cpermcheck::<Bls12<ark_bls12_381::Config>, _>(
+                    n,
+                    &params,
+                    &pp,
+                    &net,
+                    MultiplexedStreamID::Zero,
+                )
+                .await
+                .unwrap(),
+            );
+
+            if net.is_leader() {
+                println!("Comm: {:?}", net.get_comm());
+            }
+        })
+        .await;
+    end_timer!(timer);
 }
 
-#[cfg(feature = "leader")]
+#[cfg(not(feature = "leader"))]
 async fn dpermcheck_bench(n: usize, l: usize) {
-    use hyperplonk::dhyperplonk::{dhyperplonk_data_parallel, dpermcheck};
-
+    use hyperplonk::dhyperplonk::dpermcheck;
+    
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     let params = PackedProvingParameters::new(n, l, &pp);
     let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
-    black_box(
-        dpermcheck::<Bls12<ark_bls12_381::Config>, _>(
-            n,
-            &params,
-            &pp,
-            net.get_leader(),
-            MultiplexedStreamID::Zero,
-        )
-        .await
-        .unwrap(),
-    );
+    let timer = start_timer!("Simulate Improved Collaborative Permutation Check");
+    let _ = net
+        .simulate_network_round(params, move | net, params | async move {
+            let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
+            black_box(
+                dpermcheck::<Bls12<ark_bls12_381::Config>, _>(
+                    n,
+                    &params,
+                    &pp,
+                    &net,
+                    MultiplexedStreamID::Zero,
+                )
+                .await
+                .unwrap(),
+            );
+
+            if net.is_leader() {
+                println!("Comm: {:?}", net.get_comm());
+            }
+        })
+        .await;
+    end_timer!(timer);
 }
