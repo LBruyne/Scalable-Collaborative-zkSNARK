@@ -44,9 +44,9 @@ cargo 1.80.0-nightly (05364cb2f 2024-05-03)
 
 ### Benchmark
 
-The benchmarks are based on the `benchmark` mode. A crucial parameter is $l$, which represents the packing factor as defined in the paper. To run a benchmark with packing factor $l$, you need $l \times 8$ servers. The expected speedup is approximately between $l$ and $2l$ times.
+The benchmarks are based on the `benchmark` mode. A crucial parameter is $l$, which represents the packing factor as defined in the paper. To run a benchmark with packing factor $l$, you need $l \times 8$ servers/machines. The expected speedup is approximately between $l$ and $2l$ times.
 
-<!-- **Artifact Evaluation**: We understand that it may be difficult for reviewers to access a large number of servers to reproduce the results in the `benchmark` mode, although the results presented in the paper were obtained using this mode. Therefore, you can use the `local` mode to simulate the results. Remember to divide the total execution time by the number of servers $N$ to estimate the actual running time. -->
+<!-- **Artifact Evaluation**: We understand that it may be difficult for reviewers to access a large number of servers to reproduce the results in the `benchmark` mode, although the results presented in the paper were obtained using this mode. Therefore, you can use the `local` mode to simulate the results. Jump to [here](#collaborative--distributed-primitives) for references. Remember to divide the total execution time by the number of servers $N$ to estimate the actual running time. -->
 
 If you have an additional *jump server* for your cluster, deploying the cluster becomes easier. A script is provided at `hack/prepare-server.sh` to prepare the jump server for running benchmarks. For inter-server communication, you will need an IP address file containing the list of server IPs in the following format:
 ```
@@ -66,14 +66,14 @@ Make sure the file ends with a newline, and provide the jump server's IP address
 6. You can use the `tc` command in a Linux machine to control the network speed to simulate LAN/WAN.
 
 There are 4 benchmarks available. They are:
-1. Collaborative and monolithic Hyperplonk (for general circuits) §5.2, Fig. 3, Tab. 2
-2. Collaborative Hyperplonk (for data-parallel circuits) §5.3, Tab. 4
-3. Collaborative permcheck (with prodcheck) §4.3, Tab. 5
-4. Collaborative permcheck (improved) §5.1, Tab. 5
- 
-The benchmark of zkSaaS can be found [here](https://github.com/guruvamsi-policharla/zksaas), and it can be executed by following the instructions provided in that repository.
+1. [Collaborative and monolithic Hyperplonk (for general circuits)](./hack/run-hyperplonk/), coressponding to §5.2, Fig. 3, Tab. 2 in the paper
+2. [Collaborative Hyperplonk (for data-parallel circuits)](./hack/run-hyperplonk-dataparallel/), §5.3, Tab. 4
+3. [Collaborative permcheck (with prodcheck)](./hack/run-cpermcheck/), §4.3, Tab. 5
+4. [Collaborative permcheck (improved)](./hack/run-dpermcheck/), §5.1, Tab. 5
 
-We strongly advise you run the script, or you may have to read through the script yourself to understand how the scripts work and how to manually set up the addresses. To run the benchmarks, you have to:
+The source code of zkSaaS can be found [here](https://github.com/guruvamsi-policharla/zksaas), and it can be executed by following the instructions provided in that repository. We also provide [scripts](./hack/run-zksaas/) to reproduce its result.
+
+We strongly advise you run the scripts above, or you may have to read through the script yourself to understand how the scripts work and how to manually set up the addresses. To run the benchmarks, you have to:
 
 1. Go to the jump server
 2. `cd` to the desired bench
