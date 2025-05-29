@@ -16,7 +16,7 @@ use secret_sharing::pss::PackedSharingParams;
 
 #[derive(Parser)]
 struct Cli {
-    /// The packing size, should be 1/4 of the party size as well as a power of 2.
+    /// The packing size, should be 1/8 of the party size as well as a power of 2.
     #[arg(long)]
     l: usize,
     /// log2 of the total number of variables.
@@ -72,15 +72,15 @@ async fn mvpc_bench(n: usize, l: usize) {
         end_timer!(timer);
     }
 
-    // Distributed
+    // Collaborative
     {
-        let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
-        let timer = start_timer!("Distributed");
+        let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
+        let timer = start_timer!("Collaborative");
         let pp =
             PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
         let commit_timer = start_timer!("Commit");
         let commit = adult
-            .d_commit(
+            .c_commit(
                 &vec![peval_share.clone()],
                 &pp,
                 &net.get_leader(),
@@ -91,7 +91,7 @@ async fn mvpc_bench(n: usize, l: usize) {
         end_timer!(commit_timer);
         let open_timer = start_timer!("Open");
         let (value, proof) = adult
-            .d_open(
+            .c_open(
                 &peval_share,
                 &u,
                 &pp,
@@ -144,11 +144,11 @@ async fn mvpc_bench(n: usize, l: usize) {
         end_timer!(open_timer);
         end_timer!(timer);
     }
-    // Distributed
+    // Collaborative
     {
-        let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+        let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
         // Now simulate the protocol
-        let timer = start_timer!("Simulate distributed polynomial commitment");
+        let timer = start_timer!("Simulate collaborative polynomial commitment");
         let sharing = start_timer!("Sharing");
         let peval_shares = transpose(
             peval
@@ -166,7 +166,7 @@ async fn mvpc_bench(n: usize, l: usize) {
 
                 let commit_timer = start_timer!("Commit", net.is_leader());
                 let commit = adult
-                    .d_commit(
+                    .c_commit(
                         &vec![peval_shares[net.party_id() as usize].clone()],
                         &pp,
                         &net,
@@ -178,7 +178,7 @@ async fn mvpc_bench(n: usize, l: usize) {
 
                 let open_timer = start_timer!("Open", net.is_leader());
                 let (value, proof) = adult
-                    .d_open(
+                    .c_open(
                         &peval_shares[net.party_id() as usize],
                         &u,
                         &pp,

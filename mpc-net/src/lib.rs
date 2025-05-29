@@ -68,7 +68,10 @@ pub trait MPCNet: Send + Sync {
     ) -> Result<Option<Vec<Bytes>>, MPCNetError> {
         let bytes_out = Bytes::copy_from_slice(bytes);
         let own_id = self.party_id();
-        let timer = start_timer!(format!("Comm: from {} to leader, {}B", own_id, bytes_out.len()), self.is_leader());
+        let timer = start_timer!(
+            format!("Comm: from {} to leader, {}B", own_id, bytes_out.len()),
+            self.is_leader()
+        );
 
         let r = if self.is_leader() {
             let mut r = FuturesOrdered::new();
@@ -113,7 +116,15 @@ pub trait MPCNet: Send + Sync {
     ) -> Result<Option<Vec<Bytes>>, MPCNetError> {
         let bytes_out = Bytes::copy_from_slice(bytes);
         let own_id = self.party_id();
-        let timer = start_timer!(format!("Comm: from {} to {}, {}B", own_id, receiver, bytes_out.len()), self.is_leader());
+        let timer = start_timer!(
+            format!(
+                "Comm: from {} to {}, {}B",
+                own_id,
+                receiver,
+                bytes_out.len()
+            ),
+            self.is_leader()
+        );
 
         let r = if receiver == self.party_id() {
             let mut r = FuturesOrdered::new();
@@ -159,7 +170,10 @@ pub trait MPCNet: Send + Sync {
         let own_id = self.party_id();
 
         if let Some(bytes_out) = bytes_out {
-            let timer = start_timer!(format!("Comm: from leader to all, {}B", bytes_out.len()), self.is_leader());
+            let timer = start_timer!(
+                format!("Comm: from leader to all, {}B", bytes_out[0].len()),
+                self.is_leader()
+            );
 
             if !self.is_leader() {
                 return Err(MPCNetError::BadInput {
@@ -167,15 +181,13 @@ pub trait MPCNet: Send + Sync {
                 });
             }
 
-            let m = bytes_out[0].len();
-
             for id in (0..self.n_parties()).filter(|p| *p != own_id as usize) {
-                if bytes_out[id].len() != m {
-                    return Err(MPCNetError::Protocol {
-                        err: format!("The leader sent wrong number of bytes to Peer {}", id),
-                        party: id as u32,
-                    });
-                }
+                // if bytes_out[id].len() != m {
+                //     return Err(MPCNetError::Protocol {
+                //         err: format!("The leader sent wrong number of bytes to Peer {}", id),
+                //         party: id as u32,
+                //     });
+                // }
 
                 self.send_to(id as u32, bytes_out[id].clone(), sid).await?;
             }
@@ -205,8 +217,10 @@ pub trait MPCNet: Send + Sync {
         let own_id = self.party_id();
 
         if let Some(bytes_out) = bytes_out {
-
-            let timer = start_timer!(format!("Comm: from {} to all, {}B", own_id, bytes_out.len()), self.is_leader());
+            let timer = start_timer!(
+                format!("Comm: from {} to all, {}B", own_id, bytes_out[0].len()),
+                self.is_leader()
+            );
 
             if !own_id == sender {
                 return Err(MPCNetError::BadInput {
@@ -231,7 +245,7 @@ pub trait MPCNet: Send + Sync {
 
             Ok(bytes_out[own_id as usize].clone())
         } else {
-            if own_id == sender{
+            if own_id == sender {
                 return Err(MPCNetError::BadInput {
                     err: "recv_from_leader called with no bytes_out when leader",
                 });
@@ -255,5 +269,19 @@ pub trait MPCNet: Send + Sync {
         let leader_response = self.worker_send_or_leader_receive(bytes, sid).await?.map(f);
         self.worker_receive_or_leader_send(leader_response, sid)
             .await
+    }
+
+    // Sync MPC state
+    async fn sync(&self) -> Result<(), MPCNetError> {
+        let bytes = &vec![135u8; 1];
+        let sid = MultiplexedStreamID::Zero;
+        let timer = start_timer!("Sync MPC state", self.is_leader());
+        let leader_response = self.worker_send_or_leader_receive(bytes, sid).await?;
+        let recv_bytes = self
+            .worker_receive_or_leader_send(leader_response, sid)
+            .await?;
+        end_timer!(timer);
+        assert_eq!(recv_bytes, Bytes::from_static(&[135u8]));
+        Ok(())
     }
 }

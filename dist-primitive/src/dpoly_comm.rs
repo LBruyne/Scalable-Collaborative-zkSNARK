@@ -1,4 +1,3 @@
-use std::hint::black_box;
 use crate::dmsm::d_msm;
 use crate::unpack::pss2ss;
 use crate::utils::operator::transpose;
@@ -9,11 +8,12 @@ use ark_ec::AffineRepr;
 use ark_ec::VariableBaseMSM;
 use ark_ff::UniformRand;
 use ark_ff::{One, Zero};
-use mpc_net::{end_timer, start_timer};
 use mpc_net::MPCNetError;
 use mpc_net::MultiplexedStreamID;
+use mpc_net::{end_timer, start_timer};
 use rayon::prelude::*;
 use secret_sharing::pss::PackedSharingParams;
+use std::hint::black_box;
 
 /// This form is used to further pack the elements. Not eligible for computing.
 #[derive(Clone, Debug)]
@@ -65,6 +65,53 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
             powers_of_g2,
         }
     }
+
+    pub fn new_ugly(g: E::G1, g2: E::G2, s: Vec<E::ScalarField>, party_count: usize) -> Self {
+        let n = s.len();
+        let log_party = party_count.trailing_zeros() as usize;
+        let mut powers_of_g: Vec<Vec<<E as Pairing>::G1>> = vec![Vec::new(); n + 1];
+        let mut powers_of_g2: Vec<<E as Pairing>::G2> = Vec::new();
+        {
+            // Last vec, only g
+            powers_of_g[0].push(g);
+        }
+        // s_0 is in the outermost layer, i.e. in the final vec the first half is s_0, and the second half is 1-s_0
+        for i in 0..log_party {
+            powers_of_g[i + 1] = powers_of_g[i]
+                .clone()
+                .into_par_iter()
+                .map(|e| e * (E::ScalarField::one() - s[log_party - i - 1]))
+                .chain(
+                    powers_of_g[i]
+                        .clone()
+                        .into_par_iter()
+                        .map(|e| e * s[log_party - i - 1]),
+                )
+                .collect();
+        }
+        for i in log_party..n {
+            powers_of_g[i + 1] = powers_of_g[i]
+                .clone()
+                .into_par_iter()
+                .map(|e| e * (E::ScalarField::one() - s[n - i - 1]))
+                .chain(
+                    powers_of_g[i]
+                        .clone()
+                        .into_par_iter()
+                        .map(|e| e * s[n - i - 1]),
+                )
+                .collect();
+        }
+        powers_of_g2.push(g2);
+        for i in 0..n {
+            powers_of_g2.push(g2 * s[i]);
+        }
+        Self {
+            powers_of_g,
+            powers_of_g2,
+        }
+    }
+
     pub fn new_toy(g: E::G1, g2: E::G2, s: Vec<E::ScalarField>) -> Self {
         let n = s.len();
         let rng = &mut ark_std::test_rng();
@@ -124,7 +171,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
                 powers_of_g: vec![Vec::new(); self.powers_of_g.len()],
                 powers_of_g2: self.powers_of_g2.clone(),
             };
-            l * 4
+            l * 8
         ];
         for i in 0..self.powers_of_g.len() {
             let v = &self.powers_of_g[i];
@@ -139,7 +186,7 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
                     .map(|chunk| pp.pack_from_public(chunk.to_vec()))
                     .collect()
             });
-            for j in (0..l * 4).rev() {
+            for j in (0..l * 8).rev() {
                 result[j].powers_of_g[i] = powers_of_g.remove(j);
             }
         }
@@ -170,6 +217,20 @@ impl<E: Pairing> PolynomialCommitmentCub<E> {
         }
         result.mature()
     }
+    pub fn new_random(len_log_2: usize, party_count: usize) -> PolynomialCommitment<E> {
+        let rng = &mut ark_std::test_rng();
+        let len_log_2 = len_log_2 - party_count.trailing_zeros() as usize;
+        let mut result = Self {
+            powers_of_g: vec![Vec::new(); len_log_2 + 1],
+            powers_of_g2: (0..len_log_2 + 1).map(|_| E::G2::rand(rng)).collect(),
+        };
+        for i in 0..len_log_2 + 1 {
+            // Last few powers may not be properly packed, fill in some dummy values
+            let powers_of_g = (0..(1 << i)).map(|_| E::G1::rand(rng)).collect();
+            result.powers_of_g[i] = powers_of_g;
+        }
+        result.mature()
+    }
 }
 
 impl<E: Pairing> PolynomialCommitment<E> {
@@ -180,15 +241,15 @@ impl<E: Pairing> PolynomialCommitment<E> {
         // eprintln!("MSM len: {}", peval.len());
         E::G1::msm(&self.powers_of_g[level], peval).unwrap()
     }
-    pub async fn d_commit<Net: MPCSerializeNet>(
+    pub async fn c_commit<Net: MPCSerializeNet>(
         &self,
         pevals: &Vec<Vec<E::ScalarField>>,
         pp: &PackedSharingParams<E::ScalarField>,
         net: &Net,
         sid: MultiplexedStreamID,
     ) -> Result<Vec<E::G1>, MPCNetError> {
-        let timer = start_timer!("Local: Something", net.is_leader());
-        let bases: &Vec<Vec<_>> = &pevals
+        let timer = start_timer!("Local: c_commit", net.is_leader());
+        let bases: Vec<Vec<_>> = pevals
             .iter()
             .map(|peval| {
                 let level = (peval.len() * pp.l).trailing_zeros() as usize;
@@ -197,17 +258,48 @@ impl<E: Pairing> PolynomialCommitment<E> {
                 self.powers_of_g[level].clone()
             })
             .collect();
-        end_timer!(timer);
         // if net.is_leader() {
         //     eprintln!("dMSM batch size: {}", bases.len());
         // }
-        d_msm(bases, pevals, pp, net, sid).await
+        end_timer!(timer);
+        let result = d_msm(&bases, pevals, pp, net, sid).await;
+        return result;
+    }
+
+    pub fn d_local_commit(&self, peval: &Vec<E::ScalarField>) -> E::G1 {
+        let level = peval.len().trailing_zeros() as usize;
+        assert!(level < self.powers_of_g.len());
+        assert!(peval.len() == 2_usize.pow(level as u32));
+        // eprintln!("MSM len: {}", peval.len());
+        E::G1::msm(&self.powers_of_g[level], peval).unwrap()
+    }
+    pub async fn d_commit<Net: MPCSerializeNet>(
+        &self,
+        peval: &Vec<E::ScalarField>,
+        net: &Net,
+        sid: MultiplexedStreamID,
+    ) -> Result<E::G1, MPCNetError> {
+        let timer = start_timer!("Local: d_commit", net.is_leader());
+        let local_commitment = self.d_local_commit(peval);
+        end_timer!(timer);
+        let result = net
+            .leader_compute_element(
+                &local_commitment,
+                sid,
+                |commitments| {
+                    let commitment = commitments.into_iter().sum();
+                    vec![commitment; net.n_parties()]
+                },
+                "d_commit",
+            )
+            .await;
+        return result;
     }
 
     pub fn open(
         &self,
         peval: &Vec<E::ScalarField>,
-        point: &Vec<E::ScalarField>,
+        point: &[E::ScalarField],
     ) -> (E::ScalarField, Vec<E::G1>) {
         let mut result = Vec::new();
         let n = peval.len().trailing_zeros() as usize; // peval.len = 2^n
@@ -231,8 +323,82 @@ impl<E: Pairing> PolynomialCommitment<E> {
         }
         (current_r[0], result)
     }
-    /// In this protocol, we make an optimization that batches all of dMSM into one round of communication.
+
+    pub fn d_local_open(
+        &self,
+        peval: &Vec<E::ScalarField>,
+        point: &[E::ScalarField],
+    ) -> (E::ScalarField, Vec<E::G1>) {
+        let mut result = Vec::new();
+        let n = peval.len().trailing_zeros() as usize; // peval.len = 2^n
+        assert_eq!(peval.len(), 2_usize.pow(n as u32));
+        let mut current_r = peval.clone();
+        // If you have 2^1 elements in peval, you need to compute 1 element in result
+        for i in 0..n {
+            let (part0, part1) = current_r.split_at(current_r.len() / 2);
+            let q_i: Vec<_> = part0
+                .iter()
+                .zip(part1.iter())
+                .map(|(&x, &y)| y - x)
+                .collect();
+            let r_i: Vec<_> = part0
+                .iter()
+                .zip(part1.iter())
+                .map(|(&x, &y)| (E::ScalarField::one() - point[i]) * x + point[i] * y)
+                .collect();
+            current_r = r_i;
+            result.push(self.d_local_commit(&q_i));
+        }
+        (current_r[0], result)
+    }
+
     pub async fn d_open<Net: MPCSerializeNet>(
+        &self,
+        peval: &Vec<E::ScalarField>,
+        point: &Vec<E::ScalarField>,
+        net: &Net,
+        sid: MultiplexedStreamID,
+    ) -> Result<(E::ScalarField, Vec<E::G1>), MPCNetError> {
+        // get local opens
+        let timer = start_timer!("Local: d_open", net.is_leader());
+        let party_log = net.n_parties().trailing_zeros() as usize;
+        let local_points = &point[party_log..];
+        let local_open = self.d_local_open(peval, local_points);
+        end_timer!(timer);
+        let result = net
+            .leader_compute_element(
+                &local_open,
+                sid,
+                |local_opens| {
+                    let (local_z, local_pi): (Vec<_>, Vec<_>) = local_opens.into_iter().unzip();
+                    let pi: Vec<_> = (0..local_pi[0].len())
+                        .map(|i| local_pi.iter().map(|row| row[i]).sum())
+                        .collect();
+                    let root_open = self.open(&local_z, &point[..party_log]);
+
+                    let pi = root_open
+                        .1
+                        .iter()
+                        .cloned()
+                        .chain(pi.iter().cloned())
+                        .collect();
+
+                    let leader_answer = (root_open.0, pi);
+                    let worker_answer = (<E as Pairing>::ScalarField::zero(), vec![]);
+                    vec![leader_answer]
+                        .into_iter()
+                        .chain(std::iter::repeat_n(worker_answer, net.n_parties() - 1))
+                        .collect()
+                },
+                "d_open",
+            )
+            .await;
+
+        return result;
+    }
+
+    /// In this protocol, we make an optimization that batches all of dMSM into one round of communication.
+    pub async fn c_open<Net: MPCSerializeNet>(
         &self,
         peval: &Vec<E::ScalarField>,
         point: &Vec<E::ScalarField>,
@@ -240,7 +406,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         net: &Net,
         sid: MultiplexedStreamID,
     ) -> Result<(E::ScalarField, Vec<E::G1>), MPCNetError> {
-        let all_timer = start_timer!("Distributed opening", net.is_leader());
+        let all_timer = start_timer!("c_open", net.is_leader());
         let mut result = Vec::new();
         // n and l must be powers of 2
         let n: usize = peval.len().trailing_zeros() as usize; // peval.len = 2^n
@@ -267,7 +433,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
         end_timer!(timer);
         assert!(current_r.len() == 1);
         // Finally commit to all elements in a batch.
-        let mut res = self.d_commit(&result, pp, net, sid).await?;
+        let mut res = self.c_commit(&result, pp, net, sid).await?;
         // Next we go into packed shares
         // Notice that msm here should use non-packed base for commitment. Here this is simplified.
         let mut current_r = pss2ss(current_r[0], pp, net, sid).await?;
@@ -285,7 +451,7 @@ impl<E: Pairing> PolynomialCommitment<E> {
                 .zip(part1.iter())
                 .map(|(&x, &y)| (E::ScalarField::one() - point[i]) * x + point[i] * y)
                 .collect();
-            // Local small MSM between ss of q_i and ss of base. 
+            // Local small MSM between ss of q_i and ss of base.
             // Note that the base should also be regular shares, which is replaced by packed shares for simplicity here.
             let level = (q_i.len() * pp.l).trailing_zeros() as usize;
             res.push(E::G1::msm(&self.powers_of_g[level], &q_i).unwrap());
@@ -327,6 +493,7 @@ mod test {
     use ark_ec::bls12::Bls12;
     use ark_ec::pairing::Pairing;
     use ark_std::UniformRand;
+    use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
     // use mpc_net::{LocalTestNet, MPCNet, MultiplexedStreamID};
     // use secret_sharing::pss::PackedSharingParams;
     // const l: usize = 2;
@@ -346,12 +513,12 @@ mod test {
         let rng = &mut ark_std::test_rng();
         let mut s = Vec::new();
         let mut u = Vec::new();
-        for _ in 0..4 {
+        for _ in 0..8 {
             s.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
             u.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
         }
         let mut peval = Vec::new();
-        for _ in 0..2_usize.pow(4) {
+        for _ in 0..2_usize.pow(8) {
             peval.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
         }
         let g1 = <Bls12<ark_bls12_381::Config> as Pairing>::G1::rand(rng);
@@ -363,71 +530,55 @@ mod test {
         assert!(adult.verify(commitment, value, &proof, &u));
     }
 
-    // #[tokio::test]
-    // async fn should_d_commit_and_open() {
-    //     let rng = &mut ark_std::test_rng();
-    //     let mut s = Vec::new();
-    //     let mut u = Vec::new();
-    //     for _ in 0..4 {
-    //         s.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
-    //         u.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
-    //     }
-    //     let mut peval = Vec::new();
-    //     for _ in 0..2_usize.pow(4) {
-    //         peval.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
-    //     }
-    //     let mut shares = vec![Vec::new(); l * 4];
-    //     let pp =
-    //         PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
-    //     peval.chunks(l).for_each(|chunk| {
-    //         let chunk = chunk.to_vec();
-    //         let chunk = pp.pack_from_public(chunk);
-    //         chunk.into_iter().enumerate().for_each(|(i, share)| {
-    //             shares[i].push(share);
-    //         })
-    //     });
-    //     let g1 = <Bls12<ark_bls12_381::Config> as Pairing>::G1::rand(rng);
-    //     let g2 = <Bls12<ark_bls12_381::Config> as Pairing>::G2::rand(rng);
-    //     let cub = PolynomialCommitmentCub::<Bls12_381>::new(g1, g2, s);
-    //     let adult = cub.to_packed(&pp);
-    //     let verification = cub.mature();
-    //     let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
-    //     let result = net
-    //         .simulate_network_round(
-    //             (u.clone(), adult, shares),
-    //             |net, (u, adult, shares)| async move {
-    //                 let pp = PackedSharingParams::<
-    //                     <Bls12<ark_bls12_381::Config> as Pairing>::ScalarField,
-    //                 >::new(l);
-    //                 let adult = adult[net.party_id() as usize].clone();
-    //                 let share = shares[net.party_id() as usize].clone();
-    //                 let commit = adult
-    //                     .d_commit(&share, &pp, &net, MultiplexedStreamID::Zero)
-    //                     .await
-    //                     .unwrap();
-    //                 let (value, proof) = adult
-    //                     .d_open(&share, &u, &pp, &net, MultiplexedStreamID::Zero)
-    //                     .await
-    //                     .unwrap();
-    //                 (commit, value, proof)
-    //             },
-    //         )
-    //         .await;
-    //     let (commitment, value, proof) = {
-    //         let mut commitment = Vec::new();
-    //         let mut value = Vec::new();
-    //         let mut proof = Vec::new();
-    //         for (c, v, p) in result {
-    //             commitment.push(c);
-    //             value.push(v);
-    //             proof.push(p);
-    //         }
-    //         let commitment = pp.unpack(commitment)[0];
-    //         let value = pp.unpack(value)[0];
-    //         let proof = transpose(proof);
-    //         let proof: Vec<_> = proof.into_iter().map(|v| pp.unpack(v)[0]).collect();
-    //         (commitment, value, proof)
-    //     };
-    //     assert!(verification.verify(commitment, value, &proof, &u));
-    // }
+    #[tokio::test]
+    async fn should_d_commit_and_open() {
+        let rng = &mut ark_std::test_rng();
+        let mut s = Vec::new();
+        let mut u = Vec::new();
+        for _ in 0..8 {
+            s.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
+            u.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
+        }
+        let mut peval = Vec::new();
+        for _ in 0..2_usize.pow(8) {
+            peval.push(<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField::rand(rng));
+        }
+        let g1 = <Bls12<ark_bls12_381::Config> as Pairing>::G1::rand(rng);
+        let g2 = <Bls12<ark_bls12_381::Config> as Pairing>::G2::rand(rng);
+        let cub = PolynomialCommitmentCub::<Bls12_381>::new(g1, g2, s.clone());
+        let ugly_cub = PolynomialCommitmentCub::<Bls12_381>::new_ugly(g1, g2, s, 8);
+        let commitment = ugly_cub.mature();
+        let verification = cub.mature();
+        let net = LocalTestNet::new_local_testnet(8).await.unwrap();
+        let result = net
+            .simulate_network_round(
+                (u.clone(), commitment, peval.clone()),
+                |net, (u, commitment, peval)| async move {
+                    let id = net.party_id();
+                    let peval = &peval[8 * id as usize..8 * (id + 1) as usize].into();
+                    let commit = commitment
+                        .d_commit(&peval, &net, MultiplexedStreamID::Zero)
+                        .await
+                        .unwrap();
+                    let (value, proof) = commitment
+                        .d_open(&peval, &u, &net, MultiplexedStreamID::Zero)
+                        .await
+                        .unwrap();
+                    (commit, value, proof)
+                },
+            )
+            .await;
+        let normal_commitment = verification.commit(&peval);
+        let normal_open = verification.open(&peval, &u);
+        let normal_value = normal_open.0;
+        let normal_proof = normal_open.1;
+        let d_commitment = result[0].0;
+        let d_value = result[0].1;
+        let d_proof = result[0].2.clone();
+        assert_eq!(normal_commitment, d_commitment);
+        assert_eq!(normal_value, d_value);
+        assert_eq!(normal_proof.len(), d_proof.len());
+        assert_eq!(normal_proof, d_proof);
+        assert!(verification.verify(result[0].0, result[0].1, &result[0].2, &u));
+    }
 }

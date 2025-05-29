@@ -30,6 +30,7 @@ pub fn wrap_stream<T: AsyncRead + AsyncWrite>(stream: T) -> Framed<T, LengthDeli
     LengthDelimitedCodec::builder()
         .big_endian()
         .length_field_type::<u32>()
+        .max_frame_length(32*1024*1024)
         .new_framed(stream)
 }
 

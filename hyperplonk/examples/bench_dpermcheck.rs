@@ -5,10 +5,10 @@ use ark_ec::{bls12::Bls12, pairing::Pairing};
 
 use clap::Parser;
 
-use hyperplonk::dhyperplonk::dhyperplonk;
+use env_logger;
+use hyperplonk::dhyperplonk::dpermcheck;
 use hyperplonk::dhyperplonk::PackedProvingParameters;
 use mpc_net::multi::MPCNetConnection;
-use env_logger;
 use mpc_net::MultiplexedStreamID;
 use secret_sharing::pss::PackedSharingParams;
 use tokio::net::TcpStream;
@@ -30,20 +30,22 @@ struct Cli {
 #[cfg_attr(feature = "single_thread", tokio::main(flavor = "current_thread"))]
 #[cfg_attr(not(feature = "single_thread"), tokio::main)]
 async fn main() {
-    env_logger::builder().format_timestamp(None).filter_level(log::LevelFilter::Trace).init();
+    env_logger::builder()
+        .format_timestamp(None)
+        .filter_level(log::LevelFilter::Trace)
+        .init();
     let args = Cli::parse();
     let mut net = MPCNetConnection::init_from_path(&args.file, args.id);
     net.listen().await.unwrap();
     net.connect_to_all().await.unwrap();
-    hyperplonk_distributed_bench(&net, args.n, args.l).await;
+    permcheck_distributed_bench(&net, args.n, args.l).await;
 }
 
-
-async fn hyperplonk_distributed_bench(net: &MPCNetConnection<TcpStream>, n: usize, l: usize) {
+async fn permcheck_distributed_bench(net: &MPCNetConnection<TcpStream>, n: usize, l: usize) {
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     let params = PackedProvingParameters::new(n, l, &pp);
     black_box(
-        dhyperplonk::<Bls12<ark_bls12_381::Config>, _>(
+        dpermcheck::<Bls12<ark_bls12_381::Config>, _>(
             n,
             &params,
             &pp,

@@ -50,7 +50,7 @@ impl Delegator {
             Worker {
                 x_shares: Vec::new()
             };
-            l * 4
+            l * 8
         ];
         let pp = PackedSharingParams::<Fr>::new(l);
         self.x.chunks(l).enumerate().for_each(|(_, chunk)| {

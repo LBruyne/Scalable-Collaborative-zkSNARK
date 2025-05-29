@@ -7,14 +7,11 @@ if [ -z "$1" ]; then
 fi
 
 # bash pack.sh
-
+trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 # IP address file parameter
 ip_address_file="$1"
 
 while read -r ip_address; do
-    # Define the log file for each IP address
-    log_file="$log_dir/log_${index}_${m}_${l}.txt"
-        
     # Run the processes in parallel and redirect stdout to the log file
     (
         scp -o StrictHostKeyChecking=no -i ~/.ssh/zkp.pem tmp.zip run.sh "root@$ip_address:/tmp/"
@@ -26,8 +23,12 @@ wait
 
 # Create a temporary directory for log files
 log_dir="./output"
-for m in {21..21}; do
-    for log_l in {3..5}; do
+for m in {16..28}; do
+    for log_l in {1..5}; do
+    # if (( m - log_l >= 20 )); then
+    #     echo "Skipping iteration: m = $m, log_l = $log_l (m - log_l >= 20)"
+    #     continue
+    # fi
     l=$((2**$log_l))
     echo "Running m = $m and l = $l"
     index=0
@@ -60,3 +61,4 @@ EOF
     done
 done
 echo "All processes have completed. Log files are located in: $log_dir"
+tar czf output.tar.gz $log_dir

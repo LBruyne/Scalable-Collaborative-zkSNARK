@@ -56,7 +56,7 @@ async fn main() {
         end_timer!(nmsm);
 
         // Distributed msm
-        let network = Net::new_local_testnet(L * 4).await.unwrap();
+        let network = Net::new_local_testnet(L * 8).await.unwrap();
         network
             .simulate_network_round(
                 (x_share, y_share),

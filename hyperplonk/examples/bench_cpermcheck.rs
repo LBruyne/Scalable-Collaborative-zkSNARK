@@ -5,7 +5,7 @@ use ark_ec::{bls12::Bls12, pairing::Pairing};
 
 use clap::Parser;
 
-use hyperplonk::dhyperplonk::dhyperplonk;
+use hyperplonk::dhyperplonk::cpermcheck;
 use hyperplonk::dhyperplonk::PackedProvingParameters;
 use mpc_net::multi::MPCNetConnection;
 use env_logger;
@@ -35,15 +35,15 @@ async fn main() {
     let mut net = MPCNetConnection::init_from_path(&args.file, args.id);
     net.listen().await.unwrap();
     net.connect_to_all().await.unwrap();
-    hyperplonk_distributed_bench(&net, args.n, args.l).await;
+    permcheck_distributed_bench(&net, args.n, args.l).await;
 }
 
 
-async fn hyperplonk_distributed_bench(net: &MPCNetConnection<TcpStream>, n: usize, l: usize) {
+async fn permcheck_distributed_bench(net: &MPCNetConnection<TcpStream>, n: usize, l: usize) {
     let pp = PackedSharingParams::<<Bls12<ark_bls12_381::Config> as Pairing>::ScalarField>::new(l);
     let params = PackedProvingParameters::new(n, l, &pp);
     black_box(
-        dhyperplonk::<Bls12<ark_bls12_381::Config>, _>(
+        cpermcheck::<Bls12<ark_bls12_381::Config>, _>(
             n,
             &params,
             &pp,

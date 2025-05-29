@@ -6,8 +6,8 @@ use ark_bls12_377::Fr;
 use ark_std::UniformRand;
 
 use clap::Parser;
-use dist_primitive::dsumcheck::d_sumcheck_product;
-use dist_primitive::dsumcheck::d_sumcheck;
+use dist_primitive::dsumcheck::c_sumcheck_product;
+use dist_primitive::dsumcheck::c_sumcheck;
 use dist_primitive::dsumcheck::sumcheck_product;
 use dist_primitive::dsumcheck::sumcheck;
 use dist_primitive::utils::operator::transpose;
@@ -81,7 +81,7 @@ impl ProductDelegator {
 
 #[derive(Parser)]
 struct Cli {
-    /// The packing size, should be 1/4 of the party size as well as a power of 2.
+    /// The packing size, should be 1/8 of the party size as well as a power of 2.
     #[arg(long)]
     l: usize,
     /// log2 of the total number of variables.
@@ -114,10 +114,10 @@ async fn sumcheck_bench(n: usize, l: usize) {
     end_timer!(sc);
     black_box(proof);
     
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     let x = delegator.delegate(l);
-    let dsc = start_timer!("Distributed Sumcheck Leader");
-    let proof = d_sumcheck(
+    let dsc = start_timer!("Collaborative Sumcheck Leader");
+    let proof = c_sumcheck(
         &x[net.get_leader().party_id() as usize],
         &challenge,
         &pp,
@@ -145,7 +145,7 @@ async fn sumcheck_bench(n: usize, l: usize) {
     end_timer!(sc);
     black_box(proof);
 
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
     let dsc = start_timer!("Simulate sumcheck");
     // This is a Vec of Vecs, where each Vec is a party's shares.
@@ -158,7 +158,7 @@ async fn sumcheck_bench(n: usize, l: usize) {
             (shares, challenge.clone()),
             move |net, (shares, challenge)| async move {
                 let pp = PackedSharingParams::<Fr>::new(l);
-                let res = d_sumcheck(
+                let res = c_sumcheck(
                     black_box(&shares[net.party_id() as usize]),
                     black_box(&challenge),
                     &pp,
@@ -196,10 +196,10 @@ async fn sumcheck_product_bench(n: usize, l: usize) {
     end_timer!(sc);
     black_box(proof);
     
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     let (x, y) = delegator.delegate(l);
-    let dsc = start_timer!("Distributed SumcheckProduct Leader");
-    let proof = d_sumcheck_product(
+    let dsc = start_timer!("Collaborative SumcheckProduct Leader");
+    let proof = c_sumcheck_product(
         &x[net.get_leader().party_id() as usize],
         &y[net.get_leader().party_id() as usize],
         &challenge,
@@ -228,7 +228,7 @@ async fn sumcheck_product_bench(n: usize, l: usize) {
     end_timer!(sc);
     black_box(proof);
 
-    let net = LocalTestNet::new_local_testnet(l * 4).await.unwrap();
+    let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     // Now simulate the protocol
     let dsc = start_timer!("Simulate SumcheckProduct");
     // This is a Vec of Vecs, where each Vec is a party's shares.
@@ -241,7 +241,7 @@ async fn sumcheck_product_bench(n: usize, l: usize) {
             (shares, challenge.clone()),
             move |net, (shares, challenge)| async move {
                 let pp = PackedSharingParams::<Fr>::new(l);
-                let res = d_sumcheck_product(
+                let res = c_sumcheck_product(
                     black_box(&shares.0[net.party_id() as usize]),
                     black_box(&shares.1[net.party_id() as usize]),
                     &challenge,
