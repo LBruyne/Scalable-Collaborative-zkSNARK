@@ -1,6 +1,6 @@
 # Scalable-Collaborative-zk-SNARK
 
-Rust implementation of the paper "[Scalable Collaborative zk-SNARK and its Application to Fully Distributed Proof Delegation](https://eprint.iacr.org/2024/940)".
+Rust implementation of the paper "[Scalable Collaborative zk-SNARK and its Application to Fully Distributed Proof Delegation](https://eprint.iacr.org/2024/940)", which appears in [*USENIX Security 2025*](https://www.usenix.org/conference/usenixsecurity25).
 
 **⚠️ WARNING**: This is an academic proof-of-concept prototype and has **not** undergone a thorough code review. It is **NOT suitable** for production use. The benchmarks are intended primarily to measure time, memory, and communication complexities; **correctness of the output proofs is not guaranteed**.
 
