@@ -17,7 +17,7 @@ Rust implementation of the paper "[Scalable Collaborative zk-SNARK and its Appli
 
 ## Illustration
 
-<!-- **Artifact Evaluation**: For artifact evaluation reviewers, please jump to [How to Benchmark](#benchmark). -->
+**🙋 Artifact Evaluation**: For artifact evaluation reviewers, we provide detailed guidance. You can jump to [How to Benchmark](#benchmark).
 
 In this work, we assume multiparty is connected through a peer-to-peer network for smooth operation of the MPC protocol. Each peer can be a low-end instance (e.g., 2 vCPU and 4 GB memory is enough). Upon receiving the secret-shared witness, the parties collaborate to generate a ZK proof for large-scale circuits while preserving witness privacy.
 
@@ -46,7 +46,7 @@ cargo 1.80.0-nightly (05364cb2f 2024-05-03)
 
 The benchmarks are based on the `benchmark` mode. A crucial parameter is $l$, which represents the packing factor as defined in the paper. To run a benchmark with packing factor $l$, you need $l \times 8$ servers/machines. The expected speedup is approximately between $l$ and $2l$ times.
 
-<!-- **Artifact Evaluation**: We understand that it may be difficult for reviewers to access a large number of servers to reproduce the results in the `benchmark` mode, although the results presented in the paper were obtained using this mode. Therefore, you can use the `local` mode to simulate the results. Jump to [here](#collaborative--distributed-primitives) for references. Remember to divide the total execution time by the number of servers $N$ to estimate the actual running time. -->
+**🙋 Artifact Evaluation**: We understand that it may be difficult for reviewers to access a large number of servers to reproduce the results in the `benchmark` mode, although the results presented in the paper were obtained using this mode. Therefore, you can use the `local` mode to simulate the results. Jump to [here](#collaborative--distributed-primitives) for references. Remember to divide the total execution time by the number of servers $N$ to estimate the actual running time.
 
 If you have an additional *jump server* for your cluster, deploying the cluster becomes easier. A script is provided at `hack/prepare-server.sh` to prepare the jump server for running benchmarks. For inter-server communication, you will need an IP address file containing the list of server IPs in the following format:
 ```
