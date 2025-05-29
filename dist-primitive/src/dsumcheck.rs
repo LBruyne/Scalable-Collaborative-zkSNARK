@@ -9,12 +9,13 @@ pub fn sumcheck<F: FftField>(evaluation: &Vec<F>, challenge: &Vec<F>) -> Vec<(F,
     let n: usize = evaluation.len().trailing_zeros() as usize;
     for i in 0..n {
         let parts = last_round.split_at(last_round.len() / 2);
+        let one_minus_challenge = F::ONE - challenge[i];
         result.push((parts.0.iter().sum(), parts.1.iter().sum()));
         let this_round = parts
             .0
             .iter()
             .zip(parts.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
         last_round = this_round;
     }
@@ -36,6 +37,7 @@ pub fn sumcheck_product<F: FftField>(
     for i in 0..n {
         let parts_f = last_round_f.split_at(last_round_f.len() / 2);
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
+        let one_minus_challenge = F::ONE - challenge[i];
         // t=0
         let part0_sum = parts_f
             .0
@@ -72,13 +74,13 @@ pub fn sumcheck_product<F: FftField>(
             .0
             .iter()
             .zip(parts_f.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
         last_round_g = parts_g
             .0
             .iter()
             .zip(parts_g.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
     }
     debug_assert!(last_round_f.len() == 1);
@@ -104,6 +106,7 @@ pub async fn c_sumcheck<F: FftField, Net: MPCSerializeNet>(
     let timer = start_timer!("Local: Phase 1", net.is_leader());
     for i in 0..n {
         let parts = last_round.split_at(last_round.len() / 2);
+        let one_minus_challenge = F::ONE - challenge[i];
         let res1 = parts.0.iter().sum();
         let res2 = parts.1.iter().sum();
         result.push((res1, res2));
@@ -112,7 +115,7 @@ pub async fn c_sumcheck<F: FftField, Net: MPCSerializeNet>(
             .0
             .iter()
             .zip(parts.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
         last_round = this_round;
     }
@@ -123,6 +126,7 @@ pub async fn c_sumcheck<F: FftField, Net: MPCSerializeNet>(
     let timer = start_timer!("Local: Phase 2", net.is_leader());
     for i in 0..l {
         let parts = last_round.split_at(last_round.len() / 2);
+        let one_minus_challenge = F::ONE - challenge[i];
         let res1 = parts.0.iter().sum();
         let res2 = parts.1.iter().sum();
         result.push((res1, res2));
@@ -131,7 +135,7 @@ pub async fn c_sumcheck<F: FftField, Net: MPCSerializeNet>(
             .0
             .iter()
             .zip(parts.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
         last_round = this_round;
     }
@@ -163,6 +167,7 @@ pub async fn c_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     for i in 0..n {
         let parts_f = last_round_f.split_at(last_round_f.len() / 2);
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
+        let one_minus_challenge = F::ONE - challenge[i];
         let res: (F, F, F) = {
             // t=0
             let part0_sum = parts_f
@@ -203,13 +208,13 @@ pub async fn c_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
             .0
             .iter()
             .zip(parts_f.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
         last_round_g = parts_g
             .0
             .iter()
             .zip(parts_g.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
     }
     end_timer!(timer);
@@ -222,6 +227,7 @@ pub async fn c_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     for i in 0..l {
         let parts_f = last_round_f.split_at(last_round_f.len() / 2);
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
+        let one_minus_challenge = F::ONE - challenge[i];
         let res = {
             // t=0
             let part0_sum = parts_f
@@ -262,13 +268,13 @@ pub async fn c_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
             .0
             .iter()
             .zip(parts_f.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
         last_round_g = parts_g
             .0
             .iter()
             .zip(parts_g.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
     }
     end_timer!(timer);
@@ -279,7 +285,7 @@ pub async fn c_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
 }
 
 pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
-    A_f: &Vec<F>,
+    partial_poly: &Vec<F>,
     challenge: &Vec<F>,
     net: &Net,
     sid: MultiplexedStreamID,
@@ -287,13 +293,14 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
     let d_sumcheck_timer = start_timer!("Distributed sumcheck", net.is_leader());
     let mut result = Vec::new();
     // n and l must be powers of 2
-    let n = A_f.len().trailing_zeros() as usize;
+    let n = partial_poly.len().trailing_zeros() as usize;
     let s = net.n_parties().trailing_zeros() as usize;
-    let mut last_round = A_f.clone();
+    let mut last_round = partial_poly.clone();
     // Phase 1
     let timer = start_timer!("Local: Phase 1", net.is_leader());
     for i in 0..n {
         let parts = last_round.split_at(last_round.len() / 2);
+        let one_minus_challenge = F::ONE - challenge[i];
         let res1 = parts.0.iter().sum();
         let res2 = parts.1.iter().sum();
         result.push((res1, res2));
@@ -302,7 +309,7 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
             .0
             .iter()
             .zip(parts.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
         last_round = this_round;
     }
@@ -323,10 +330,11 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
                     .reduce(|(a1, b1), (a2, b2)| (a1 + a2, b1 + b2))
             })
             .collect::<Vec<_>>();
-        let A_f = local_polys.iter().map(|x| x.last().unwrap().1).collect::<Vec<_>>();
-        let mut last_round = A_f.clone();
+        let leader_f = local_polys.iter().map(|x| x.last().unwrap().1).collect::<Vec<_>>();
+        let mut last_round = leader_f.clone();
         for i in n..n+s {
             let parts = last_round.split_at(last_round.len() / 2);
+            let one_minus_challenge = F::ONE - challenge[i];
             let res1 = parts.0.iter().sum();
             let res2 = parts.1.iter().sum();
             result.push((res1, res2));
@@ -334,7 +342,7 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
                 .0
                 .iter()
                 .zip(parts.1.iter())
-                .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+                .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
                 .collect::<Vec<_>>();
             last_round = this_round;
         }
@@ -349,19 +357,19 @@ pub async fn d_sumcheck<F: FftField, Net: MPCSerializeNet>(
 }
 
 pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
-    A_f: &Vec<F>,
-    A_g: &Vec<F>,
+    partial_f: &Vec<F>,
+    partial_g: &Vec<F>,
     challenge: &Vec<F>,
     net: &Net,
     sid: MultiplexedStreamID,
 ) -> Result<Vec<(F, F, F)>, MPCNetError> {
     let d_sumcheck_product_timer = start_timer!("Distributed sumcheck product", net.is_leader());
     let mut result = Vec::new();
-    let n = A_f.len().trailing_zeros() as usize;
+    let n = partial_f.len().trailing_zeros() as usize;
     let s = net.n_parties().trailing_zeros() as usize;
-    assert_eq!(A_f.len(), A_g.len());
-    let mut last_round_f = A_f.clone();
-    let mut last_round_g = A_g.clone();
+    assert_eq!(partial_f.len(), partial_g.len());
+    let mut last_round_f = partial_f.clone();
+    let mut last_round_g = partial_g.clone();
     // Phase 1
     // In this part the shares can be viewed as a whole. There's no need to go into them
     // The result of this part is a degree 2d share since we perform multiplication between shares.
@@ -369,6 +377,7 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     for i in 0..n {
         let parts_f = last_round_f.split_at(last_round_f.len() / 2);
         let parts_g = last_round_g.split_at(last_round_g.len() / 2);
+        let one_minus_challenge = F::ONE - challenge[i];
         let res: (F, F, F) = {
             // t=0
             let part0_sum = parts_f
@@ -409,13 +418,13 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
             .0
             .iter()
             .zip(parts_f.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
         last_round_g = parts_g
             .0
             .iter()
             .zip(parts_g.1.iter())
-            .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+            .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
             .collect::<Vec<_>>();
     }
     end_timer!(timer);
@@ -436,13 +445,14 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                     .reduce(|(a1, b1, c1), (a2, b2, c2)| (a1 + a2, b1 + b2, c1 + c2))
             })
             .collect::<Vec<_>>();
-        let A_f = local_polys.iter().map(|x| x.last().unwrap().1).collect::<Vec<_>>();
-        let A_g = local_polys.iter().map(|x| x.last().unwrap().0).collect::<Vec<_>>();
-        let mut last_round_f = A_f.clone();
-        let mut last_round_g = A_g.clone();
+        let leader_f = local_polys.iter().map(|x| x.last().unwrap().1).collect::<Vec<_>>();
+        let leader_g: Vec<_> = local_polys.iter().map(|x| x.last().unwrap().0).collect::<Vec<_>>();
+        let mut last_round_f = leader_f.clone();
+        let mut last_round_g = leader_g.clone();
         for i in n..n+s {
             let parts_f = last_round_f.split_at(last_round_f.len() / 2);
             let parts_g = last_round_g.split_at(last_round_g.len() / 2);
+            let one_minus_challenge = F::ONE - challenge[i];
             let res: (F, F, F) = {
                 // t=0
                 let part0_sum = parts_f
@@ -483,13 +493,13 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
                 .0
                 .iter()
                 .zip(parts_f.1.iter())
-                .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+                .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
                 .collect::<Vec<_>>();
             last_round_g = parts_g
                 .0
                 .iter()
                 .zip(parts_g.1.iter())
-                .map(|(a, b)| *a * (F::ONE - challenge[i]) + *b * challenge[i])
+                .map(|(a, b)| *a * one_minus_challenge + *b * challenge[i])
                 .collect::<Vec<_>>();
         }
         end_timer!(timer);
@@ -500,76 +510,6 @@ pub async fn d_sumcheck_product<F: FftField, Net: MPCSerializeNet>(
     end_timer!(d_sumcheck_product_timer);
     Ok(result)
 }
-
-// pub struct SumcheckProof<F: FftField>(Vec<Vec<F>>);
-
-// pub async fn d_sum<F: FftField, Net: MPCSerializeNet>(
-//     share: F,
-//     pp: &PackedSharingParams<F>,
-//     net: &Net,
-//     sid: MultiplexedStreamID,
-// ) -> Result<F, MPCNetError> {
-//     net.leader_compute_element(&share, sid, |shares| {
-//         let values = pp.unpack(shares);
-//         let sum = values.iter().sum();
-//         pp.pack_from_public(vec![sum; pp.l])
-//     })
-//     .await
-// }
-
-// pub async fn d_sum2<F: FftField, Net: MPCSerializeNet>(
-//     share: F,
-//     pp: &PackedSharingParams<F>,
-//     net: &Net,
-//     sid: MultiplexedStreamID,
-// ) -> Result<F, MPCNetError> {
-//     net.leader_compute_element(&share, sid, |shares| {
-//         let values = pp.unpack2(shares);
-//         let sum = values.iter().sum();
-//         pp.pack_from_public(vec![sum; pp.l])
-//     })
-//     .await
-// }
-
-// pub async fn d_sum_masked<F: FftField, Net: MPCSerializeNet>(
-//     share: F,
-//     mask: &Vec<usize>,
-//     pp: &PackedSharingParams<F>,
-//     net: &Net,
-//     sid: MultiplexedStreamID,
-// ) -> Result<F, MPCNetError> {
-//     net.leader_compute_element(&share, sid, |shares| {
-//         let values = pp.unpack(shares);
-//         let mut sum = F::zero();
-//         values.iter().enumerate().for_each(|(i, v)| {
-//             if mask.get(i) == Some(&1) {
-//                 sum += v;
-//             }
-//         });
-//         pp.pack_from_public(vec![sum; pp.l])
-//     })
-//     .await
-// }
-
-// pub async fn d_sum2_masked<F: FftField, Net: MPCSerializeNet>(
-//     share: F,
-//     mask: &Vec<usize>,
-//     pp: &PackedSharingParams<F>,
-//     net: &Net,
-//     sid: MultiplexedStreamID,
-// ) -> Result<F, MPCNetError> {
-//     net.leader_compute_element(&share, sid, |shares| {
-//         let values = pp.unpack2(shares);
-//         let mut sum = F::zero();
-//         values.iter().enumerate().for_each(|(i, v)| {
-//             if mask.get(i) == Some(&1) {
-//                 sum += v;
-//             }
-//         });
-//         pp.pack_from_public(vec![sum; pp.l])
-//     })
-//     .await
-// }
 
 #[cfg(test)]
 mod tests {

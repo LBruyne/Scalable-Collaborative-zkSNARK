@@ -44,7 +44,7 @@ cargo 1.80.0-nightly (05364cb2f 2024-05-03)
 
 ### Benchmark
 
-The benchmarks are based on the `benchmark` mode. To run a benchmark with packing factor $l$ you need $l\times 8$ servers. 
+The benchmarks are based on the `benchmark` mode. A crucial parameter is $l$, which represents the packing factor as defined in the paper. To run a benchmark with packing factor $l$, you need $l \times 8$ servers. The expected speedup is approximately between $l$ and $2l$ times.
 
 <!-- **Artifact Evaluation**: We understand that it may be difficult for reviewers to access a large number of servers to reproduce the results in the `benchmark` mode, although the results presented in the paper were obtained using this mode. Therefore, you can use the `local` mode to simulate the results. Remember to divide the total execution time by the number of servers $N$ to estimate the actual running time. -->
 
@@ -97,16 +97,23 @@ If you don't have just, execute the examples using the raw cargo commands:
 RUSTFLAGS="-Ctarget-cpu=native -Awarnings" cargo +nightly run --release --example <example name> <args>
 ```
 
-For example, to run a collaborative sumcheck protocol in a local `leader` mode, run:
+For example, to run a collaborative sumcheck protocol in a `leader` mode (only one party executes its job locally), run:
 
 ```bash
-just run --release --example sumcheck -F leader -- --l 32 --n 20
+just run --release --example sumcheck -F leader -- --l 16 --n 20
 # WARNING: If you encounter a `Too many open files` error, please adjust your environment setting with `ulimit -HSn 65536` 
 ```
 
-This command will locally simulate one server's task in a cluster where $128=l*8$ parties engage in and the input number of sumcheck is $2^{20}$. 
+This command locally simulates the task of a single server in a network where $128 = l \times 8$ parties participate, and the input size for the sumcheck protocol is $2^{20}$. The output will indicate that the leader's running time is approximately $\frac{1}{16}$ of that of the local prover.
 
-To further benchmark the distributed primitives described in the paper, please check the scripts under `hack` folder (e.g., `hack/bench_sumcheck.sh`). We only provide commands for leader mode. To switch modes, try different Rust features. You can change to `benchmark` mode if you have enough hardware resources.
+Also you can run:
+```bash
+just run --release --example sumcheck -F local -- --l 16 --n 20
+```
+
+This command initiates a local network to perform the same task. The output time should be divided by $N = 128 = 8 \times 16$ to estimate the simulated execution time for each party.
+
+To further benchmark the collaborative primitives in a large scale, please check the scripts under `hack` folder (e.g., `hack/bench_sumcheck.sh`). We only provide commands for leader mode. To switch modes, try different Rust features. You can also change to `benchmark` mode if you have enough hardware resources.
 
 ### Collaborative ZKPs
 

@@ -116,7 +116,7 @@ async fn sumcheck_bench(n: usize, l: usize) {
     
     let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     let x = delegator.delegate(l);
-    let dsc = start_timer!("Distributed Sumcheck Leader");
+    let dsc = start_timer!("Collaborative Sumcheck Leader");
     let proof = c_sumcheck(
         &x[net.get_leader().party_id() as usize],
         &challenge,
@@ -198,7 +198,7 @@ async fn sumcheck_product_bench(n: usize, l: usize) {
     
     let net = LocalTestNet::new_local_testnet(l * 8).await.unwrap();
     let (x, y) = delegator.delegate(l);
-    let dsc = start_timer!("Distributed SumcheckProduct Leader");
+    let dsc = start_timer!("Collaborative SumcheckProduct Leader");
     let proof = c_sumcheck_product(
         &x[net.get_leader().party_id() as usize],
         &y[net.get_leader().party_id() as usize],
