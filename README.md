@@ -58,12 +58,17 @@ If you have an additional *jump server* for your cluster, deploying the cluster 
 ```
 Make sure the file ends with a newline, and provide the jump server's IP address as an input to the script. Notably, there are a few things to tweak:
 
-1. You need to change the username and identity file in the script.
-2. Be sure to check the `pack.sh` scripts and see if any path is not correct for your system. 
-3. Remove the zkSaaS-related lines if they are not available
-4. Change the directories if you don't like them
-5. Change the ports if they are not available
-6. You can use the `tc` command in a Linux machine to control the network speed to simulate LAN/WAN.
+1. You need to install `just` and `zip` command in the head.
+2. You need to change the username and identity file in the script. Currently, the script contains hardcoded values for the SSH identity file and username. For example:
+    ```
+    scp -i ~/.ssh/zkp.pem ~/.ssh/zkp.pem root@$2:/root/.ssh/
+    ```
+    You should replace the `.pem` file path, the username `root`, and any associated paths with your own settings. Be sure to update all occurrences consistently throughout the scripts to match your environment.
+3. Be sure to check the `pack.sh` scripts and see if any path is not correct for your system. 
+4. Remove the zkSaaS-related lines if they are not available
+5. Change the directories if you don't like them
+6. Change the ports if they are not available
+7. You can use the `tc` command in a Linux machine to control the network speed to simulate LAN/WAN.
 
 There are 4 benchmarks available. They are:
 1. [Collaborative and monolithic Hyperplonk (for general circuits)](./hack/run-hyperplonk/), coressponding to §5.2, Fig. 3, Tab. 2 in the paper
