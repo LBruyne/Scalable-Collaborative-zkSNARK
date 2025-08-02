@@ -17,7 +17,7 @@ Rust implementation of the paper "[Scalable Collaborative zk-SNARK and its Appli
 
 ## Illustration
 
-<!-- **Artifact Evaluation**: For artifact evaluation reviewers, please jump to [How to Benchmark](#benchmark). -->
+**🙋 Artifact Evaluation**: For artifact evaluation reviewers, we provide detailed guidance. You can jump to [How to Benchmark](#benchmark).
 
 In this work, we assume multiparty is connected through a peer-to-peer network for smooth operation of the MPC protocol. Each peer can be a low-end instance (e.g., 2 vCPU and 4 GB memory is enough). Upon receiving the secret-shared witness, the parties collaborate to generate a ZK proof for large-scale circuits while preserving witness privacy.
 
@@ -46,7 +46,7 @@ cargo 1.80.0-nightly (05364cb2f 2024-05-03)
 
 The benchmarks are based on the `benchmark` mode. A crucial parameter is $l$, which represents the packing factor as defined in the paper. To run a benchmark with packing factor $l$, you need $l \times 8$ servers/machines. The expected speedup is approximately between $l$ and $2l$ times.
 
-<!-- **Artifact Evaluation**: We understand that it may be difficult for reviewers to access a large number of servers to reproduce the results in the `benchmark` mode, although the results presented in the paper were obtained using this mode. Therefore, you can use the `local` mode to simulate the results. Jump to [here](#collaborative--distributed-primitives) for references. Remember to divide the total execution time by the number of servers $N$ to estimate the actual running time. -->
+**🙋 Artifact Evaluation**: We understand that it may be difficult for reviewers to access a large number of servers to reproduce the results in the `benchmark` mode, although the results presented in the paper were obtained using this mode. Therefore, you can use the `local` mode to simulate the results. Jump to [here](#collaborative--distributed-primitives) for references. Remember to divide the total execution time by the number of servers $N$ to estimate the actual running time.
 
 If you have an additional *jump server* for your cluster, deploying the cluster becomes easier. A script is provided at `hack/prepare-server.sh` to prepare the jump server for running benchmarks. For inter-server communication, you will need an IP address file containing the list of server IPs in the following format:
 ```
@@ -58,12 +58,17 @@ If you have an additional *jump server* for your cluster, deploying the cluster 
 ```
 Make sure the file ends with a newline, and provide the jump server's IP address as an input to the script. Notably, there are a few things to tweak:
 
-1. You need to change the username and identity file in the script.
-2. Be sure to check the `pack.sh` scripts and see if any path is not correct for your system. 
-3. Remove the zkSaaS-related lines if they are not available
-4. Change the directories if you don't like them
-5. Change the ports if they are not available
-6. You can use the `tc` command in a Linux machine to control the network speed to simulate LAN/WAN.
+1. You need to install `just` and `zip` command in the head.
+2. You need to change the username and identity file in the script. Currently, the script contains hardcoded values for the SSH identity file and username. For example:
+    ```
+    scp -i ~/.ssh/zkp.pem ~/.ssh/zkp.pem root@$2:/root/.ssh/
+    ```
+    You should replace the `.pem` file path, the username `root`, and any associated paths with your own settings. Be sure to update all occurrences consistently throughout the scripts to match your environment.
+3. Be sure to check the `pack.sh` scripts and see if any path is not correct for your system. 
+4. Remove the zkSaaS-related lines if they are not available
+5. Change the directories if you don't like them
+6. Change the ports if they are not available
+7. You can use the `tc` command in a Linux machine to control the network speed to simulate LAN/WAN.
 
 There are 4 benchmarks available. They are:
 1. [Collaborative and monolithic Hyperplonk (for general circuits)](./hack/run-hyperplonk/), coressponding to §5.2, Fig. 3, Tab. 2 in the paper

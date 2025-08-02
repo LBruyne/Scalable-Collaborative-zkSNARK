@@ -9,7 +9,6 @@ if [ -z "$2" ]; then
     exit 1
 fi
 
-
 address_file="$1"
 ip="$2"
 

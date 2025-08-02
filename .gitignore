@@ -36,3 +36,5 @@ hack/run-zksaas/tmp.zip
 **/tmp.zip
 *.zip
 ip_address.txt
+
+*.txt
